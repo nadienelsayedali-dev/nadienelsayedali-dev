@@ -5,66 +5,122 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Our Little Adventure</title>
 <style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020b13}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#020b13;
+}
 *{box-sizing:border-box}
+
 .scene{
- position:absolute;inset:0;
- background-size:cover;background-position:center;background-repeat:no-repeat;
- opacity:0;transform:scale(1.025);
- transition:opacity 1s ease,transform 1.4s ease;
- pointer-events:none;
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100dvh;
+  min-height:100vh;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
 }
-.scene.active{opacity:1;transform:scale(1);pointer-events:auto}
-#s1{background-image:url('scene1.png');cursor:pointer}
-#s2{background-image:url('scene2.png')}
-.shimmer{
- position:absolute;left:38%;right:-5%;top:34%;bottom:10%;
- background:repeating-linear-gradient(174deg,transparent 0 9px,rgba(255,255,255,.07) 10px 11px,transparent 12px 21px);
- mix-blend-mode:screen;opacity:.34;animation:water 4.6s linear infinite;pointer-events:none
+
+#scene1{
+  display:block;
+  background-image:url('scene1.png');
+  cursor:pointer;
 }
-@keyframes water{to{background-position:95px 38px;transform:translateX(1.2%)}}
-.fade{
- position:absolute;inset:0;background:#020b13;opacity:0;
- pointer-events:none;transition:opacity .5s ease;z-index:50
+
+#scene2{
+  display:none;
+  background-image:url('scene2_clean.png');
 }
-.fade.on{opacity:1}
-.tapHint{
- position:absolute;left:50%;bottom:2.5%;transform:translateX(-50%);
- color:rgba(255,235,190,.9);font:600 12px Georgia,serif;letter-spacing:.18em;
- text-shadow:0 2px 10px #000;opacity:.72;pointer-events:none
+
+.water{
+  position:absolute;
+  left:35%;
+  right:-4%;
+  top:36%;
+  bottom:0;
+  pointer-events:none;
+  opacity:.28;
+  mix-blend-mode:screen;
+  background:
+    repeating-linear-gradient(
+      176deg,
+      transparent 0 10px,
+      rgba(255,255,255,.08) 11px 12px,
+      transparent 13px 23px
+    );
+  animation:waterMove 5s linear infinite;
 }
+@keyframes waterMove{
+  to{background-position:110px 38px;transform:translateX(1.2%)}
+}
+
+#blackout{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:#01070c;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .65s ease;
+}
+#blackout.on{opacity:1}
+
 @media(max-width:760px){
- .scene{background-position:center}
- .tapHint{font-size:10px;bottom:1.8%}
+  .scene{background-position:center}
 }
 </style>
 </head>
 <body>
-<section id="s1" class="scene active" aria-label="Opening scene">
-  <div class="shimmer"></div>
-  <div class="tapHint">TAP ANYWHERE TO BEGIN</div>
+
+<section id="scene1" class="scene" aria-label="Opening scene">
+  <div class="water"></div>
 </section>
-<section id="s2" class="scene" aria-label="The message and approaching boat">
-  <div class="shimmer"></div>
+
+<section id="scene2" class="scene" aria-label="Message bottle and approaching boat">
+  <div class="water"></div>
 </section>
-<div id="fade" class="fade"></div>
+
+<div id="blackout"></div>
+
 <script>
-const s1=document.getElementById('s1');
-const s2=document.getElementById('s2');
-const fade=document.getElementById('fade');
-let started=false;
-function beginStory(){
-  if(started)return;
-  started=true;
-  fade.classList.add('on');
-  setTimeout(()=>{
-    s1.classList.remove('active');
-    s2.classList.add('active');
-    fade.classList.remove('on');
-  },520);
+const scene1 = document.getElementById('scene1');
+const scene2 = document.getElementById('scene2');
+const blackout = document.getElementById('blackout');
+let changing = false;
+
+function openScene2(){
+  if(changing) return;
+  changing = true;
+
+  // Fade Scene 1 completely to black.
+  blackout.classList.add('on');
+
+  setTimeout(() => {
+    // Scene 1 is removed from layout entirely.
+    scene1.style.display = 'none';
+
+    // Only after Scene 1 is gone, Scene 2 is shown.
+    scene2.style.display = 'block';
+
+    // Fade out the black screen to reveal Scene 2.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => blackout.classList.remove('on'));
+    });
+
+    changing = false;
+  }, 680);
 }
-s1.addEventListener('click',beginStory);
-s1.addEventListener('touchend',function(e){e.preventDefault();beginStory();},{passive:false});
+
+scene1.addEventListener('click', openScene2);
+scene1.addEventListener('touchend', function(e){
+  e.preventDefault();
+  openScene2();
+}, {passive:false});
 </script>
+
 </body>
 </html>
