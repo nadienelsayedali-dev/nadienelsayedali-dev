@@ -1,45 +1,111 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Our Little Adventure</title>
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020b13}
 *{box-sizing:border-box}
-#scene{position:relative;width:100vw;height:100dvh;min-height:100vh;overflow:hidden;background:url('scene1.png') center/cover no-repeat}
-#scene:before{content:"";position:absolute;inset:-2%;background:url('scene1.png') center/cover no-repeat;animation:camera 16s ease-in-out infinite alternate;z-index:0}
-@keyframes camera{from{transform:scale(1.01)}to{transform:scale(1.045) translate(-.35%,-.2%)}}
-.shimmer{position:absolute;z-index:1;left:42%;right:-5%;top:39%;bottom:19%;background:repeating-linear-gradient(174deg,transparent 0 9px,rgba(255,255,255,.08) 10px 11px,transparent 12px 20px);mix-blend-mode:screen;opacity:.42;animation:water 4s linear infinite;pointer-events:none}
-@keyframes water{to{background-position:90px 35px;transform:translateX(1.5%)}}
-.spark{position:absolute;z-index:2;width:4px;height:4px;border-radius:50%;background:#ffd37b;box-shadow:0 0 12px #ffc85d;opacity:0;pointer-events:none;animation:rise var(--d) ease-in-out infinite}
-@keyframes rise{0%{opacity:0;transform:translateY(20px) scale(.6)}25%{opacity:.9}100%{opacity:0;transform:translate(var(--x),-75px) scale(1.15)}}
-.clickzone{position:absolute;z-index:4;left:7%;top:54%;width:29%;height:14%;border:0;background:transparent;cursor:pointer}
-.fade{position:absolute;z-index:20;inset:0;background:#020b13;opacity:0;pointer-events:none;transition:opacity 1s ease}
+.scene{
+ position:absolute;inset:0;
+ background-size:cover;background-position:center;background-repeat:no-repeat;
+ opacity:0;transform:scale(1.035);
+ transition:opacity 1.15s ease,transform 1.6s ease;
+ pointer-events:none;
+}
+.scene.active{opacity:1;transform:scale(1);pointer-events:auto}
+#s1{background-image:url('scene1.png')}
+#s2{background-image:url('scene2.png')}
+
+.scene::before{
+ content:"";position:absolute;inset:0;
+ background:linear-gradient(90deg,rgba(2,10,18,.06),transparent 45%,rgba(0,0,0,.03));
+ pointer-events:none;
+}
+.shimmer{
+ position:absolute;left:38%;right:-5%;top:34%;bottom:10%;
+ background:repeating-linear-gradient(174deg,transparent 0 9px,rgba(255,255,255,.075) 10px 11px,transparent 12px 21px);
+ mix-blend-mode:screen;opacity:.36;animation:water 4.6s linear infinite;pointer-events:none
+}
+@keyframes water{to{background-position:95px 38px;transform:translateX(1.2%)}}
+.spark{
+ position:absolute;width:4px;height:4px;border-radius:50%;
+ background:#ffd37b;box-shadow:0 0 12px #ffc85d;opacity:0;
+ animation:rise var(--d) ease-in-out infinite;pointer-events:none
+}
+@keyframes rise{
+ 0%{opacity:0;transform:translateY(18px) scale(.7)}
+ 25%{opacity:.85}
+ 100%{opacity:0;transform:translate(var(--x),-70px) scale(1.15)}
+}
+.hotspot{
+ position:absolute;border:0;background:transparent;cursor:pointer;z-index:5
+}
+/* Matches the Begin the Story button already drawn into Scene 1 */
+#beginBtn{left:5.2%;top:66%;width:28%;height:11%}
+#nextBtn{right:4%;bottom:4%;width:20%;height:13%}
+.fade{
+ position:absolute;inset:0;background:#020b13;opacity:0;
+ pointer-events:none;transition:opacity .55s ease;z-index:50
+}
 .fade.on{opacity:1}
-@media(max-width:700px){#scene,#scene:before{background-position:58% center}.clickzone{left:3%;top:49%;width:52%;height:20%}}
-@media(prefers-reduced-motion:reduce){#scene:before,.shimmer,.spark{animation:none}}
+@media(max-width:760px){
+ .scene{background-position:center}
+ #beginBtn{left:2%;top:62%;width:45%;height:15%}
+ #nextBtn{right:2%;bottom:3%;width:30%;height:16%}
+}
+@media(prefers-reduced-motion:reduce){
+ .scene,.shimmer,.spark{animation:none;transition:none}
+}
 </style>
 </head>
 <body>
-<main id="scene" aria-label="Our Little Adventure opening scene">
+
+<section id="s1" class="scene active" aria-label="Opening scene">
   <div class="shimmer"></div>
-  <button class="clickzone" id="begin" aria-label="Begin the story"></button>
-  <div class="fade" id="fade"></div>
-</main>
+  <button id="beginBtn" class="hotspot" aria-label="Begin the story"></button>
+</section>
+
+<section id="s2" class="scene" aria-label="The message and approaching boat">
+  <div class="shimmer"></div>
+  <button id="nextBtn" class="hotspot" aria-label="Continue the adventure"></button>
+</section>
+
+<div id="fade" class="fade"></div>
+
 <script>
-const scene=document.getElementById('scene');
-for(let i=0;i<24;i++){
- const p=document.createElement('i');p.className='spark';
- p.style.left=(55+Math.random()*30)+'%';p.style.top=(65+Math.random()*22)+'%';
- p.style.setProperty('--d',(3+Math.random()*4)+'s');
- p.style.setProperty('--x',(-25+Math.random()*50)+'px');
- p.style.animationDelay=(-Math.random()*6)+'s';scene.appendChild(p);
+const s1=document.getElementById('s1');
+const s2=document.getElementById('s2');
+const fade=document.getElementById('fade');
+
+function addSparks(scene,count,minLeft,maxLeft,minTop,maxTop){
+ for(let i=0;i<count;i++){
+   const p=document.createElement('i');
+   p.className='spark';
+   p.style.left=(minLeft+Math.random()*(maxLeft-minLeft))+'%';
+   p.style.top=(minTop+Math.random()*(maxTop-minTop))+'%';
+   p.style.setProperty('--d',(3+Math.random()*4)+'s');
+   p.style.setProperty('--x',(-25+Math.random()*50)+'px');
+   p.style.animationDelay=(-Math.random()*6)+'s';
+   scene.appendChild(p);
+ }
 }
-document.getElementById('begin').onclick=()=>{
- const f=document.getElementById('fade');f.classList.add('on');
- setTimeout(()=>f.classList.remove('on'),1000);
-};
+addSparks(s1,22,55,83,66,90);
+addSparks(s2,16,52,88,58,88);
+
+document.getElementById('beginBtn').addEventListener('click',()=>{
+ fade.classList.add('on');
+ setTimeout(()=>{
+   s1.classList.remove('active');
+   s2.classList.add('active');
+   fade.classList.remove('on');
+ },560);
+});
+
+document.getElementById('nextBtn').addEventListener('click',()=>{
+ // Scene 3 will be connected here next.
+});
 </script>
 </body>
 </html>
