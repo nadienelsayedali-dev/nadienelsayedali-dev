@@ -7,65 +7,272 @@
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020b13}
 *{box-sizing:border-box}
-.scene{position:fixed;inset:0;width:100vw;height:100dvh;min-height:100vh;background-size:cover;background-position:center;background-repeat:no-repeat;display:none}
+.scene{
+  position:fixed;inset:0;width:100vw;height:100dvh;min-height:100vh;
+  background-size:cover;background-position:center;background-repeat:no-repeat;display:none
+}
 .scene.active{display:block}
 #s1{background-image:url('scene1.png');cursor:pointer}
 #s2{background-image:url('scene2_clean.png')}
 #s3{background-image:url('scene3_cartoon.png')}
-.water{position:absolute;left:30%;right:-4%;top:38%;bottom:0;pointer-events:none;opacity:.22;mix-blend-mode:screen;background:repeating-linear-gradient(176deg,transparent 0 10px,rgba(255,255,255,.075) 11px 12px,transparent 13px 23px);animation:water 5s linear infinite}
+
+.water{
+  position:absolute;left:30%;right:-4%;top:38%;bottom:0;pointer-events:none;
+  opacity:.22;mix-blend-mode:screen;
+  background:repeating-linear-gradient(176deg,transparent 0 10px,rgba(255,255,255,.075) 11px 12px,transparent 13px 23px);
+  animation:water 5s linear infinite
+}
 @keyframes water{to{background-position:110px 38px;transform:translateX(1.2%)}}
-#blackout{position:fixed;inset:0;z-index:100;background:#01070c;opacity:0;pointer-events:none;transition:opacity .6s ease}
+
+#blackout{
+  position:fixed;inset:0;z-index:100;background:#01070c;opacity:0;
+  pointer-events:none;transition:opacity .6s ease
+}
 #blackout.on{opacity:1}
 
-.missionCard{position:absolute;left:4%;top:8%;max-width:390px;padding:20px 24px;border:1px solid rgba(238,181,83,.7);border-radius:18px;background:rgba(2,12,25,.70);color:#ffe2a3;font-family:Georgia,serif;box-shadow:0 12px 40px #0008;backdrop-filter:blur(5px);z-index:8}
+.missionCard{
+  position:absolute;left:4%;top:8%;max-width:390px;padding:20px 24px;
+  border:1px solid rgba(238,181,83,.7);border-radius:18px;
+  background:rgba(2,12,25,.70);color:#ffe2a3;font-family:Georgia,serif;
+  box-shadow:0 12px 40px #0008;backdrop-filter:blur(5px);z-index:8
+}
 .missionCard b{display:block;font-size:clamp(18px,2.2vw,30px);margin-bottom:7px}
 .missionCard span{color:#fff4d8;font-size:clamp(13px,1.3vw,18px)}
 
-#start{position:absolute;left:60%;top:39%;width:90px;height:90px;border-radius:50%;border:2px solid #f4bd5e;box-shadow:0 0 0 10px #f4bd5e22,0 0 25px #f4bd5eaa;background:#f4bd5e0d;z-index:15;cursor:grab;touch-action:none}
-#target{position:absolute;left:24%;top:57%;width:150px;height:170px;border-radius:48%;border:2px solid #f4bd5e88;box-shadow:0 0 25px #f4bd5e55;z-index:10;pointer-events:none}
-#line{position:fixed;height:5px;border-radius:99px;background:linear-gradient(90deg,#f4bd5e,#fff0bd);box-shadow:0 0 15px #f4bd5e;transform-origin:0 50%;display:none;z-index:14;pointer-events:none}
+#armAnchor{
+  position:absolute;
+  left:62%;
+  top:44%;
+  width:1px;
+  height:1px;
+  z-index:12;
+}
 
-#success{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(1,8,18,.62);z-index:30}
+/* The actual extending arm */
+#stretchArm{
+  position:fixed;
+  height:34px;
+  width:0;
+  left:0;
+  top:0;
+  border-radius:999px;
+  background:linear-gradient(180deg,#b96e47 0%,#a95d3a 55%,#8f4c31 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(255,255,255,.18),
+    inset 0 -4px 8px rgba(80,30,15,.22),
+    0 4px 12px rgba(0,0,0,.28);
+  transform-origin:0 50%;
+  display:none;
+  z-index:13;
+  pointer-events:none;
+}
+
+/* Slight sleeve/shoulder cap to blend with the character */
+#shoulderCap{
+  position:fixed;
+  width:44px;height:44px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#c47b52,#9d5436 70%);
+  box-shadow:inset 0 2px 5px rgba(255,255,255,.15);
+  display:none;z-index:14;pointer-events:none
+}
+
+/* Hand at the end of the arm */
+#dragHand{
+  position:fixed;
+  width:48px;height:48px;border-radius:48% 52% 55% 45%;
+  background:radial-gradient(circle at 38% 32%,#cb8258 0%,#b46a45 55%,#945033 100%);
+  box-shadow:
+    inset 0 2px 5px rgba(255,255,255,.18),
+    0 4px 12px rgba(0,0,0,.28);
+  display:none;
+  z-index:15;
+  pointer-events:none;
+}
+#dragHand::before{
+  content:"";
+  position:absolute;
+  width:18px;height:9px;border-radius:999px;
+  background:#a85e3d;
+  right:-9px;top:12px;
+  transform:rotate(-18deg);
+}
+#dragHand::after{
+  content:"";
+  position:absolute;
+  width:19px;height:9px;border-radius:999px;
+  background:#a85e3d;
+  right:-8px;bottom:12px;
+  transform:rotate(12deg);
+}
+
+#start{
+  position:absolute;left:59.5%;top:40.5%;width:95px;height:95px;border-radius:50%;
+  border:2px solid rgba(244,189,94,.95);
+  box-shadow:0 0 0 10px rgba(244,189,94,.10),0 0 25px rgba(244,189,94,.72);
+  background:rgba(244,189,94,.03);
+  z-index:20;cursor:grab;touch-action:none
+}
+#target{
+  position:absolute;left:23%;top:56%;width:155px;height:180px;border-radius:48%;
+  border:2px solid rgba(244,189,94,.55);
+  box-shadow:0 0 25px rgba(244,189,94,.28);
+  z-index:10;pointer-events:none
+}
+
+#success{
+  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(1,8,18,.62);z-index:30
+}
 #success.show{display:flex}
-.successBox{text-align:center;color:#ffe4a8;background:rgba(3,15,30,.9);border:1px solid #dba94e;border-radius:24px;padding:28px 38px;box-shadow:0 18px 60px #000a;font-family:Georgia,serif}
+.successBox{
+  text-align:center;color:#ffe4a8;background:rgba(3,15,30,.9);
+  border:1px solid #dba94e;border-radius:24px;padding:28px 38px;
+  box-shadow:0 18px 60px #000a;font-family:Georgia,serif
+}
 .successBox h2{font-size:clamp(28px,4vw,54px);margin:0 0 8px}
 .successBox p{color:#fff4dc;font-size:18px}
-.successBox button{margin-top:12px;border:1px solid #dba94e;border-radius:999px;padding:13px 28px;background:#091a2a;color:#ffe0a0;font:600 16px Georgia,serif;cursor:pointer}
+.successBox button{
+  margin-top:12px;border:1px solid #dba94e;border-radius:999px;padding:13px 28px;
+  background:#091a2a;color:#ffe0a0;font:600 16px Georgia,serif;cursor:pointer
+}
 
 @media(max-width:760px){
- .missionCard{left:3%;top:5%;max-width:290px;padding:14px 16px}
- #start{left:59%;top:40%;width:70px;height:70px}
- #target{left:18%;top:57%;width:120px;height:145px}
+  .missionCard{left:3%;top:5%;max-width:290px;padding:14px 16px}
+  #start{left:58%;top:41%;width:74px;height:74px}
+  #target{left:17%;top:56%;width:125px;height:150px}
+  #stretchArm{height:28px}
+  #dragHand{width:40px;height:40px}
+  #shoulderCap{width:38px;height:38px}
 }
 </style>
 </head>
 <body>
+
 <section id="s1" class="scene active"><div class="water"></div></section>
 <section id="s2" class="scene"><div class="water"></div></section>
-<section id="s3" class="scene">
- <div class="water"></div>
- <div class="missionCard"><b>HELP HER REACH THE MESSAGE</b><span>Drag from her hand and stretch toward the bottle.</span></div>
- <div id="line"></div><div id="start"></div><div id="target"></div>
- <div id="success"><div class="successBox"><h2>You did it!</h2><p>You brought the message closer.</p><button id="continueBtn">CONTINUE</button></div></div>
-</section>
-<div id="blackout"></div>
-<script>
-const scenes=[...document.querySelectorAll('.scene')], blackout=document.getElementById('blackout');
-function show(id){
- blackout.classList.add('on');
- setTimeout(()=>{scenes.forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');requestAnimationFrame(()=>requestAnimationFrame(()=>blackout.classList.remove('on')))},620)
-}
-document.getElementById('s1').addEventListener('click',()=>{show('s2');setTimeout(()=>show('s3'),3300)});
 
-const start=document.getElementById('start'), target=document.getElementById('target'), line=document.getElementById('line'), success=document.getElementById('success');
+<section id="s3" class="scene">
+  <div class="water"></div>
+  <div class="missionCard">
+    <b>HELP HER REACH THE MESSAGE</b>
+    <span>Drag from her hand and stretch her arm toward the bottle.</span>
+  </div>
+
+  <div id="start" aria-label="Drag from her hand"></div>
+  <div id="target"></div>
+
+  <div id="stretchArm"></div>
+  <div id="shoulderCap"></div>
+  <div id="dragHand"></div>
+
+  <div id="success">
+    <div class="successBox">
+      <h2>You did it!</h2>
+      <p>She reached the bottle.</p>
+      <button id="continueBtn">CONTINUE</button>
+    </div>
+  </div>
+</section>
+
+<div id="blackout"></div>
+
+<script>
+const scenes=[...document.querySelectorAll('.scene')];
+const blackout=document.getElementById('blackout');
+
+function show(id){
+  blackout.classList.add('on');
+  setTimeout(()=>{
+    scenes.forEach(x=>x.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>blackout.classList.remove('on')));
+  },620);
+}
+
+document.getElementById('s1').addEventListener('click',()=>{
+  show('s2');
+  setTimeout(()=>show('s3'),3300);
+});
+
+const start=document.getElementById('start');
+const target=document.getElementById('target');
+const arm=document.getElementById('stretchArm');
+const hand=document.getElementById('dragHand');
+const shoulder=document.getElementById('shoulderCap');
+const success=document.getElementById('success');
+
 let dragging=false;
-function origin(){const r=start.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}}
-function draw(x,y){const o=origin(),dx=x-o.x,dy=y-o.y;line.style.left=o.x+'px';line.style.top=(o.y-2)+'px';line.style.width=Math.hypot(dx,dy)+'px';line.style.transform='rotate('+Math.atan2(dy,dx)*180/Math.PI+'deg)';line.style.display='block'}
-function hit(x,y){const r=target.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom}
-start.addEventListener('pointerdown',e=>{dragging=true;start.setPointerCapture?.(e.pointerId);draw(e.clientX,e.clientY)});
-window.addEventListener('pointermove',e=>{if(!dragging)return;draw(e.clientX,e.clientY);if(hit(e.clientX,e.clientY)){dragging=false;line.style.display='none';success.classList.add('show')}});
-window.addEventListener('pointerup',()=>{dragging=false;line.style.display='none'});
-document.getElementById('continueBtn').addEventListener('click',()=>{/* next shore scene goes here */});
+
+function anchorPoint(){
+  const r=start.getBoundingClientRect();
+  return {
+    x:r.left+r.width*0.55,
+    y:r.top+r.height*0.55
+  };
+}
+
+function placeArm(x,y){
+  const a=anchorPoint();
+  const dx=x-a.x, dy=y-a.y;
+  const len=Math.hypot(dx,dy);
+  const angle=Math.atan2(dy,dx)*180/Math.PI;
+
+  arm.style.left=a.x+'px';
+  arm.style.top=(a.y-17)+'px';
+  arm.style.width=Math.max(24,len)+'px';
+  arm.style.transform='rotate('+angle+'deg)';
+  arm.style.display='block';
+
+  shoulder.style.left=(a.x-22)+'px';
+  shoulder.style.top=(a.y-22)+'px';
+  shoulder.style.display='block';
+
+  hand.style.left=(x-24)+'px';
+  hand.style.top=(y-24)+'px';
+  hand.style.transform='rotate('+(angle*0.18)+'deg)';
+  hand.style.display='block';
+}
+
+function hitTarget(x,y){
+  const r=target.getBoundingClientRect();
+  return x>=r.left && x<=r.right && y>=r.top && y<=r.bottom;
+}
+
+function resetArm(){
+  arm.style.display='none';
+  hand.style.display='none';
+  shoulder.style.display='none';
+}
+
+start.addEventListener('pointerdown',e=>{
+  dragging=true;
+  start.setPointerCapture?.(e.pointerId);
+  placeArm(e.clientX,e.clientY);
+});
+
+window.addEventListener('pointermove',e=>{
+  if(!dragging)return;
+  placeArm(e.clientX,e.clientY);
+
+  if(hitTarget(e.clientX,e.clientY)){
+    dragging=false;
+    placeArm(e.clientX,e.clientY);
+    setTimeout(()=>{
+      resetArm();
+      success.classList.add('show');
+    },250);
+  }
+});
+
+window.addEventListener('pointerup',()=>{
+  if(!dragging)return;
+  dragging=false;
+  resetArm();
+});
+
+document.getElementById('continueBtn').addEventListener('click',()=>{
+  // Next shore scene will be connected here.
+});
 </script>
 </body>
 </html>
