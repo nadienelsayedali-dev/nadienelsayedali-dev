@@ -8,198 +8,170 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020b13}
 *{box-sizing:border-box}
 .scene{
-  position:fixed;inset:0;width:100vw;height:100dvh;min-height:100vh;
-  background-size:cover;background-position:center;background-repeat:no-repeat;
-  display:none
+ position:fixed;inset:0;width:100vw;height:100dvh;min-height:100vh;
+ background-size:cover;background-position:center;background-repeat:no-repeat;
+ display:none
 }
 .scene.active{display:block}
 #s1{background-image:url('scene1.png');cursor:pointer}
-#s2{background-image:url('scene2_clean.png')}
-#s3{background-image:url('scene3_final.png')}
+#s2{background-image:url('scene2_clean.png');cursor:pointer}
+#s3{background-image:url('scene3_clean_final.png')}
 
 .water{
-  position:absolute;left:28%;right:-5%;top:36%;bottom:0;pointer-events:none;
-  opacity:.20;mix-blend-mode:screen;
-  background:repeating-linear-gradient(176deg,transparent 0 10px,rgba(255,255,255,.07) 11px 12px,transparent 13px 23px);
-  animation:water 5s linear infinite
+ position:absolute;left:28%;right:-5%;top:36%;bottom:0;pointer-events:none;
+ opacity:.18;mix-blend-mode:screen;
+ background:repeating-linear-gradient(176deg,transparent 0 10px,rgba(255,255,255,.065) 11px 12px,transparent 13px 23px);
+ animation:water 5s linear infinite
 }
 @keyframes water{to{background-position:110px 38px;transform:translateX(1.2%)}}
 
 #blackout{
-  position:fixed;inset:0;z-index:100;background:#01070c;opacity:0;
-  pointer-events:none;transition:opacity .62s ease
+ position:fixed;inset:0;z-index:100;background:#01070c;opacity:0;
+ pointer-events:none;transition:opacity .62s ease
 }
 #blackout.on{opacity:1}
 
-/* Scene 2 story */
+/* Scene 2 — simple story, no frame */
 .story{
-  position:absolute;
-  left:6vw;top:50%;transform:translateY(-50%);
-  width:min(460px,36vw);
-  color:#fff2d0;
-  font-family:Georgia,serif;
-  text-shadow:0 3px 18px rgba(0,0,0,.75);
-  z-index:8
-}
-.story .eyebrow{
-  font-size:clamp(.75rem,1vw,.95rem);
-  letter-spacing:.22em;
-  text-transform:uppercase;
-  color:#e7b85c;
-  margin-bottom:15px
+ position:absolute;left:6vw;top:50%;transform:translateY(-50%);
+ width:min(480px,38vw);color:#fff5dd;font-family:Georgia,serif;
+ text-shadow:0 4px 20px rgba(0,0,0,.92);z-index:8
 }
 .story h2{
-  margin:0 0 18px;
-  font-size:clamp(2rem,3.8vw,4.2rem);
-  line-height:1.03;
-  font-weight:500
+ margin:0 0 16px;font-size:clamp(2rem,3.5vw,4.1rem);
+ line-height:1.05;font-weight:500
 }
 .story p{
-  margin:0;
-  font-size:clamp(1rem,1.45vw,1.35rem);
-  line-height:1.65;
-  color:#fff8e7
+ margin:0;font-size:clamp(1rem,1.4vw,1.3rem);line-height:1.65
 }
-.story .small{
-  margin-top:20px;
-  color:#e9bd68;
-  font-style:italic
+.story .gold{color:#efc46d;font-style:italic;margin-top:16px}
+.tap{
+ position:absolute;left:50%;bottom:3%;transform:translateX(-50%);
+ color:#f3cc7b;font:600 12px Georgia,serif;letter-spacing:.18em;
+ text-shadow:0 3px 12px #000;opacity:.85;z-index:9
 }
 
-/* Scene 3 mission card */
-.missionCard{
-  position:absolute;left:3.2%;top:6%;max-width:360px;
-  padding:18px 22px;border:1px solid rgba(234,176,76,.75);
-  border-radius:18px;background:rgba(2,12,25,.72);
-  color:#ffe1a0;font-family:Georgia,serif;z-index:8;
-  box-shadow:0 12px 40px rgba(0,0,0,.45);
-  backdrop-filter:blur(5px)
+/* Scene 3 — minimal UI */
+.missionTitle{
+ position:absolute;left:4%;top:5%;z-index:8;
+ color:#ffd889;font:600 clamp(1.2rem,2.1vw,2.2rem) Georgia,serif;
+ text-shadow:0 4px 18px #000
 }
-.missionCard b{
-  display:block;font-size:clamp(1.25rem,2vw,2rem);margin-bottom:7px
-}
-.missionCard span{
-  color:#fff7e4;font-size:clamp(.9rem,1.2vw,1.05rem);line-height:1.5
+.missionHint{
+ position:absolute;left:4%;top:11%;z-index:8;
+ color:#fff4da;font:italic clamp(.9rem,1.2vw,1.1rem) Georgia,serif;
+ text-shadow:0 3px 14px #000
 }
 
-/* Interactive articulated arm */
-#start{
-  position:absolute;
-  left:58.7%;
-  top:39.5%;
-  width:86px;height:86px;border-radius:50%;
-  border:2px solid rgba(244,189,94,.90);
-  box-shadow:0 0 0 10px rgba(244,189,94,.08),0 0 26px rgba(244,189,94,.60);
-  background:rgba(244,189,94,.02);
-  z-index:30;cursor:grab;touch-action:none
+/* The player grabs the visible illustrated hand */
+#grabHand{
+ position:absolute;
+ left:29.5%;
+ top:62%;
+ width:95px;height:95px;border-radius:50%;
+ border:2px solid rgba(246,199,105,.95);
+ box-shadow:0 0 0 10px rgba(246,199,105,.10),0 0 30px rgba(246,199,105,.8);
+ background:rgba(246,199,105,.035);
+ z-index:30;cursor:grab;touch-action:none;
+ animation:pulse 1.8s ease-in-out infinite
 }
+@keyframes pulse{50%{box-shadow:0 0 0 15px rgba(246,199,105,.04),0 0 38px rgba(246,199,105,.95)}}
+
+/* Bottle target */
 #target{
-  position:absolute;
-  left:22%;
-  top:61%;
-  width:150px;height:170px;border-radius:48%;
-  border:2px solid rgba(244,189,94,.55);
-  box-shadow:0 0 24px rgba(244,189,94,.28);
-  z-index:12;pointer-events:none
+ position:absolute;left:15%;top:68%;width:155px;height:165px;border-radius:48%;
+ border:2px solid rgba(246,199,105,.42);
+ box-shadow:0 0 24px rgba(246,199,105,.22);
+ z-index:12;pointer-events:none
 }
+
+/* Articulated overlay starts at SHOULDER, not chest */
 .limb{
-  position:fixed;
-  height:30px;
-  border-radius:999px;
-  background:linear-gradient(180deg,#b86e48,#a75c3d 55%,#8d4b32);
-  box-shadow:inset 0 3px 6px rgba(255,255,255,.15),inset 0 -4px 8px rgba(70,25,10,.18),0 4px 10px rgba(0,0,0,.28);
-  transform-origin:0 50%;
-  display:none;
-  z-index:20;
-  pointer-events:none
+ position:fixed;height:38px;border-radius:999px;
+ background:linear-gradient(180deg,#b87550,#a76142 58%,#915036);
+ box-shadow:inset 0 3px 6px rgba(255,255,255,.15),
+            inset 0 -4px 7px rgba(60,20,10,.18),
+            0 4px 12px rgba(0,0,0,.25);
+ transform-origin:0 50%;display:none;z-index:20;pointer-events:none
 }
 #elbow{
-  position:fixed;width:38px;height:38px;border-radius:50%;
-  background:radial-gradient(circle at 40% 35%,#c47b54,#985337 72%);
-  box-shadow:0 3px 10px rgba(0,0,0,.25);
-  display:none;z-index:22;pointer-events:none
+ position:fixed;width:45px;height:45px;border-radius:50%;
+ background:radial-gradient(circle at 38% 32%,#c68058,#9e593b 72%);
+ display:none;z-index:22;pointer-events:none
 }
-#hand{
-  position:fixed;width:46px;height:46px;border-radius:48% 52% 55% 45%;
-  background:radial-gradient(circle at 38% 32%,#cc835a,#b26947 58%,#925034);
-  box-shadow:0 4px 10px rgba(0,0,0,.28);
-  display:none;z-index:23;pointer-events:none
+#dragHand{
+ position:fixed;width:55px;height:55px;border-radius:50%;
+ background:radial-gradient(circle at 36% 30%,#cd865d,#ad6746 60%,#925138);
+ box-shadow:0 4px 12px rgba(0,0,0,.28);
+ display:none;z-index:23;pointer-events:none
 }
-#hand:before,#hand:after{
-  content:"";position:absolute;width:18px;height:8px;border-radius:999px;background:#a75f40;right:-8px
-}
-#hand:before{top:11px;transform:rotate(-16deg)}
-#hand:after{bottom:11px;transform:rotate(12deg)}
 
+/* Success: clean, tiny, no giant frame */
 #success{
-  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
-  background:rgba(1,8,18,.62);z-index:40
+ position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+ background:rgba(1,8,18,.48);z-index:40
 }
 #success.show{display:flex}
-.successBox{
-  text-align:center;color:#ffe4a8;background:rgba(3,15,30,.92);
-  border:1px solid #dba94e;border-radius:24px;padding:28px 38px;
-  box-shadow:0 18px 60px #000a;font-family:Georgia,serif
+.successText{
+ text-align:center;color:#fff4d9;font-family:Georgia,serif;
+ text-shadow:0 4px 20px #000
 }
-.successBox h2{font-size:clamp(2rem,4vw,3.4rem);margin:0 0 8px}
-.successBox p{color:#fff4dc;font-size:1.05rem}
-.successBox button{
-  margin-top:12px;border:1px solid #dba94e;border-radius:999px;padding:13px 28px;
-  background:#091a2a;color:#ffe0a0;font:600 16px Georgia,serif;cursor:pointer
+.successText h2{font-size:clamp(2.4rem,5vw,5rem);margin:0;color:#ffd47c}
+.successText p{font-size:clamp(1rem,1.4vw,1.3rem);margin:10px 0 22px}
+.successText button{
+ border:1px solid #e0b75f;border-radius:999px;padding:13px 28px;
+ background:rgba(5,20,34,.78);color:#ffe0a0;font:600 16px Georgia,serif
 }
 
 @media(max-width:760px){
-  .story{left:5vw;top:22%;transform:none;width:82vw}
-  .story h2{font-size:2.4rem}
-  .story p{font-size:1rem}
-  .missionCard{left:3%;top:4%;max-width:290px;padding:14px 16px}
-  #start{left:57%;top:40%;width:72px;height:72px}
-  #target{left:15%;top:61%;width:120px;height:145px}
-  .limb{height:24px}
-  #elbow{width:32px;height:32px}
-  #hand{width:40px;height:40px}
+ .story{left:5vw;top:20%;transform:none;width:86vw}
+ .story h2{font-size:2.3rem}
+ .missionTitle{left:4%;top:4%}
+ .missionHint{left:4%;top:9%}
+ #grabHand{left:28%;top:62%;width:74px;height:74px}
+ #target{left:10%;top:68%;width:125px;height:140px}
+ .limb{height:30px}
+ #elbow{width:36px;height:36px}
+ #dragHand{width:46px;height:46px}
 }
 </style>
 </head>
 <body>
 
 <section id="s1" class="scene active">
-  <div class="water"></div>
+ <div class="water"></div>
 </section>
 
 <section id="s2" class="scene">
-  <div class="water"></div>
-  <div class="story">
-    <div class="eyebrow">A message from the sea</div>
-    <h2>Something has been wandering through the ocean…</h2>
-    <p>Carrying a little secret meant only for you.</p>
-    <p class="small">And tonight, someone is coming to find it.</p>
-  </div>
+ <div class="water"></div>
+ <div class="story">
+   <h2>A message has been wandering through the ocean…</h2>
+   <p>Carrying a little secret meant only for you.</p>
+   <p class="gold">And tonight, someone is coming to find it.</p>
+ </div>
+ <div class="tap">TAP TO CONTINUE</div>
 </section>
 
 <section id="s3" class="scene">
-  <div class="water"></div>
+ <div class="water"></div>
+ <div class="missionTitle">Help her reach the message</div>
+ <div class="missionHint">Drag her hand toward the bottle.</div>
 
-  <div class="missionCard">
-    <b>HELP HER REACH THE MESSAGE</b>
-    <span>Drag from her hand. Her arm will bend and stretch toward the bottle.</span>
-  </div>
+ <div id="grabHand" aria-label="Drag her hand"></div>
+ <div id="target"></div>
 
-  <div id="start" aria-label="Drag from her hand"></div>
-  <div id="target"></div>
+ <div id="upperArm" class="limb"></div>
+ <div id="foreArm" class="limb"></div>
+ <div id="elbow"></div>
+ <div id="dragHand"></div>
 
-  <div id="upperArm" class="limb"></div>
-  <div id="foreArm" class="limb"></div>
-  <div id="elbow"></div>
-  <div id="hand"></div>
-
-  <div id="success">
-    <div class="successBox">
-      <h2>You did it!</h2>
-      <p>She reached the bottle.</p>
-      <button id="continueBtn">CONTINUE</button>
-    </div>
-  </div>
+ <div id="success">
+   <div class="successText">
+     <h2>You did it!</h2>
+     <p>She reached the message.</p>
+     <button id="continueBtn">CONTINUE</button>
+   </div>
+ </div>
 </section>
 
 <div id="blackout"></div>
@@ -209,104 +181,107 @@ const scenes=[...document.querySelectorAll('.scene')];
 const blackout=document.getElementById('blackout');
 
 function show(id){
-  blackout.classList.add('on');
-  setTimeout(()=>{
-    scenes.forEach(s=>s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    requestAnimationFrame(()=>requestAnimationFrame(()=>blackout.classList.remove('on')));
-  },620);
+ blackout.classList.add('on');
+ setTimeout(()=>{
+   scenes.forEach(s=>s.classList.remove('active'));
+   document.getElementById(id).classList.add('active');
+   requestAnimationFrame(()=>requestAnimationFrame(()=>blackout.classList.remove('on')));
+ },620);
 }
 
-// Scene 1 -> Scene 2 -> Scene 3
-document.getElementById('s1').addEventListener('click',()=>{
-  show('s2');
-  setTimeout(()=>show('s3'),4300);
-});
+/* Scene 1 -> Scene 2 */
+document.getElementById('s1').addEventListener('click',()=>show('s2'));
 
-// Articulated arm
-const start=document.getElementById('start');
+/* Scene 2 stays FOREVER until the user taps */
+document.getElementById('s2').addEventListener('click',()=>show('s3'));
+
+/* Arm game */
+const grab=document.getElementById('grabHand');
 const target=document.getElementById('target');
 const upper=document.getElementById('upperArm');
 const fore=document.getElementById('foreArm');
 const elbow=document.getElementById('elbow');
-const hand=document.getElementById('hand');
+const hand=document.getElementById('dragHand');
 const success=document.getElementById('success');
 
 let dragging=false;
 
-function anchor(){
-  const r=start.getBoundingClientRect();
-  return {x:r.left+r.width*.55,y:r.top+r.height*.56};
+/* Shoulder anchor in the cropped Scene 3 artwork */
+function shoulder(){
+ const r=document.getElementById('s3').getBoundingClientRect();
+ return {
+   x:r.left+r.width*0.535,
+   y:r.top+r.height*0.405
+ };
 }
 
 function setSegment(el,x1,y1,x2,y2){
-  const dx=x2-x1,dy=y2-y1;
-  el.style.left=x1+'px';
-  el.style.top=(y1-15)+'px';
-  el.style.width=Math.hypot(dx,dy)+'px';
-  el.style.transform='rotate('+Math.atan2(dy,dx)*180/Math.PI+'deg)';
-  el.style.display='block';
+ const dx=x2-x1,dy=y2-y1;
+ el.style.left=x1+'px';
+ el.style.top=(y1-el.offsetHeight/2)+'px';
+ el.style.width=Math.hypot(dx,dy)+'px';
+ el.style.transform='rotate('+Math.atan2(dy,dx)*180/Math.PI+'deg)';
+ el.style.display='block';
 }
 
-function poseArm(x,y){
-  const a=anchor();
+function pose(x,y){
+ const s=shoulder();
 
-  // Elbow is calculated as a bent midpoint rather than a straight line.
-  const midX=a.x+(x-a.x)*0.48;
-  const midY=a.y+(y-a.y)*0.48-38;
+ /* Give the arm a visible elbow bend */
+ const ex=s.x+(x-s.x)*0.50;
+ const ey=s.y+(y-s.y)*0.50-42;
 
-  setSegment(upper,a.x,a.y,midX,midY);
-  setSegment(fore,midX,midY,x,y);
+ setSegment(upper,s.x,s.y,ex,ey);
+ setSegment(fore,ex,ey,x,y);
 
-  elbow.style.left=(midX-19)+'px';
-  elbow.style.top=(midY-19)+'px';
-  elbow.style.display='block';
+ elbow.style.left=(ex-elbow.offsetWidth/2)+'px';
+ elbow.style.top=(ey-elbow.offsetHeight/2)+'px';
+ elbow.style.display='block';
 
-  hand.style.left=(x-23)+'px';
-  hand.style.top=(y-23)+'px';
-  hand.style.display='block';
+ hand.style.left=(x-hand.offsetWidth/2)+'px';
+ hand.style.top=(y-hand.offsetHeight/2)+'px';
+ hand.style.display='block';
 }
 
 function hideArm(){
-  upper.style.display='none';
-  fore.style.display='none';
-  elbow.style.display='none';
-  hand.style.display='none';
+ upper.style.display=fore.style.display=elbow.style.display=hand.style.display='none';
 }
 
 function hit(x,y){
-  const r=target.getBoundingClientRect();
-  return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
+ const r=target.getBoundingClientRect();
+ return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
 }
 
-start.addEventListener('pointerdown',e=>{
-  dragging=true;
-  start.setPointerCapture?.(e.pointerId);
-  poseArm(e.clientX,e.clientY);
+grab.addEventListener('pointerdown',e=>{
+ dragging=true;
+ grab.setPointerCapture?.(e.pointerId);
+ grab.style.opacity='0';
+ pose(e.clientX,e.clientY);
 });
 
 window.addEventListener('pointermove',e=>{
-  if(!dragging)return;
-  poseArm(e.clientX,e.clientY);
+ if(!dragging)return;
+ pose(e.clientX,e.clientY);
 
-  if(hit(e.clientX,e.clientY)){
-    dragging=false;
-    poseArm(e.clientX,e.clientY);
-    setTimeout(()=>{
-      hideArm();
-      success.classList.add('show');
-    },260);
-  }
+ if(hit(e.clientX,e.clientY)){
+   dragging=false;
+   setTimeout(()=>{
+     hideArm();
+     grab.style.opacity='1';
+     success.classList.add('show');
+   },220);
+ }
 });
 
 window.addEventListener('pointerup',()=>{
-  if(!dragging)return;
-  dragging=false;
-  hideArm();
+ if(!dragging)return;
+ dragging=false;
+ hideArm();
+ grab.style.opacity='1';
 });
 
 document.getElementById('continueBtn').addEventListener('click',()=>{
-  // Next: shore scene.
+ /* next shore scene will connect here */
 });
 </script>
 </body>
