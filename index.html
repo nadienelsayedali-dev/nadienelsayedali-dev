@@ -5,214 +5,299 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Our Little Adventure</title>
 <style>
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#020b13;
-}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020b13}
 *{box-sizing:border-box}
-
 .scene{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100dvh;
-  min-height:100vh;
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-  display:none;
+  position:fixed;inset:0;width:100vw;height:100dvh;min-height:100vh;
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+  display:none
 }
 .scene.active{display:block}
+#s1{background-image:url('scene1.png');cursor:pointer}
+#s2{background-image:url('scene2_clean.png');cursor:pointer;overflow:hidden}
+#s3{background-image:url('scene3_clean_game.png');overflow:hidden}
 
-#s1{
-  background-image:url('scene1.png');
-  cursor:pointer;
-}
-#s2{
-  background-image:url('scene2_clean.png');
-  cursor:pointer;
-  overflow:hidden;
-}
-
-/* moving sea shimmer */
+/* Scene 2 movement */
 .sea-shimmer{
-  position:absolute;
-  left:0;
-  right:0;
-  top:43%;
-  bottom:0;
-  pointer-events:none;
-  mix-blend-mode:screen;
-  opacity:.28;
-  background:
-    repeating-linear-gradient(
-      174deg,
-      transparent 0 10px,
-      rgba(255,255,255,.075) 11px 12px,
-      transparent 13px 23px
-    );
-  animation:seaShift 5.4s linear infinite;
+  position:absolute;left:0;right:0;top:43%;bottom:0;pointer-events:none;
+  mix-blend-mode:screen;opacity:.27;
+  background:repeating-linear-gradient(174deg,transparent 0 10px,rgba(255,255,255,.075) 11px 12px,transparent 13px 23px);
+  animation:seaShift 5.4s linear infinite
 }
 @keyframes seaShift{
   from{background-position:0 0;transform:translateX(-.5%)}
   to{background-position:120px 36px;transform:translateX(1.5%)}
 }
-
-/* subtle moonlight */
 .moon-path{
-  position:absolute;
-  left:38%;
-  top:43%;
-  width:34%;
-  height:34%;
+  position:absolute;left:38%;top:43%;width:34%;height:34%;
   background:linear-gradient(180deg,rgba(255,255,255,.13),transparent 75%);
-  filter:blur(16px);
-  opacity:.26;
-  mix-blend-mode:screen;
-  pointer-events:none;
-  animation:moonPulse 3.7s ease-in-out infinite alternate;
+  filter:blur(16px);opacity:.25;mix-blend-mode:screen;pointer-events:none;
+  animation:moonPulse 3.7s ease-in-out infinite alternate
 }
 @keyframes moonPulse{
   from{opacity:.18;transform:scaleX(.94)}
   to{opacity:.34;transform:scaleX(1.06)}
 }
-
-/* subtle movement cues around the boat/bottle areas */
 .boat-glow{
-  position:absolute;
-  left:56%;
-  top:31%;
-  width:31%;
-  height:39%;
-  border-radius:45%;
-  pointer-events:none;
+  position:absolute;left:56%;top:31%;width:31%;height:39%;
+  border-radius:45%;pointer-events:none;
   background:radial-gradient(circle at 50% 55%,rgba(255,171,67,.08),transparent 60%);
   animation:boatRock 4.2s ease-in-out infinite;
-  transform-origin:50% 70%;
+  transform-origin:50% 70%
 }
 @keyframes boatRock{
   0%,100%{transform:translateY(0) rotate(-.3deg)}
   50%{transform:translateY(5px) rotate(.5deg)}
 }
-
 .bottle-glow{
-  position:absolute;
-  left:18%;
-  top:60%;
-  width:19%;
-  height:28%;
-  border-radius:45%;
-  pointer-events:none;
+  position:absolute;left:18%;top:60%;width:19%;height:28%;
+  border-radius:45%;pointer-events:none;
   background:radial-gradient(circle,rgba(190,225,255,.06),transparent 65%);
   animation:bottleBob 3.1s ease-in-out infinite;
-  transform-origin:50% 70%;
+  transform-origin:50% 70%
 }
 @keyframes bottleBob{
   0%,100%{transform:translateY(0) rotate(-1deg)}
   50%{transform:translateY(-10px) rotate(1.8deg)}
 }
 
-/* Scene 2 story text */
+/* typography matching Scene 1 */
 .story{
-  position:absolute;
-  left:6vw;
-  top:50%;
-  transform:translateY(-50%);
-  width:min(480px,38vw);
-  z-index:10;
-  color:#fff6e6;
-  font-family:Georgia,"Times New Roman",serif;
-  text-shadow:0 4px 22px rgba(0,0,0,.88);
+  position:absolute;left:6vw;top:50%;transform:translateY(-50%);
+  width:min(470px,38vw);z-index:10;
+  color:#fff6e6;font-family:Georgia,"Times New Roman",serif;
+  text-shadow:0 4px 22px rgba(0,0,0,.88)
 }
 .story .label{
-  color:#d9ae61;
-  letter-spacing:.2em;
-  text-transform:uppercase;
-  font-size:clamp(.7rem,.9vw,.9rem);
-  margin-bottom:14px;
+  color:#d9ae61;letter-spacing:.2em;text-transform:uppercase;
+  font-size:clamp(.7rem,.9vw,.9rem);margin-bottom:14px
 }
 .story h2{
-  margin:0;
-  color:#efc77a;
-  font-weight:500;
-  line-height:1.06;
-  letter-spacing:.025em;
-  font-size:clamp(2rem,3.4vw,3.9rem);
+  margin:0;color:#efc77a;font-weight:500;line-height:1.06;
+  letter-spacing:.025em;font-size:clamp(2rem,3.4vw,3.9rem)
 }
 .story p{
-  margin:15px 0 0;
-  font-size:clamp(1rem,1.35vw,1.25rem);
-  line-height:1.55;
-  font-style:italic;
-  color:#fff8e9;
+  margin:15px 0 0;font-size:clamp(1rem,1.35vw,1.25rem);
+  line-height:1.55;font-style:italic;color:#fff8e9
 }
 .tap{
-  position:absolute;
-  left:50%;
-  bottom:3%;
-  transform:translateX(-50%);
-  color:#eac06d;
-  font:600 12px Georgia,"Times New Roman",serif;
-  letter-spacing:.18em;
-  text-shadow:0 3px 12px #000;
-  z-index:12;
-  opacity:.82;
-  animation:tapPulse 2s ease-in-out infinite;
+  position:absolute;left:50%;bottom:3%;transform:translateX(-50%);
+  color:#eac06d;font:600 12px Georgia,"Times New Roman",serif;
+  letter-spacing:.18em;text-shadow:0 3px 12px #000;
+  z-index:12;opacity:.82;animation:tapPulse 2s ease-in-out infinite
 }
 @keyframes tapPulse{
   50%{opacity:1;transform:translateX(-50%) translateY(-3px)}
 }
 
+/* Scene 3 minimal presentation */
+.mission-title{
+  position:absolute;left:5%;top:7%;z-index:12;
+  color:#efc77a;font:500 clamp(1.8rem,3vw,3.4rem) Georgia,"Times New Roman",serif;
+  letter-spacing:.03em;text-shadow:0 4px 22px #000
+}
+.mission-sub{
+  position:absolute;left:5%;top:15%;z-index:12;
+  color:#fff6e6;font:italic clamp(1rem,1.3vw,1.2rem) Georgia,"Times New Roman",serif;
+  text-shadow:0 3px 16px #000
+}
+
+/* glowing cue on the visible illustrated hand */
+#grab{
+  position:absolute;left:36.5%;top:67%;
+  width:86px;height:86px;border-radius:50%;
+  border:2px solid rgba(240,193,98,.95);
+  box-shadow:0 0 0 10px rgba(240,193,98,.08),0 0 28px rgba(240,193,98,.72);
+  background:rgba(240,193,98,.02);
+  z-index:30;cursor:grab;touch-action:none;
+  animation:handPulse 1.7s ease-in-out infinite
+}
+@keyframes handPulse{
+  50%{box-shadow:0 0 0 15px rgba(240,193,98,.03),0 0 38px rgba(240,193,98,.9)}
+}
+#target{
+  position:absolute;left:13%;top:69%;
+  width:150px;height:170px;border-radius:48%;
+  border:2px solid rgba(240,193,98,.42);
+  box-shadow:0 0 24px rgba(240,193,98,.22);
+  pointer-events:none;z-index:14
+}
+
+/* articulated arm overlay from shoulder */
+.limb{
+  position:fixed;height:31px;border-radius:999px;
+  background:linear-gradient(180deg,#b87853,#a45f42 58%,#8f4f38);
+  box-shadow:inset 0 3px 6px rgba(255,255,255,.12),
+             inset 0 -4px 7px rgba(60,20,10,.16),
+             0 4px 10px rgba(0,0,0,.22);
+  transform-origin:0 50%;display:none;z-index:22;pointer-events:none
+}
+#elbow{
+  position:fixed;width:37px;height:37px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#c7845b,#9c593e 72%);
+  display:none;z-index:23;pointer-events:none
+}
+#dragHand{
+  position:fixed;width:46px;height:46px;border-radius:50%;
+  background:radial-gradient(circle at 36% 30%,#cb865f,#aa6748 60%,#925239);
+  display:none;z-index:24;pointer-events:none
+}
+
+/* simple success */
+#success{
+  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(1,8,18,.45);z-index:50
+}
+#success.show{display:flex}
+.success-inner{
+  text-align:center;color:#fff6e6;
+  font-family:Georgia,"Times New Roman",serif;
+  text-shadow:0 4px 20px #000
+}
+.success-inner h2{
+  margin:0;color:#efc77a;font-size:clamp(2.5rem,5vw,5rem);font-weight:500
+}
+.success-inner p{font-size:clamp(1rem,1.4vw,1.25rem)}
+.success-inner button{
+  margin-top:12px;border:1px solid #d8ad58;border-radius:999px;
+  padding:13px 28px;background:rgba(4,18,30,.75);color:#ffe2a1;
+  font:600 15px Georgia,"Times New Roman",serif
+}
+
 @media(max-width:760px){
-  .story{
-    left:5vw;
-    top:18%;
-    transform:none;
-    width:86vw;
-  }
+  .story{left:5vw;top:18%;transform:none;width:86vw}
   .story h2{font-size:2.25rem}
-  .story p{font-size:1rem}
-  .boat-glow{left:51%;top:32%;width:42%;height:40%}
-  .bottle-glow{left:12%;top:62%;width:26%;height:25%}
+  .mission-title{left:4%;top:5%}
+  .mission-sub{left:4%;top:12%}
+  #grab{left:34%;top:67%;width:70px;height:70px}
+  #target{left:8%;top:70%;width:120px;height:145px}
 }
 </style>
 </head>
 <body>
 
-<section id="s1" class="scene active" aria-label="Opening scene"></section>
+<section id="s1" class="scene active"></section>
 
-<section id="s2" class="scene" aria-label="Message from the sea">
+<section id="s2" class="scene">
   <div class="sea-shimmer"></div>
   <div class="moon-path"></div>
   <div class="boat-glow"></div>
   <div class="bottle-glow"></div>
-
   <div class="story">
     <div class="label">A message from the sea</div>
     <h2>A message has crossed the ocean…</h2>
     <p>and somehow, it found you.</p>
   </div>
-
   <div class="tap">TAP TO CONTINUE</div>
+</section>
+
+<section id="s3" class="scene">
+  <div class="mission-title">Your Mission</div>
+  <div class="mission-sub">Reach for the message.</div>
+
+  <div id="grab"></div>
+  <div id="target"></div>
+
+  <div id="upperArm" class="limb"></div>
+  <div id="foreArm" class="limb"></div>
+  <div id="elbow"></div>
+  <div id="dragHand"></div>
+
+  <div id="success">
+    <div class="success-inner">
+      <h2>You did it.</h2>
+      <p>You reached the message.</p>
+      <button id="continueBtn">CONTINUE</button>
+    </div>
+  </div>
 </section>
 
 <script>
 const s1=document.getElementById('s1');
 const s2=document.getElementById('s2');
+const s3=document.getElementById('s3');
 
-s1.addEventListener('click',()=>{
-  s1.classList.remove('active');
-  s2.classList.add('active');
+function activate(scene){
+  [s1,s2,s3].forEach(s=>s.classList.remove('active'));
+  scene.classList.add('active');
+}
+
+s1.addEventListener('click',()=>activate(s2));
+s2.addEventListener('click',()=>activate(s3));
+
+const grab=document.getElementById('grab');
+const target=document.getElementById('target');
+const upper=document.getElementById('upperArm');
+const fore=document.getElementById('foreArm');
+const elbow=document.getElementById('elbow');
+const dragHand=document.getElementById('dragHand');
+const success=document.getElementById('success');
+let dragging=false;
+
+function shoulder(){
+  const r=s3.getBoundingClientRect();
+  return {x:r.left+r.width*0.64,y:r.top+r.height*0.47};
+}
+function setSeg(el,x1,y1,x2,y2){
+  const dx=x2-x1,dy=y2-y1;
+  el.style.left=x1+'px';
+  el.style.top=(y1-15)+'px';
+  el.style.width=Math.hypot(dx,dy)+'px';
+  el.style.transform='rotate('+Math.atan2(dy,dx)*180/Math.PI+'deg)';
+  el.style.display='block';
+}
+function pose(x,y){
+  const s=shoulder();
+  const ex=s.x+(x-s.x)*0.48;
+  const ey=s.y+(y-s.y)*0.48-34;
+
+  setSeg(upper,s.x,s.y,ex,ey);
+  setSeg(fore,ex,ey,x,y);
+
+  elbow.style.left=(ex-18)+'px';
+  elbow.style.top=(ey-18)+'px';
+  elbow.style.display='block';
+
+  dragHand.style.left=(x-23)+'px';
+  dragHand.style.top=(y-23)+'px';
+  dragHand.style.display='block';
+}
+function hideArm(){
+  upper.style.display=fore.style.display=elbow.style.display=dragHand.style.display='none';
+}
+function hit(x,y){
+  const r=target.getBoundingClientRect();
+  return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
+}
+
+grab.addEventListener('pointerdown',e=>{
+  dragging=true;
+  grab.setPointerCapture?.(e.pointerId);
+  grab.style.opacity='0';
+  pose(e.clientX,e.clientY);
+});
+window.addEventListener('pointermove',e=>{
+  if(!dragging)return;
+  pose(e.clientX,e.clientY);
+  if(hit(e.clientX,e.clientY)){
+    dragging=false;
+    setTimeout(()=>{
+      hideArm();
+      grab.style.opacity='1';
+      success.classList.add('show');
+    },180);
+  }
+});
+window.addEventListener('pointerup',()=>{
+  if(!dragging)return;
+  dragging=false;
+  hideArm();
+  grab.style.opacity='1';
 });
 
-/* Scene 2 stays until tap. We do nothing yet because Scene 3 is not connected. */
-s2.addEventListener('click',()=>{
-  // Scene 3 will be added after Scene 2 is approved.
+document.getElementById('continueBtn').addEventListener('click',()=>{
+  // Scene 4 will be connected next.
 });
 </script>
-
 </body>
 </html>
