@@ -5,150 +5,178 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Our Little Adventure</title>
 <style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020b13}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#020b13;
+}
 *{box-sizing:border-box}
+
 .scene{
-  position:fixed;inset:0;width:100vw;height:100dvh;min-height:100vh;
-  background-size:cover;background-position:center;background-repeat:no-repeat;
-  display:none
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100dvh;
+  min-height:100vh;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  display:none;
 }
 .scene.active{display:block}
-#s1{background-image:url('scene1.png');cursor:pointer}
-#s2{background-image:url('scene2_clean.png');cursor:pointer;overflow:hidden}
 
-/* cinematic fade */
-#fade{
-  position:fixed;inset:0;background:#020b13;opacity:0;pointer-events:none;
-  transition:opacity .7s ease;z-index:100
+#s1{
+  background-image:url('scene1.png');
+  cursor:pointer;
 }
-#fade.on{opacity:1}
+#s2{
+  background-image:url('scene2_clean.png');
+  cursor:pointer;
+  overflow:hidden;
+}
 
-/* SEA MOVEMENT */
+/* moving sea shimmer */
 .sea-shimmer{
-  position:absolute;left:0;right:0;top:43%;bottom:0;pointer-events:none;
-  mix-blend-mode:screen;opacity:.32;
+  position:absolute;
+  left:0;
+  right:0;
+  top:43%;
+  bottom:0;
+  pointer-events:none;
+  mix-blend-mode:screen;
+  opacity:.28;
   background:
     repeating-linear-gradient(
       174deg,
-      transparent 0 9px,
-      rgba(255,255,255,.075) 10px 11px,
-      transparent 12px 22px
+      transparent 0 10px,
+      rgba(255,255,255,.075) 11px 12px,
+      transparent 13px 23px
     );
-  animation:seaShift 5.5s linear infinite;
+  animation:seaShift 5.4s linear infinite;
 }
 @keyframes seaShift{
   from{background-position:0 0;transform:translateX(-.5%)}
   to{background-position:120px 36px;transform:translateX(1.5%)}
 }
 
-/* subtle moon path shimmer */
+/* subtle moonlight */
 .moon-path{
-  position:absolute;left:36%;top:45%;width:38%;height:36%;
-  background:linear-gradient(180deg,rgba(255,255,255,.13),transparent 70%);
-  filter:blur(14px);opacity:.28;mix-blend-mode:screen;pointer-events:none;
-  animation:moonPulse 3.8s ease-in-out infinite alternate;
+  position:absolute;
+  left:38%;
+  top:43%;
+  width:34%;
+  height:34%;
+  background:linear-gradient(180deg,rgba(255,255,255,.13),transparent 75%);
+  filter:blur(16px);
+  opacity:.26;
+  mix-blend-mode:screen;
+  pointer-events:none;
+  animation:moonPulse 3.7s ease-in-out infinite alternate;
 }
 @keyframes moonPulse{
-  from{opacity:.18;transform:scaleX(.92)}
-  to{opacity:.36;transform:scaleX(1.08)}
+  from{opacity:.18;transform:scaleX(.94)}
+  to{opacity:.34;transform:scaleX(1.06)}
 }
 
-/* create moving focal regions over the static art */
-.boat-motion{
+/* subtle movement cues around the boat/bottle areas */
+.boat-glow{
   position:absolute;
-  left:56%;top:29%;
-  width:31%;height:42%;
-  border-radius:46%;
-  pointer-events:none;
-  animation:boatRock 4.2s ease-in-out infinite;
-  transform-origin:50% 76%;
-}
-.boat-motion::before{
-  content:"";
-  position:absolute;inset:0;
-  background:radial-gradient(circle at 50% 60%,rgba(255,178,77,.08),transparent 58%);
-  filter:blur(2px)
-}
-@keyframes boatRock{
-  0%,100%{transform:translate(0,0) rotate(-.35deg)}
-  50%{transform:translate(-7px,6px) rotate(.55deg)}
-}
-
-/* bottle: small magnifying/refractive overlay gives visible bobbing without replacing artwork */
-.bottle-motion{
-  position:absolute;
-  left:20%;top:61%;
-  width:17%;height:28%;
+  left:56%;
+  top:31%;
+  width:31%;
+  height:39%;
   border-radius:45%;
   pointer-events:none;
+  background:radial-gradient(circle at 50% 55%,rgba(255,171,67,.08),transparent 60%);
+  animation:boatRock 4.2s ease-in-out infinite;
   transform-origin:50% 70%;
+}
+@keyframes boatRock{
+  0%,100%{transform:translateY(0) rotate(-.3deg)}
+  50%{transform:translateY(5px) rotate(.5deg)}
+}
+
+.bottle-glow{
+  position:absolute;
+  left:18%;
+  top:60%;
+  width:19%;
+  height:28%;
+  border-radius:45%;
+  pointer-events:none;
+  background:radial-gradient(circle,rgba(190,225,255,.06),transparent 65%);
   animation:bottleBob 3.1s ease-in-out infinite;
-  backdrop-filter:brightness(1.03) saturate(1.05);
-  box-shadow:0 0 24px rgba(190,225,255,.05);
+  transform-origin:50% 70%;
 }
 @keyframes bottleBob{
-  0%,100%{transform:translateY(0) rotate(-2deg)}
-  50%{transform:translateY(-12px) rotate(2.2deg)}
+  0%,100%{transform:translateY(0) rotate(-1deg)}
+  50%{transform:translateY(-10px) rotate(1.8deg)}
 }
 
-/* foam streaks */
-.wave{
-  position:absolute;height:3px;border-radius:999px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
-  opacity:.3;filter:blur(.25px);pointer-events:none;
-  animation:waveMove var(--t) ease-in-out infinite alternate
-}
-@keyframes waveMove{
-  from{transform:translateX(-16px) scaleX(.92);opacity:.18}
-  to{transform:translateX(18px) scaleX(1.12);opacity:.58}
-}
-
-/* Scene 2 text — same elegant family / tone as Scene 1, no frame */
+/* Scene 2 story text */
 .story{
-  position:absolute;left:6.3vw;top:50%;transform:translateY(-50%);
-  width:min(480px,37vw);z-index:10;
-  color:#f8ead0;font-family:Georgia,"Times New Roman",serif;
-  text-shadow:0 4px 24px rgba(0,0,0,.88);
-  opacity:0;animation:textIn 1.25s .5s ease forwards
+  position:absolute;
+  left:6vw;
+  top:50%;
+  transform:translateY(-50%);
+  width:min(480px,38vw);
+  z-index:10;
+  color:#fff6e6;
+  font-family:Georgia,"Times New Roman",serif;
+  text-shadow:0 4px 22px rgba(0,0,0,.88);
 }
 .story .label{
-  color:#d9ac5a;letter-spacing:.22em;text-transform:uppercase;
-  font-size:clamp(.68rem,.9vw,.88rem);margin-bottom:16px
+  color:#d9ae61;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  font-size:clamp(.7rem,.9vw,.9rem);
+  margin-bottom:14px;
 }
 .story h2{
-  margin:0;font-weight:500;line-height:1.07;
-  letter-spacing:.03em;
-  font-size:clamp(2rem,3.55vw,4rem);
-  color:#f0c77a
+  margin:0;
+  color:#efc77a;
+  font-weight:500;
+  line-height:1.06;
+  letter-spacing:.025em;
+  font-size:clamp(2rem,3.4vw,3.9rem);
 }
 .story p{
-  margin:16px 0 0;
+  margin:15px 0 0;
   font-size:clamp(1rem,1.35vw,1.25rem);
-  line-height:1.55;color:#fff7e8;font-style:italic
+  line-height:1.55;
+  font-style:italic;
+  color:#fff8e9;
 }
-@keyframes textIn{
-  from{opacity:0;transform:translateY(-44%)}
-  to{opacity:1;transform:translateY(-50%)}
-}
-
 .tap{
-  position:absolute;left:50%;bottom:3%;transform:translateX(-50%);
-  color:#eac06d;font:600 12px Georgia,"Times New Roman",serif;
-  letter-spacing:.18em;text-shadow:0 3px 12px #000;
-  opacity:.72;animation:tapPulse 2s ease-in-out infinite;z-index:12
+  position:absolute;
+  left:50%;
+  bottom:3%;
+  transform:translateX(-50%);
+  color:#eac06d;
+  font:600 12px Georgia,"Times New Roman",serif;
+  letter-spacing:.18em;
+  text-shadow:0 3px 12px #000;
+  z-index:12;
+  opacity:.82;
+  animation:tapPulse 2s ease-in-out infinite;
 }
-@keyframes tapPulse{50%{opacity:1;transform:translateX(-50%) translateY(-3px)}}
+@keyframes tapPulse{
+  50%{opacity:1;transform:translateX(-50%) translateY(-3px)}
+}
 
 @media(max-width:760px){
-  .story{left:5vw;top:20%;transform:none;width:84vw}
-  .story h2{font-size:2.35rem}
-  .story p{font-size:1rem;max-width:78vw}
-  @keyframes textIn{
-    from{opacity:0;transform:translateY(12px)}
-    to{opacity:1;transform:translateY(0)}
+  .story{
+    left:5vw;
+    top:18%;
+    transform:none;
+    width:86vw;
   }
-  .boat-motion{left:50%;top:32%;width:44%;height:42%}
-  .bottle-motion{left:13%;top:64%;width:24%;height:24%}
+  .story h2{font-size:2.25rem}
+  .story p{font-size:1rem}
+  .boat-glow{left:51%;top:32%;width:42%;height:40%}
+  .bottle-glow{left:12%;top:62%;width:26%;height:25%}
 }
 </style>
 </head>
@@ -156,16 +184,11 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020b13}
 
 <section id="s1" class="scene active" aria-label="Opening scene"></section>
 
-<section id="s2" class="scene" aria-label="A message from the sea">
+<section id="s2" class="scene" aria-label="Message from the sea">
   <div class="sea-shimmer"></div>
   <div class="moon-path"></div>
-  <div class="boat-motion"></div>
-  <div class="bottle-motion"></div>
-
-  <div class="wave" style="left:8%;top:70%;width:32%;--t:4.3s"></div>
-  <div class="wave" style="left:19%;top:77%;width:35%;--t:5.2s"></div>
-  <div class="wave" style="left:49%;top:66%;width:38%;--t:4.8s"></div>
-  <div class="wave" style="left:43%;top:75%;width:46%;--t:6.1s"></div>
+  <div class="boat-glow"></div>
+  <div class="bottle-glow"></div>
 
   <div class="story">
     <div class="label">A message from the sea</div>
@@ -176,31 +199,20 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020b13}
   <div class="tap">TAP TO CONTINUE</div>
 </section>
 
-<div id="fade"></div>
-
 <script>
-const scenes=[...document.querySelectorAll('.scene')];
-const fade=document.getElementById('fade');
+const s1=document.getElementById('s1');
+const s2=document.getElementById('s2');
 
-function show(id){
-  fade.classList.add('on');
-  setTimeout(()=>{
-    scenes.forEach(s=>s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    requestAnimationFrame(()=>requestAnimationFrame(()=>fade.classList.remove('on')));
-  },700);
-}
+s1.addEventListener('click',()=>{
+  s1.classList.remove('active');
+  s2.classList.add('active');
+});
 
-document.getElementById('s1').addEventListener('click',()=>show('s2'));
-
-/* Scene 2 deliberately waits for the person to tap */
-document.getElementById('s2').addEventListener('click',()=>{
-  fade.classList.add('on');
-  setTimeout(()=>{
-    // Scene 3 will be connected here after Scene 2 is approved.
-    fade.classList.remove('on');
-  },700);
+/* Scene 2 stays until tap. We do nothing yet because Scene 3 is not connected. */
+s2.addEventListener('click',()=>{
+  // Scene 3 will be added after Scene 2 is approved.
 });
 </script>
+
 </body>
 </html>
