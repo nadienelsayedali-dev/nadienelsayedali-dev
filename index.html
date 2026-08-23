@@ -55,134 +55,68 @@ background:rgba(2,10,18,.35);z-index:50;font-family:Georgia,serif;color:#ffe9bd;
 
 
 
-/* ===== Scene 4: stable tap interaction, no duplicated image layers ===== */
 
-#scene4img{
+/* ===== Scene 4 three-state cinematic sequence ===== */
+.scene4state{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
   object-fit:cover;
   object-position:center;
+  opacity:0;
+  transform:scale(1.01);
+  transition:opacity .42s ease, transform .42s ease;
   pointer-events:none;
   user-select:none;
-  transform-origin:28% 55%;
-  transition:
-    transform .65s cubic-bezier(.2,.75,.2,1),
-    filter .45s ease;
-  will-change:transform;
+}
+.scene4state.active4{
+  opacity:1;
+  transform:scale(1);
 }
 
-/* bottle is in the character's hands, left side */
-#scene4BottleHotspot{
+#scene4BottleTap,
+#scene4RockTap{
   position:absolute;
-  left:20%;
-  top:43%;
-  width:130px;
-  height:170px;
-  z-index:25;
   border:0;
   background:transparent;
+  z-index:30;
   padding:0;
+  margin:0;
   cursor:pointer;
   touch-action:manipulation;
 }
 
-/* rock is center-bottom */
-#scene4RockHotspot{
-  position:absolute;
-  left:45%;
-  top:63%;
-  width:240px;
-  height:170px;
-  z-index:25;
-  border:0;
-  background:transparent;
-  padding:0;
-  cursor:pointer;
-  touch-action:manipulation;
-  pointer-events:none;
-}
-
-#scene4BottlePulse{
-  position:absolute;
-  left:20.7%;
+/* State 1: bottle in her hands */
+#scene4BottleTap{
+  left:22%;
   top:46%;
-  width:105px;
-  height:105px;
-  border-radius:50%;
-  z-index:20;
-  pointer-events:none;
-  background:radial-gradient(circle,rgba(255,214,120,.18),rgba(255,214,120,.04) 42%,transparent 70%);
-  filter:drop-shadow(0 0 12px rgba(255,214,120,.52));
-  animation:scene4BottlePulse 1.7s ease-in-out infinite;
-}
-@keyframes scene4BottlePulse{
-  50%{transform:scale(1.12);opacity:.7}
-}
-
-#scene4RockPulse{
-  position:absolute;
-  left:45%;
-  top:63%;
-  width:240px;
+  width:120px;
   height:170px;
-  border-radius:50%;
-  z-index:19;
-  pointer-events:none;
-  opacity:0;
-  transition:opacity .3s ease;
-  box-shadow:
-    0 0 0 2px rgba(255,216,135,.48),
-    0 0 30px rgba(255,216,135,.22);
 }
-#scene4RockPulse.on{opacity:1}
 
-#scene4Impact{
-  position:absolute;
-  left:50%;
+/* State 2: rock target */
+#scene4RockTap{
+  left:49%;
   top:66%;
-  width:180px;
-  height:180px;
-  margin-left:-90px;
-  margin-top:-90px;
-  border-radius:50%;
-  z-index:40;
+  width:220px;
+  height:170px;
   pointer-events:none;
-  opacity:0;
-  background:radial-gradient(circle,rgba(255,225,160,.95),rgba(255,181,67,.26) 36%,transparent 70%);
-}
-#scene4Impact.show{animation:scene4Impact .85s ease forwards}
-@keyframes scene4Impact{
-  0%{opacity:0;transform:scale(.3)}
-  45%{opacity:1;transform:scale(1.15)}
-  100%{opacity:0;transform:scale(1.8)}
-}
-
-#scene4Message{
-  position:absolute;
-  left:50%;
-  top:64%;
-  width:150px;
-  height:110px;
-  margin-left:-75px;
-  z-index:41;
-  opacity:0;
-  pointer-events:none;
-  background:linear-gradient(#f3e4bb,#d6bd83);
-  border-radius:5px;
-  box-shadow:0 12px 28px rgba(0,0,0,.38),0 0 24px rgba(255,205,115,.32);
-  transform:translateY(30px) scale(.7) rotate(-6deg);
-}
-#scene4Message.show{animation:scene4Message .8s .15s ease forwards}
-@keyframes scene4Message{
-  to{opacity:1;transform:translateY(-55px) scale(1) rotate(3deg)}
 }
 
 @media(max-width:760px){
-  #scene4BottleHotspot{left:18%;top:43%;width:100px;height:150px}
-  #scene4BottlePulse{left:18.5%;top:46%;width:90px;height:90px}
-  #scene4RockHotspot,#scene4RockPulse{left:43%;top:63%;width:210px;height:155px}
+  #scene4BottleTap{
+    left:18%;
+    top:45%;
+    width:95px;
+    height:150px;
+  }
+  #scene4RockTap{
+    left:45%;
+    top:66%;
+    width:180px;
+    height:150px;
+  }
 }
 
 </style>
@@ -214,19 +148,16 @@ background:rgba(2,10,18,.35);z-index:50;font-family:Georgia,serif;color:#ffe9bd;
 
 
 
+
 <section id="s4" class="scene">
-  <img id="scene4img" class="fullimg" src="scene4.png" alt="">
+  <img id="scene4State1" class="scene4state active4" src="scene4_1.png" alt="">
+  <img id="scene4State2" class="scene4state" src="scene4_2.png" alt="">
+  <img id="scene4State3" class="scene4state" src="scene4_3.png" alt="">
 
-  <!-- invisible interaction areas -->
-  <button id="scene4BottleHotspot" aria-label="Tap the bottle"></button>
-  <button id="scene4RockHotspot" aria-label="Tap the rock"></button>
-
-  <!-- subtle interaction feedback -->
-  <div id="scene4BottlePulse"></div>
-  <div id="scene4RockPulse"></div>
-  <div id="scene4Impact"></div>
-  <div id="scene4Message"></div>
+  <button id="scene4BottleTap" aria-label="Tap the bottle"></button>
+  <button id="scene4RockTap" aria-label="Tap the rock"></button>
 </section>
+
 
 
 
@@ -286,56 +217,36 @@ svg3.addEventListener('pointerup',()=>{
   }
 });
 
-/* Scene 4: stable cinematic tap interaction */
-const scene4img=document.getElementById('scene4img');
-const bottleHotspot=document.getElementById('scene4BottleHotspot');
-const rockHotspot=document.getElementById('scene4RockHotspot');
-const bottlePulse=document.getElementById('scene4BottlePulse');
-const rockPulse=document.getElementById('scene4RockPulse');
-const impact4=document.getElementById('scene4Impact');
-const message4=document.getElementById('scene4Message');
+/* Scene 4: three image states */
+const s4img1=document.getElementById('scene4State1');
+const s4img2=document.getElementById('scene4State2');
+const s4img3=document.getElementById('scene4State3');
+const s4BottleTap=document.getElementById('scene4BottleTap');
+const s4RockTap=document.getElementById('scene4RockTap');
 
-let scene4State='ready';
+let s4state=1;
 
-bottleHotspot.addEventListener('click',()=>{
-  if(scene4State!=='ready')return;
-  scene4State='lifted';
+function showScene4State(n){
+  [s4img1,s4img2,s4img3].forEach(img=>img.classList.remove('active4'));
+  if(n===1) s4img1.classList.add('active4');
+  if(n===2) s4img2.classList.add('active4');
+  if(n===3) s4img3.classList.add('active4');
+  s4state=n;
+}
 
-  bottlePulse.style.opacity='0';
-
-  /*
-    Move the entire character scene very slightly upward/forward.
-    Since the bottle is already in her hands, this reads as her
-    lifting the bottle without duplicating or masking any artwork.
-  */
-  scene4img.style.transform='translateY(-18px) scale(1.018) rotate(-0.35deg)';
-  scene4img.style.filter='brightness(1.035)';
-
+s4BottleTap.addEventListener('click',()=>{
+  if(s4state!==1) return;
+  showScene4State(2);
+  s4BottleTap.style.pointerEvents='none';
   setTimeout(()=>{
-    rockPulse.classList.add('on');
-    rockHotspot.style.pointerEvents='auto';
-  },520);
+    s4RockTap.style.pointerEvents='auto';
+  },350);
 });
 
-rockHotspot.addEventListener('click',()=>{
-  if(scene4State!=='lifted')return;
-  scene4State='impact';
-
-  rockHotspot.style.pointerEvents='none';
-  rockPulse.classList.remove('on');
-
-  /*
-    Small forward/down follow-through to suggest the release.
-    No second image and no browser drag interaction.
-  */
-  scene4img.style.transition='transform .48s cubic-bezier(.25,.8,.25,1), filter .3s ease';
-  scene4img.style.transform='translate(6px,4px) scale(1.01) rotate(.25deg)';
-  scene4img.style.filter='brightness(1.06)';
-
-  setTimeout(()=>{
-    impact4.classList.add('show');
-    message4.classList.add('show');
-  },430);
+s4RockTap.addEventListener('click',()=>{
+  if(s4state!==2) return;
+  s4RockTap.style.pointerEvents='none';
+  showScene4State(3);
 });
 </script>
 </body>
