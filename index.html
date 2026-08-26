@@ -9,253 +9,132 @@
   <title>Our Little Adventure</title>
 
   <style>
-    :root{
-      --bg:#020b13;
-      --gold:#e8b753;
-      --ratio:1672/941;
+    :root {
+      --bg: #020b13;
+      --ratio: 1672/941;
     }
 
-    *{box-sizing:border-box;margin:0;padding:0}
-
-    html,body{
-      width:100%;
-      height:100%;
-      min-height:100dvh;
-      overflow:hidden;
-      background:var(--bg);
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    body{
-      position:fixed;
-      inset:0;
-      overflow:hidden;
-      -webkit-user-select:none;
-      user-select:none;
-      -webkit-touch-callout:none;
-      touch-action:manipulation;
-      overscroll-behavior:none;
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100dvh;
+      overflow: hidden;
+      background: var(--bg);
     }
 
-    #app{
-      position:fixed;
-      inset:0;
-      display:grid;
-      place-items:center;
-      overflow:hidden;
-      background:var(--bg);
+    body {
+      position: fixed;
+      inset: 0;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+      overscroll-behavior: none;
     }
 
-    .scene{
-      position:absolute;
-      width:min(100vw,calc(100dvh * 1672 / 941));
-      height:min(100dvh,calc(100vw * 941 / 1672));
-      aspect-ratio:var(--ratio);
-      overflow:hidden;
-      opacity:0;
-      pointer-events:none;
-      background:var(--bg);
-      transition:opacity .42s ease;
+    #app {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: var(--bg);
     }
 
-    .scene.active{
-      opacity:1;
-      pointer-events:auto;
+    .scene {
+      position: absolute;
+      width: min(100vw, calc(100dvh * 1672 / 941));
+      height: min(100dvh, calc(100vw * 941 / 1672));
+      aspect-ratio: var(--ratio);
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      background: var(--bg);
+      transition: opacity .45s ease;
     }
 
-    .art{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      display:block;
-      object-fit:fill;
-      pointer-events:none;
-      -webkit-user-drag:none;
-      will-change:transform,filter;
-      transform:translate3d(0,0,0) scale(1);
+    .scene.active {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .hotspot{
-      position:absolute;
-      z-index:25;
-      border:0;
-      outline:0;
-      background:transparent;
-      padding:0;
-      margin:0;
-      appearance:none;
-      -webkit-appearance:none;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
+    .scene img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: fill;
+      pointer-events: none;
+      -webkit-user-drag: none;
     }
 
-    #beginStory{
-      left:63.2%;
-      top:75%;
-      width:21.5%;
-      height:10.5%;
+    .hotspot {
+      position: absolute;
+      z-index: 10;
+      border: 0;
+      outline: 0;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* Large hit area: includes TAP TO SAIL FORWARD and nearby area */
-    #scene2Continue{
-      left:56%;
-      top:74%;
-      width:39%;
-      height:21%;
+    /* Scene 1: BEGIN THE STORY */
+    #beginStory {
+      left: 63.2%;
+      top: 75%;
+      width: 21.5%;
+      height: 10.5%;
     }
 
-    /* Water-rush overlay */
-    #waterRush{
-      position:absolute;
-      inset:0;
-      z-index:8;
-      pointer-events:none;
-      opacity:0;
-      mix-blend-mode:screen;
-      background:
-        repeating-linear-gradient(
-          168deg,
-          rgba(255,255,255,0) 0 22px,
-          rgba(157,211,255,.26) 23px 25px,
-          rgba(255,255,255,0) 26px 52px
-        );
-      transform:translateX(28%);
-      will-change:transform,opacity;
+    /* Scene 2: TAP TO SAIL FORWARD */
+    #scene2Continue {
+      left: 61%;
+      top: 79%;
+      width: 30%;
+      height: 11%;
     }
 
-    #wake{
-      position:absolute;
-      left:-3%;
-      bottom:-6%;
-      width:72%;
-      height:58%;
-      z-index:9;
-      pointer-events:none;
-      opacity:0;
-      background:
-        radial-gradient(ellipse at 42% 65%,
-          rgba(255,226,164,.38) 0%,
-          rgba(121,199,255,.22) 22%,
-          rgba(255,255,255,0) 64%);
-      filter:blur(6px);
-      will-change:transform,opacity;
+    #tapPulse {
+      position: fixed;
+      z-index: 30;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 2px solid rgba(232,183,83,.96);
+      box-shadow: 0 0 28px rgba(232,183,83,.82);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(.55);
+      pointer-events: none;
     }
 
-    #vignette{
-      position:absolute;
-      inset:0;
-      z-index:10;
-      pointer-events:none;
-      opacity:0;
-      background:
-        radial-gradient(circle at 35% 54%,
-          rgba(0,0,0,0) 0 35%,
-          rgba(0,7,16,.08) 60%,
-          rgba(0,5,12,.38) 100%);
+    #tapPulse.play {
+      animation: tapPulse .45s ease forwards;
     }
 
-    /* Strong, obvious sailing motion */
-    #scene2.sailing #scene2Art{
-      transform-origin:34% 58%;
-      animation:sailForward 2.7s cubic-bezier(.16,.74,.2,1) forwards;
-    }
-
-    #scene2.sailing #waterRush{
-      animation:rush 0.55s linear 5;
-    }
-
-    #scene2.sailing #wake{
-      animation:wakeMove 2.7s ease-out forwards;
-    }
-
-    #scene2.sailing #vignette{
-      animation:vignetteIn 2.7s ease forwards;
-    }
-
-    #scene2.sailing #scene2Continue{
-      pointer-events:none;
-    }
-
-    @keyframes sailForward{
-      0%{
-        transform:translate3d(0,0,0) scale(1) rotate(0deg);
-        filter:brightness(1) saturate(1);
+    @keyframes tapPulse {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(.55);
       }
-      12%{
-        transform:translate3d(-0.8%,0.4%,0) scale(1.03) rotate(-0.15deg);
+      45% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
       }
-      28%{
-        transform:translate3d(-2.2%,-0.4%,0) scale(1.07) rotate(0.15deg);
-      }
-      45%{
-        transform:translate3d(-3.8%,0.15%,0) scale(1.11) rotate(-0.1deg);
-        filter:brightness(1.05) saturate(1.06);
-      }
-      67%{
-        transform:translate3d(-5.6%,-0.5%,0) scale(1.16) rotate(0.12deg);
-      }
-      82%{
-        transform:translate3d(-6.8%,-0.15%,0) scale(1.20) rotate(-0.08deg);
-      }
-      100%{
-        transform:translate3d(-8.2%,-0.8%,0) scale(1.24) rotate(0deg);
-        filter:brightness(1.08) saturate(1.08);
-      }
-    }
-
-    @keyframes rush{
-      0%{opacity:0;transform:translateX(30%) translateY(-2%)}
-      18%{opacity:.48}
-      70%{opacity:.26}
-      100%{opacity:0;transform:translateX(-34%) translateY(5%)}
-    }
-
-    @keyframes wakeMove{
-      0%{opacity:0;transform:translateX(-8%) scale(.72)}
-      20%{opacity:.72}
-      55%{opacity:.48;transform:translateX(4%) scale(1)}
-      100%{opacity:.16;transform:translateX(16%) scale(1.28)}
-    }
-
-    @keyframes vignetteIn{
-      0%{opacity:0}
-      28%{opacity:.18}
-      100%{opacity:.34}
-    }
-
-    #tapPulse{
-      position:fixed;
-      z-index:50;
-      width:72px;
-      height:72px;
-      border-radius:50%;
-      border:2px solid rgba(232,183,83,.96);
-      box-shadow:0 0 30px rgba(232,183,83,.85);
-      opacity:0;
-      pointer-events:none;
-      transform:translate(-50%,-50%) scale(.55);
-    }
-
-    #tapPulse.play{
-      animation:tapPulse .45s ease forwards;
-    }
-
-    @keyframes tapPulse{
-      0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
-      45%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-      100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
-    }
-
-    @media (prefers-reduced-motion:reduce){
-      #scene2.sailing #scene2Art{
-        animation-duration:1.2s;
-      }
-      #scene2.sailing #waterRush{
-        animation-duration:.35s;
-      }
-      #scene2.sailing #wake{
-        animation-duration:1.2s;
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.45);
       }
     }
   </style>
@@ -264,15 +143,12 @@
 <body>
   <main id="app">
     <section id="scene1" class="scene active" aria-label="Scene 1">
-      <img class="art" src="./scene 1.png" alt="Our Little Adventure" draggable="false">
+      <img src="./scene 1.png" alt="Our Little Adventure" draggable="false">
       <button id="beginStory" class="hotspot" type="button" aria-label="Begin the story"></button>
     </section>
 
     <section id="scene2" class="scene" aria-label="Scene 2">
-      <img id="scene2Art" class="art" src="./scene2.png" alt="Across the Waves" draggable="false">
-      <div id="waterRush"></div>
-      <div id="wake"></div>
-      <div id="vignette"></div>
+      <img src="./scene2.png" alt="Across the Waves" draggable="false">
       <button id="scene2Continue" class="hotspot" type="button" aria-label="Sail forward"></button>
     </section>
 
@@ -287,77 +163,33 @@
       const scene2Continue = document.getElementById("scene2Continue");
       const tapPulse = document.getElementById("tapPulse");
 
-      let sailing = false;
-      let scene2Ready = false;
-
-      function pulseAt(x,y){
-        tapPulse.style.left = x + "px";
-        tapPulse.style.top = y + "px";
+      function pulseAt(event) {
+        tapPulse.style.left = event.clientX + "px";
+        tapPulse.style.top = event.clientY + "px";
         tapPulse.classList.remove("play");
         void tapPulse.offsetWidth;
         tapPulse.classList.add("play");
       }
 
-      function showScene(next){
-        document.querySelectorAll(".scene").forEach(s => s.classList.remove("active"));
+      function showScene(next) {
+        document.querySelectorAll(".scene").forEach(scene => scene.classList.remove("active"));
         next.classList.add("active");
       }
 
-      function goToScene2(e){
-        if(e && e.preventDefault) e.preventDefault();
-        if(e && typeof e.clientX === "number") pulseAt(e.clientX,e.clientY);
-        setTimeout(() => {
-          showScene(scene2);
-          scene2Ready = true;
-        }, 180);
-      }
+      beginStory.addEventListener("pointerup", (event) => {
+        event.preventDefault();
+        pulseAt(event);
+        setTimeout(() => showScene(scene2), 220);
+      });
 
-      function startSailing(e){
-        if(!scene2Ready || sailing) return;
-        if(e && e.preventDefault) e.preventDefault();
+      scene2Continue.addEventListener("pointerup", (event) => {
+        event.preventDefault();
+        pulseAt(event);
 
-        sailing = true;
-
-        if(e && typeof e.clientX === "number"){
-          pulseAt(e.clientX,e.clientY);
-        }
-
-        /* Force Safari to register the starting frame before adding animation */
-        scene2.classList.remove("sailing");
-        void scene2.offsetWidth;
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            scene2.classList.add("sailing");
-          });
-        });
-
-        setTimeout(() => {
-          document.dispatchEvent(new CustomEvent("scene2SailingComplete"));
-        }, 2700);
-      }
-
-      /* Scene 1 -> Scene 2 */
-      beginStory.addEventListener("pointerup", goToScene2);
-      beginStory.addEventListener("click", goToScene2);
-
-      /* Primary button */
-      scene2Continue.addEventListener("pointerdown", startSailing);
-      scene2Continue.addEventListener("click", startSailing);
-
-      /*
-        iPhone/iPad fallback:
-        tapping anywhere in Scene 2 also starts the sailing motion.
-      */
-      scene2.addEventListener("pointerdown", startSailing);
-
-      scene2.addEventListener("touchend", (e) => {
-        if(!scene2Ready || sailing) return;
-        e.preventDefault();
-        const t = e.changedTouches && e.changedTouches[0];
-        if(t) pulseAt(t.clientX,t.clientY);
-        startSailing();
-      }, {passive:false});
+        /*
+          Scene 3 / sailing transition will be connected here next.
+        */
+      });
     })();
   </script>
 </body>
