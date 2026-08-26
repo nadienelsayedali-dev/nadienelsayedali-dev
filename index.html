@@ -142,6 +142,15 @@
       z-index:40;
     }
 
+    /* Scene 7: CONTINUE button */
+    #scene7Continue{
+      left:67%;
+      top:73%;
+      width:22%;
+      height:11%;
+      z-index:40;
+    }
+
     #missionHint{
       position:absolute;
       left:50%;
@@ -230,6 +239,12 @@
       <button id="scene6Continue" class="hotspot" aria-label="Continue"></button>
     </section>
 
+
+    <section id="scene7" class="scene">
+      <img src="./scene7.png" alt="A Secret Waiting to Be Uncovered">
+      <button id="scene7Continue" class="hotspot" aria-label="Continue"></button>
+    </section>
+
     <div id="tapPulse" aria-hidden="true"></div>
   </main>
 
@@ -245,6 +260,7 @@
     const scene4 = document.getElementById("scene4");
     const scene5 = document.getElementById("scene5");
     const scene6 = document.getElementById("scene6");
+    const scene7 = document.getElementById("scene7");
 
     const beginStory = document.getElementById("beginStory");
     const scene2Continue = document.getElementById("scene2Continue");
@@ -255,6 +271,7 @@
     const handDragStart = document.getElementById("handDragStart");
     const missionHint = document.getElementById("missionHint");
     const scene6Continue = document.getElementById("scene6Continue");
+    const scene7Continue = document.getElementById("scene7Continue");
 
     /*
       Locked coordinates in the 1672 x 941 artwork.
@@ -451,8 +468,15 @@
       },260);
     });
 
-    /* Success scene CONTINUE button - ready for the next scene */
+    /* Scene 6 -> Scene 7 */
     scene6Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene7), 260);
+    });
+
+    /* Scene 7 CONTINUE - ready for the next scene */
+    scene7Continue.addEventListener("pointerup", e => {
       e.preventDefault();
       pulseAt(e);
 
