@@ -90,7 +90,7 @@
       -webkit-tap-highlight-color:transparent;
     }
 
-    /* Scene 1 - BEGIN THE STORY */
+    /* Scene 1: BEGIN THE STORY */
     #beginStory{
       left:63.2%;
       top:75%;
@@ -98,7 +98,7 @@
       height:10.5%;
     }
 
-    /* Scene 2 - TAP TO SAIL FORWARD */
+    /* Scene 2: TAP TO SAIL FORWARD */
     #scene2Continue{
       left:61%;
       top:79%;
@@ -144,7 +144,11 @@
     </section>
 
     <section id="scene3" class="scene" aria-label="Scene 3">
-      <img src="./scene3.png" alt="Boat sailing in the middle of the sea" draggable="false">
+      <img src="./scene3.png" alt="Boat farther out at sea" draggable="false">
+    </section>
+
+    <section id="scene4" class="scene" aria-label="Scene 4">
+      <img src="./scene4.png" alt="A message bottle appears ahead of the boat" draggable="false">
     </section>
 
     <div id="tapPulse" aria-hidden="true"></div>
@@ -155,9 +159,12 @@
       const scene1 = document.getElementById("scene1");
       const scene2 = document.getElementById("scene2");
       const scene3 = document.getElementById("scene3");
+      const scene4 = document.getElementById("scene4");
       const beginStory = document.getElementById("beginStory");
       const scene2Continue = document.getElementById("scene2Continue");
       const tapPulse = document.getElementById("tapPulse");
+
+      let scene3Timer = null;
 
       function pulseAt(event){
         tapPulse.style.left = event.clientX + "px";
@@ -183,7 +190,15 @@
       scene2Continue.addEventListener("pointerup", event => {
         event.preventDefault();
         pulseAt(event);
-        setTimeout(() => showScene(scene3), 260);
+
+        setTimeout(() => {
+          showScene(scene3);
+
+          clearTimeout(scene3Timer);
+          scene3Timer = setTimeout(() => {
+            showScene(scene4);
+          }, 1500);
+        }, 260);
       });
     })();
   </script>
