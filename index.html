@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Our Little Adventure</title>
+
   <style>
     :root{
       --bg:#020b13;
@@ -27,6 +28,7 @@
     body{
       position:fixed;
       inset:0;
+      overflow:hidden;
       -webkit-user-select:none;
       user-select:none;
       -webkit-touch-callout:none;
@@ -52,7 +54,7 @@
       opacity:0;
       pointer-events:none;
       background:var(--bg);
-      transition:opacity .5s ease;
+      transition:opacity .42s ease;
     }
 
     .scene.active{
@@ -65,27 +67,27 @@
       inset:0;
       width:100%;
       height:100%;
-      object-fit:fill;
       display:block;
+      object-fit:fill;
       pointer-events:none;
       -webkit-user-drag:none;
+      will-change:transform,filter;
       transform:translate3d(0,0,0) scale(1);
-      transform-origin:38% 55%;
     }
 
     .hotspot{
       position:absolute;
-      z-index:20;
+      z-index:25;
       border:0;
       outline:0;
-      margin:0;
-      padding:0;
       background:transparent;
-      cursor:pointer;
+      padding:0;
+      margin:0;
       appearance:none;
       -webkit-appearance:none;
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
+      cursor:pointer;
     }
 
     #beginStory{
@@ -95,128 +97,149 @@
       height:10.5%;
     }
 
+    /* Large hit area: includes TAP TO SAIL FORWARD and nearby area */
     #scene2Continue{
-      left:64%;
-      top:82%;
-      width:25%;
-      height:9%;
+      left:56%;
+      top:74%;
+      width:39%;
+      height:21%;
     }
 
-    /* --- Sailing illusion layers --- */
-    #motionShade,
-    #speedLines,
-    #wakeGlow{
+    /* Water-rush overlay */
+    #waterRush{
       position:absolute;
       inset:0;
+      z-index:8;
       pointer-events:none;
       opacity:0;
-      z-index:8;
-    }
-
-    #motionShade{
-      background:
-        radial-gradient(circle at 35% 56%, rgba(255,255,255,0) 0 25%, rgba(0,12,25,.05) 46%, rgba(0,6,15,.42) 100%);
-    }
-
-    #speedLines{
+      mix-blend-mode:screen;
       background:
         repeating-linear-gradient(
-          174deg,
-          rgba(255,255,255,0) 0 18px,
-          rgba(181,224,255,.16) 19px 21px,
-          rgba(255,255,255,0) 22px 44px
+          168deg,
+          rgba(255,255,255,0) 0 22px,
+          rgba(157,211,255,.26) 23px 25px,
+          rgba(255,255,255,0) 26px 52px
         );
-      mix-blend-mode:screen;
-      transform:translateX(16%);
+      transform:translateX(28%);
+      will-change:transform,opacity;
     }
 
-    #wakeGlow{
-      inset:auto 0 0 0;
-      height:46%;
+    #wake{
+      position:absolute;
+      left:-3%;
+      bottom:-6%;
+      width:72%;
+      height:58%;
+      z-index:9;
+      pointer-events:none;
+      opacity:0;
       background:
-        radial-gradient(ellipse at 37% 83%, rgba(255,211,126,.34) 0, rgba(112,190,255,.13) 22%, rgba(0,0,0,0) 57%);
-      filter:blur(5px);
+        radial-gradient(ellipse at 42% 65%,
+          rgba(255,226,164,.38) 0%,
+          rgba(121,199,255,.22) 22%,
+          rgba(255,255,255,0) 64%);
+      filter:blur(6px);
+      will-change:transform,opacity;
     }
 
+    #vignette{
+      position:absolute;
+      inset:0;
+      z-index:10;
+      pointer-events:none;
+      opacity:0;
+      background:
+        radial-gradient(circle at 35% 54%,
+          rgba(0,0,0,0) 0 35%,
+          rgba(0,7,16,.08) 60%,
+          rgba(0,5,12,.38) 100%);
+    }
+
+    /* Strong, obvious sailing motion */
     #scene2.sailing #scene2Art{
-      animation:sailPush 2.25s cubic-bezier(.18,.72,.18,1) forwards;
+      transform-origin:34% 58%;
+      animation:sailForward 2.7s cubic-bezier(.16,.74,.2,1) forwards;
     }
 
-    #scene2.sailing #motionShade{
-      animation:shadeIn 2.25s ease forwards;
+    #scene2.sailing #waterRush{
+      animation:rush 0.55s linear 5;
     }
 
-    #scene2.sailing #speedLines{
-      animation:waterRush .62s linear 3;
+    #scene2.sailing #wake{
+      animation:wakeMove 2.7s ease-out forwards;
     }
 
-    #scene2.sailing #wakeGlow{
-      animation:wakePulse 2.25s ease forwards;
+    #scene2.sailing #vignette{
+      animation:vignetteIn 2.7s ease forwards;
     }
 
     #scene2.sailing #scene2Continue{
       pointer-events:none;
-      animation:buttonFade .25s ease forwards;
     }
 
-    @keyframes sailPush{
+    @keyframes sailForward{
       0%{
-        transform:translate3d(0,0,0) scale(1);
-        filter:brightness(1);
+        transform:translate3d(0,0,0) scale(1) rotate(0deg);
+        filter:brightness(1) saturate(1);
       }
-      18%{
-        transform:translate3d(-.3%,.15%,0) scale(1.012);
+      12%{
+        transform:translate3d(-0.8%,0.4%,0) scale(1.03) rotate(-0.15deg);
       }
-      43%{
-        transform:translate3d(-1.0%,-.15%,0) scale(1.032);
-        filter:brightness(1.035);
+      28%{
+        transform:translate3d(-2.2%,-0.4%,0) scale(1.07) rotate(0.15deg);
       }
-      70%{
-        transform:translate3d(-1.6%,-.35%,0) scale(1.052);
+      45%{
+        transform:translate3d(-3.8%,0.15%,0) scale(1.11) rotate(-0.1deg);
+        filter:brightness(1.05) saturate(1.06);
+      }
+      67%{
+        transform:translate3d(-5.6%,-0.5%,0) scale(1.16) rotate(0.12deg);
+      }
+      82%{
+        transform:translate3d(-6.8%,-0.15%,0) scale(1.20) rotate(-0.08deg);
       }
       100%{
-        transform:translate3d(-2.2%,-.55%,0) scale(1.072);
-        filter:brightness(1.055);
+        transform:translate3d(-8.2%,-0.8%,0) scale(1.24) rotate(0deg);
+        filter:brightness(1.08) saturate(1.08);
       }
     }
 
-    @keyframes waterRush{
-      0%{opacity:0;transform:translateX(17%)}
-      22%{opacity:.34}
-      100%{opacity:0;transform:translateX(-19%)}
+    @keyframes rush{
+      0%{opacity:0;transform:translateX(30%) translateY(-2%)}
+      18%{opacity:.48}
+      70%{opacity:.26}
+      100%{opacity:0;transform:translateX(-34%) translateY(5%)}
     }
 
-    @keyframes shadeIn{
+    @keyframes wakeMove{
+      0%{opacity:0;transform:translateX(-8%) scale(.72)}
+      20%{opacity:.72}
+      55%{opacity:.48;transform:translateX(4%) scale(1)}
+      100%{opacity:.16;transform:translateX(16%) scale(1.28)}
+    }
+
+    @keyframes vignetteIn{
       0%{opacity:0}
-      35%{opacity:.22}
-      100%{opacity:.12}
-    }
-
-    @keyframes wakePulse{
-      0%{opacity:0;transform:scale(.84)}
-      30%{opacity:.72}
-      68%{opacity:.38}
-      100%{opacity:.1;transform:scale(1.18)}
-    }
-
-    @keyframes buttonFade{
-      to{opacity:0}
+      28%{opacity:.18}
+      100%{opacity:.34}
     }
 
     #tapPulse{
-      position:absolute;
-      z-index:40;
-      width:clamp(38px,5.2vw,84px);
-      height:clamp(38px,5.2vw,84px);
+      position:fixed;
+      z-index:50;
+      width:72px;
+      height:72px;
       border-radius:50%;
       border:2px solid rgba(232,183,83,.96);
-      box-shadow:0 0 28px rgba(232,183,83,.82);
+      box-shadow:0 0 30px rgba(232,183,83,.85);
       opacity:0;
-      transform:translate(-50%,-50%) scale(.55);
       pointer-events:none;
+      transform:translate(-50%,-50%) scale(.55);
     }
 
-    #tapPulse.play{animation:tapPulse .48s ease forwards}
+    #tapPulse.play{
+      animation:tapPulse .45s ease forwards;
+    }
 
     @keyframes tapPulse{
       0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
@@ -226,15 +249,18 @@
 
     @media (prefers-reduced-motion:reduce){
       #scene2.sailing #scene2Art{
-        animation-duration:.55s;
+        animation-duration:1.2s;
       }
-      #scene2.sailing #speedLines,
-      #scene2.sailing #wakeGlow{
-        display:none;
+      #scene2.sailing #waterRush{
+        animation-duration:.35s;
+      }
+      #scene2.sailing #wake{
+        animation-duration:1.2s;
       }
     }
   </style>
 </head>
+
 <body>
   <main id="app">
     <section id="scene1" class="scene active" aria-label="Scene 1">
@@ -244,9 +270,9 @@
 
     <section id="scene2" class="scene" aria-label="Scene 2">
       <img id="scene2Art" class="art" src="./scene2.png" alt="Across the Waves" draggable="false">
-      <div id="motionShade"></div>
-      <div id="speedLines"></div>
-      <div id="wakeGlow"></div>
+      <div id="waterRush"></div>
+      <div id="wake"></div>
+      <div id="vignette"></div>
       <button id="scene2Continue" class="hotspot" type="button" aria-label="Sail forward"></button>
     </section>
 
@@ -262,10 +288,11 @@
       const tapPulse = document.getElementById("tapPulse");
 
       let sailing = false;
+      let scene2Ready = false;
 
-      function pulseAt(event){
-        tapPulse.style.left = event.clientX + "px";
-        tapPulse.style.top = event.clientY + "px";
+      function pulseAt(x,y){
+        tapPulse.style.left = x + "px";
+        tapPulse.style.top = y + "px";
         tapPulse.classList.remove("play");
         void tapPulse.offsetWidth;
         tapPulse.classList.add("play");
@@ -276,27 +303,61 @@
         next.classList.add("active");
       }
 
-      beginStory.addEventListener("pointerup", e => {
-        e.preventDefault();
-        pulseAt(e);
-        setTimeout(() => showScene(scene2), 220);
-      });
+      function goToScene2(e){
+        if(e && e.preventDefault) e.preventDefault();
+        if(e && typeof e.clientX === "number") pulseAt(e.clientX,e.clientY);
+        setTimeout(() => {
+          showScene(scene2);
+          scene2Ready = true;
+        }, 180);
+      }
 
-      scene2Continue.addEventListener("pointerup", e => {
-        e.preventDefault();
-        if(sailing) return;
+      function startSailing(e){
+        if(!scene2Ready || sailing) return;
+        if(e && e.preventDefault) e.preventDefault();
+
         sailing = true;
-        pulseAt(e);
-        scene2.classList.add("sailing");
 
-        /*
-          When Scene 3 is approved, connect it here.
-          The sailing animation lasts 2250 ms.
-        */
+        if(e && typeof e.clientX === "number"){
+          pulseAt(e.clientX,e.clientY);
+        }
+
+        /* Force Safari to register the starting frame before adding animation */
+        scene2.classList.remove("sailing");
+        void scene2.offsetWidth;
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            scene2.classList.add("sailing");
+          });
+        });
+
         setTimeout(() => {
           document.dispatchEvent(new CustomEvent("scene2SailingComplete"));
-        }, 2250);
-      });
+        }, 2700);
+      }
+
+      /* Scene 1 -> Scene 2 */
+      beginStory.addEventListener("pointerup", goToScene2);
+      beginStory.addEventListener("click", goToScene2);
+
+      /* Primary button */
+      scene2Continue.addEventListener("pointerdown", startSailing);
+      scene2Continue.addEventListener("click", startSailing);
+
+      /*
+        iPhone/iPad fallback:
+        tapping anywhere in Scene 2 also starts the sailing motion.
+      */
+      scene2.addEventListener("pointerdown", startSailing);
+
+      scene2.addEventListener("touchend", (e) => {
+        if(!scene2Ready || sailing) return;
+        e.preventDefault();
+        const t = e.changedTouches && e.changedTouches[0];
+        if(t) pulseAt(t.clientX,t.clientY);
+        startSailing();
+      }, {passive:false});
     })();
   </script>
 </body>
