@@ -56,67 +56,100 @@ background:rgba(2,10,18,.35);z-index:50;font-family:Georgia,serif;color:#ffe9bd;
 
 
 
-/* ===== Scene 4 three-state cinematic sequence ===== */
+
+/* ===== Scene 4 FINAL: 3 approved image states ===== */
+#s4{
+  background:#020b13;
+  touch-action:manipulation;
+  -webkit-user-select:none;
+  user-select:none;
+  overscroll-behavior:none;
+}
+
 .scene4state{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  object-fit:cover;
+  object-fit:contain;          /* never stretch or zoom the artwork */
   object-position:center;
+  background:#020b13;
   opacity:0;
-  transform:scale(1.01);
+  transform:scale(1.008);
   transition:opacity .42s ease, transform .42s ease;
   pointer-events:none;
+  -webkit-user-drag:none;
   user-select:none;
 }
+
 .scene4state.active4{
   opacity:1;
   transform:scale(1);
 }
 
+/* large invisible tap zones; intentionally generous for iPhone/iPad */
 #scene4BottleTap,
-#scene4RockTap{
+#scene4RockTap,
+#scene4ContinueTap{
   position:absolute;
+  z-index:40;
   border:0;
-  background:transparent;
-  z-index:30;
+  outline:0;
   padding:0;
   margin:0;
-  cursor:pointer;
+  background:transparent;
   touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  cursor:pointer;
 }
 
-/* State 1: bottle in her hands */
+/* State 1 bottle */
 #scene4BottleTap{
-  left:22%;
-  top:46%;
-  width:120px;
-  height:170px;
+  left:17%;
+  top:27%;
+  width:25%;
+  height:42%;
 }
 
-/* State 2: rock target */
+/* State 2 rock.
+   State 2 is a taller approved artwork, so this zone is intentionally broad. */
 #scene4RockTap{
   left:49%;
-  top:66%;
-  width:220px;
-  height:170px;
+  top:57%;
+  width:31%;
+  height:37%;
   pointer-events:none;
 }
 
-@media(max-width:760px){
-  #scene4BottleTap{
-    left:18%;
-    top:45%;
-    width:95px;
-    height:150px;
-  }
-  #scene4RockTap{
-    left:45%;
-    top:66%;
-    width:180px;
-    height:150px;
-  }
+/* State 3 "Tap to continue" area */
+#scene4ContinueTap{
+  left:57%;
+  top:70%;
+  width:34%;
+  height:24%;
+  pointer-events:none;
+}
+
+/* tiny gold confirmation pulse when a tap is registered */
+#scene4TapPulse{
+  position:absolute;
+  z-index:45;
+  width:74px;
+  height:74px;
+  border-radius:50%;
+  border:2px solid rgba(239,199,122,.92);
+  box-shadow:0 0 28px rgba(239,199,122,.72);
+  transform:translate(-50%,-50%) scale(.55);
+  opacity:0;
+  pointer-events:none;
+}
+#scene4TapPulse.go{
+  animation:s4TapPulse .42s ease forwards;
+}
+@keyframes s4TapPulse{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
+  45%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.35)}
 }
 
 </style>
@@ -156,6 +189,8 @@ background:rgba(2,10,18,.35);z-index:50;font-family:Georgia,serif;color:#ffe9bd;
 
   <button id="scene4BottleTap" aria-label="Tap the bottle"></button>
   <button id="scene4RockTap" aria-label="Tap the rock"></button>
+  <button id="scene4ContinueTap" aria-label="Continue"></button>
+  <div id="scene4TapPulse"></div>
 </section>
 
 
@@ -217,14 +252,32 @@ svg3.addEventListener('pointerup',()=>{
   }
 });
 
-/* Scene 4: three image states */
+/* Scene 4 FINAL: approved 3-state image sequence */
 const s4img1=document.getElementById('scene4State1');
 const s4img2=document.getElementById('scene4State2');
 const s4img3=document.getElementById('scene4State3');
 const s4BottleTap=document.getElementById('scene4BottleTap');
 const s4RockTap=document.getElementById('scene4RockTap');
+const s4ContinueTap=document.getElementById('scene4ContinueTap');
+const s4Pulse=document.getElementById('scene4TapPulse');
+const s4Scene=document.getElementById('s4');
 
 let s4state=1;
+
+/* preload so the crossfade does not flash */
+['scene4_1.png','scene4_2.png','scene4_3.png'].forEach(src=>{
+  const im=new Image();
+  im.src=src;
+});
+
+function pulseAt(e){
+  const r=s4Scene.getBoundingClientRect();
+  s4Pulse.style.left=(e.clientX-r.left)+'px';
+  s4Pulse.style.top=(e.clientY-r.top)+'px';
+  s4Pulse.classList.remove('go');
+  void s4Pulse.offsetWidth;
+  s4Pulse.classList.add('go');
+}
 
 function showScene4State(n){
   [s4img1,s4img2,s4img3].forEach(img=>img.classList.remove('active4'));
@@ -234,19 +287,30 @@ function showScene4State(n){
   s4state=n;
 }
 
-s4BottleTap.addEventListener('click',()=>{
+s4BottleTap.addEventListener('pointerup',e=>{
+  e.preventDefault();
   if(s4state!==1) return;
-  showScene4State(2);
+  pulseAt(e);
   s4BottleTap.style.pointerEvents='none';
-  setTimeout(()=>{
-    s4RockTap.style.pointerEvents='auto';
-  },350);
+  showScene4State(2);
+  setTimeout(()=>{s4RockTap.style.pointerEvents='auto';},380);
 });
 
-s4RockTap.addEventListener('click',()=>{
+s4RockTap.addEventListener('pointerup',e=>{
+  e.preventDefault();
   if(s4state!==2) return;
+  pulseAt(e);
   s4RockTap.style.pointerEvents='none';
   showScene4State(3);
+  setTimeout(()=>{s4ContinueTap.style.pointerEvents='auto';},380);
+});
+
+/* We leave State 3 on screen for now.
+   This button is ready to connect to Scene 5 when we build it. */
+s4ContinueTap.addEventListener('pointerup',e=>{
+  e.preventDefault();
+  if(s4state!==3) return;
+  pulseAt(e);
 });
 </script>
 </body>
