@@ -133,6 +133,15 @@
       cursor:grabbing;
     }
 
+    /* Success scene: CONTINUE button */
+    #scene6Continue{
+      left:67.5%;
+      top:72.5%;
+      width:21.5%;
+      height:11%;
+      z-index:40;
+    }
+
     #missionHint{
       position:absolute;
       left:50%;
@@ -215,6 +224,12 @@
       <div id="missionHint">DRAG FROM HER HAND TO THE BOTTLE</div>
     </section>
 
+
+    <section id="scene6" class="scene">
+      <img src="./scene6.png" alt="Mission Complete">
+      <button id="scene6Continue" class="hotspot" aria-label="Continue"></button>
+    </section>
+
     <div id="tapPulse" aria-hidden="true"></div>
   </main>
 
@@ -229,6 +244,7 @@
     const scene3 = document.getElementById("scene3");
     const scene4 = document.getElementById("scene4");
     const scene5 = document.getElementById("scene5");
+    const scene6 = document.getElementById("scene6");
 
     const beginStory = document.getElementById("beginStory");
     const scene2Continue = document.getElementById("scene2Continue");
@@ -238,6 +254,7 @@
     const ctx = reachCanvas.getContext("2d");
     const handDragStart = document.getElementById("handDragStart");
     const missionHint = document.getElementById("missionHint");
+    const scene6Continue = document.getElementById("scene6Continue");
 
     /*
       Locked coordinates in the 1672 x 941 artwork.
@@ -392,6 +409,11 @@
       document.dispatchEvent(
         new CustomEvent("bottleMissionComplete")
       );
+
+      /* Show the locked MISSION COMPLETE scene after a short success beat */
+      setTimeout(() => {
+        showScene(scene6);
+      }, 700);
     }
 
     handDragStart.addEventListener("pointerdown",startReach);
@@ -428,6 +450,17 @@
 
       },260);
     });
+
+    /* Success scene CONTINUE button - ready for the next scene */
+    scene6Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+
+      /*
+        The next scene will be connected here.
+      */
+    });
+
   })();
   </script>
 </body>
