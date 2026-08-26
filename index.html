@@ -12,6 +12,7 @@
     :root{
       --bg:#020b13;
       --ratio:1672/941;
+      --gold:#e6b85a;
     }
 
     *{
@@ -34,7 +35,7 @@
       -webkit-user-select:none;
       user-select:none;
       -webkit-touch-callout:none;
-      touch-action:manipulation;
+      touch-action:none;
       overscroll-behavior:none;
     }
 
@@ -56,7 +57,7 @@
       opacity:0;
       pointer-events:none;
       background:var(--bg);
-      transition:opacity .55s ease;
+      transition:opacity .62s ease;
     }
 
     .scene.active{
@@ -64,20 +65,21 @@
       pointer-events:auto;
     }
 
-    .scene img{
+    .scene img,
+    #scene5Canvas{
       position:absolute;
       inset:0;
       width:100%;
       height:100%;
       display:block;
       object-fit:fill;
-      pointer-events:none;
       -webkit-user-drag:none;
+      pointer-events:none;
     }
 
     .hotspot{
       position:absolute;
-      z-index:10;
+      z-index:20;
       border:0;
       outline:0;
       padding:0;
@@ -86,11 +88,11 @@
       cursor:pointer;
       appearance:none;
       -webkit-appearance:none;
-      touch-action:manipulation;
+      touch-action:none;
       -webkit-tap-highlight-color:transparent;
     }
 
-    /* Scene 1: BEGIN THE STORY */
+    /* Scene 1 */
     #beginStory{
       left:63.2%;
       top:75%;
@@ -98,7 +100,7 @@
       height:10.5%;
     }
 
-    /* Scene 2: TAP TO SAIL FORWARD */
+    /* Scene 2 */
     #scene2Continue{
       left:61%;
       top:79%;
@@ -106,9 +108,52 @@
       height:11%;
     }
 
+    /* Scene 5 draggable bottle hit area */
+    #bottleDragArea{
+      left:52.5%;
+      top:66%;
+      width:17%;
+      height:27%;
+      cursor:grab;
+      z-index:50;
+    }
+
+    #bottleDragArea.dragging{
+      cursor:grabbing;
+    }
+
+    #missionHint{
+      position:absolute;
+      left:49%;
+      bottom:3.4%;
+      z-index:45;
+      padding:.45rem .9rem;
+      border:1px solid rgba(230,184,90,.42);
+      border-radius:999px;
+      background:rgba(2,11,19,.46);
+      color:#f2d28c;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(12px,1.4vw,23px);
+      letter-spacing:.04em;
+      opacity:0;
+      pointer-events:none;
+      transform:translateX(-50%);
+      transition:opacity .35s ease;
+      text-shadow:0 1px 8px #000;
+      backdrop-filter:blur(3px);
+    }
+
+    #scene5.active #missionHint{
+      opacity:.92;
+    }
+
+    #missionHint.success{
+      opacity:0 !important;
+    }
+
     #tapPulse{
       position:fixed;
-      z-index:30;
+      z-index:80;
       width:72px;
       height:72px;
       border-radius:50%;
@@ -133,74 +178,365 @@
 
 <body>
   <main id="app">
-    <section id="scene1" class="scene active" aria-label="Scene 1">
-      <img src="./scene 1.png" alt="Our Little Adventure" draggable="false">
-      <button id="beginStory" class="hotspot" type="button" aria-label="Begin the story"></button>
+
+    <section id="scene1" class="scene active">
+      <img src="./scene 1.png" alt="Our Little Adventure">
+      <button id="beginStory" class="hotspot" aria-label="Begin the story"></button>
     </section>
 
-    <section id="scene2" class="scene" aria-label="Scene 2">
-      <img src="./scene2.png" alt="Across the Waves" draggable="false">
-      <button id="scene2Continue" class="hotspot" type="button" aria-label="Sail forward"></button>
+    <section id="scene2" class="scene">
+      <img src="./scene2.png" alt="Across the Waves">
+      <button id="scene2Continue" class="hotspot" aria-label="Sail forward"></button>
     </section>
 
-    <section id="scene3" class="scene" aria-label="Scene 3">
-      <img src="./scene3.png" alt="Boat farther out at sea" draggable="false">
+    <section id="scene3" class="scene">
+      <img src="./scene3.png" alt="Boat sailing farther into the sea">
     </section>
 
-    <section id="scene4" class="scene" aria-label="Scene 4">
-      <img src="./scene4.png" alt="A message bottle appears ahead of the boat" draggable="false">
+    <section id="scene4" class="scene">
+      <img src="./scene4.png" alt="A bottle appears ahead of the boat">
+    </section>
+
+    <section id="scene5" class="scene">
+      <!-- The PNG stays unchanged. Canvas only makes the bottle draggable. -->
+      <canvas id="scene5Canvas" width="1672" height="941" aria-label="Your mission"></canvas>
+      <button id="bottleDragArea" class="hotspot" aria-label="Drag the bottle closer"></button>
+      <div id="missionHint">DRAG THE BOTTLE TOWARD HER HAND</div>
     </section>
 
     <div id="tapPulse" aria-hidden="true"></div>
   </main>
 
   <script>
-    (() => {
-      const scene1 = document.getElementById("scene1");
-      const scene2 = document.getElementById("scene2");
-      const scene3 = document.getElementById("scene3");
-      const scene4 = document.getElementById("scene4");
-      const beginStory = document.getElementById("beginStory");
-      const scene2Continue = document.getElementById("scene2Continue");
-      const tapPulse = document.getElementById("tapPulse");
+  (() => {
+    const W = 1672;
+    const H = 941;
 
-      let scene3Timer = null;
+    const scenes = [...document.querySelectorAll(".scene")];
+    const scene1 = document.getElementById("scene1");
+    const scene2 = document.getElementById("scene2");
+    const scene3 = document.getElementById("scene3");
+    const scene4 = document.getElementById("scene4");
+    const scene5 = document.getElementById("scene5");
 
-      function pulseAt(event){
-        tapPulse.style.left = event.clientX + "px";
-        tapPulse.style.top = event.clientY + "px";
-        tapPulse.classList.remove("play");
-        void tapPulse.offsetWidth;
-        tapPulse.classList.add("play");
+    const beginStory = document.getElementById("beginStory");
+    const scene2Continue = document.getElementById("scene2Continue");
+    const tapPulse = document.getElementById("tapPulse");
+
+    const canvas = document.getElementById("scene5Canvas");
+    const ctx = canvas.getContext("2d");
+    const bottleDragArea = document.getElementById("bottleDragArea");
+    const missionHint = document.getElementById("missionHint");
+
+    const scene5Image = new Image();
+    scene5Image.src = "./scene5.png";
+
+    /*
+      Bottle crop from the EXISTING scene5.png.
+      No additional PNG is needed.
+    */
+    const bottle = {
+      sx:900,
+      sy:640,
+      sw:220,
+      sh:235,
+
+      x:900,
+      y:640,
+
+      startX:900,
+      startY:640,
+
+      finalX:720,
+      finalY:610,
+
+      dragging:false,
+      complete:false
+    };
+
+    const handTarget = { x:918, y:648 };
+
+    function showScene(next){
+      scenes.forEach(s => s.classList.remove("active"));
+      next.classList.add("active");
+    }
+
+    function pulseAt(e){
+      if(typeof e.clientX !== "number") return;
+      tapPulse.style.left = e.clientX + "px";
+      tapPulse.style.top = e.clientY + "px";
+      tapPulse.classList.remove("play");
+      void tapPulse.offsetWidth;
+      tapPulse.classList.add("play");
+    }
+
+    /*
+      Converts phone/iPad coordinates to the original 1672x941 artwork.
+    */
+    function pointInArtwork(e){
+      const r = canvas.getBoundingClientRect();
+      return {
+        x:(e.clientX-r.left) * W/r.width,
+        y:(e.clientY-r.top) * H/r.height
+      };
+    }
+
+    function drawBottleShape(x,y){
+      ctx.save();
+
+      /*
+        Clip around the bottle so we move the bottle itself,
+        not a large square of ocean.
+      */
+      ctx.beginPath();
+      ctx.moveTo(x+163,y+5);
+      ctx.lineTo(x+216,y+16);
+      ctx.lineTo(x+207,y+55);
+      ctx.lineTo(x+190,y+70);
+      ctx.lineTo(x+200,y+98);
+      ctx.lineTo(x+181,y+135);
+      ctx.lineTo(x+145,y+199);
+      ctx.lineTo(x+112,y+232);
+      ctx.lineTo(x+30,y+222);
+      ctx.lineTo(x+13,y+197);
+      ctx.lineTo(x+24,y+165);
+      ctx.lineTo(x+65,y+120);
+      ctx.lineTo(x+103,y+88);
+      ctx.lineTo(x+143,y+59);
+      ctx.lineTo(x+148,y+35);
+      ctx.closePath();
+      ctx.clip();
+
+      ctx.shadowColor = "rgba(255,197,88,.78)";
+      ctx.shadowBlur = 18;
+
+      ctx.drawImage(
+        scene5Image,
+        bottle.sx,bottle.sy,bottle.sw,bottle.sh,
+        x,y,bottle.sw,bottle.sh
+      );
+
+      ctx.restore();
+    }
+
+    function coverOriginalBottle(){
+      /*
+        A clean piece of water from the SAME scene image
+        covers the original baked-in bottle while dragging.
+      */
+      ctx.save();
+      ctx.globalAlpha = .98;
+      ctx.drawImage(
+        scene5Image,
+        1120,690,220,235,
+        900,640,220,235
+      );
+
+      /* soft blend around the patch */
+      const g = ctx.createRadialGradient(1010,755,35,1010,755,150);
+      g.addColorStop(0,"rgba(4,20,35,0)");
+      g.addColorStop(.72,"rgba(4,20,35,.04)");
+      g.addColorStop(1,"rgba(4,20,35,.18)");
+      ctx.fillStyle=g;
+      ctx.fillRect(875,615,270,285);
+      ctx.restore();
+    }
+
+    function drawGuide(){
+      if(!bottle.dragging || bottle.complete) return;
+
+      /* cork position on moved bottle */
+      const corkX = bottle.x + 187;
+      const corkY = bottle.y + 31;
+
+      ctx.save();
+      ctx.strokeStyle="rgba(238,190,82,.72)";
+      ctx.lineWidth=3;
+      ctx.setLineDash([10,10]);
+      ctx.shadowColor="rgba(238,190,82,.65)";
+      ctx.shadowBlur=10;
+
+      ctx.beginPath();
+      ctx.moveTo(handTarget.x,handTarget.y);
+      ctx.lineTo(corkX,corkY);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function renderScene5(){
+      if(!scene5Image.complete) return;
+
+      ctx.clearRect(0,0,W,H);
+      ctx.drawImage(scene5Image,0,0,W,H);
+
+      if(bottle.dragging || bottle.complete){
+        coverOriginalBottle();
+        drawBottleShape(bottle.x,bottle.y);
+        drawGuide();
       }
 
-      function showScene(next){
-        document.querySelectorAll(".scene").forEach(scene => {
-          scene.classList.remove("active");
-        });
-        next.classList.add("active");
+      if(bottle.complete){
+        ctx.save();
+        ctx.strokeStyle="rgba(255,210,108,.88)";
+        ctx.lineWidth=4;
+        ctx.shadowColor="rgba(255,194,65,.95)";
+        ctx.shadowBlur=28;
+        ctx.beginPath();
+        ctx.arc(handTarget.x,handTarget.y,48,0,Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
       }
+    }
 
-      beginStory.addEventListener("pointerup", event => {
-        event.preventDefault();
-        pulseAt(event);
-        setTimeout(() => showScene(scene2), 220);
-      });
+    scene5Image.onload = renderScene5;
 
-      scene2Continue.addEventListener("pointerup", event => {
-        event.preventDefault();
-        pulseAt(event);
+    function syncHitArea(){
+      /*
+        Keep the invisible drag area over the CURRENT bottle position.
+      */
+      bottleDragArea.style.left = (bottle.x/W*100) + "%";
+      bottleDragArea.style.top = (bottle.y/H*100) + "%";
+      bottleDragArea.style.width = (bottle.sw/W*100) + "%";
+      bottleDragArea.style.height = (bottle.sh/H*100) + "%";
+    }
 
-        setTimeout(() => {
-          showScene(scene3);
+    function startDrag(e){
+      if(bottle.complete) return;
 
-          clearTimeout(scene3Timer);
-          scene3Timer = setTimeout(() => {
-            showScene(scene4);
-          }, 1500);
-        }, 260);
-      });
-    })();
+      e.preventDefault();
+      bottle.dragging=true;
+      bottleDragArea.classList.add("dragging");
+
+      const p=pointInArtwork(e);
+
+      /*
+        Preserve where inside the bottle the user grabbed it.
+      */
+      bottle.grabDX=p.x-bottle.x;
+      bottle.grabDY=p.y-bottle.y;
+
+      renderScene5();
+
+      try{
+        bottleDragArea.setPointerCapture(e.pointerId);
+      }catch(_){}
+    }
+
+    function dragBottle(e){
+      if(!bottle.dragging || bottle.complete) return;
+
+      e.preventDefault();
+      const p=pointInArtwork(e);
+
+      bottle.x=p.x-bottle.grabDX;
+      bottle.y=p.y-bottle.grabDY;
+
+      /* Keep it inside the artwork */
+      bottle.x=Math.max(0,Math.min(W-bottle.sw,bottle.x));
+      bottle.y=Math.max(0,Math.min(H-bottle.sh,bottle.y));
+
+      syncHitArea();
+      renderScene5();
+    }
+
+    function finishDrag(e){
+      if(!bottle.dragging || bottle.complete) return;
+
+      e.preventDefault();
+      bottle.dragging=false;
+      bottleDragArea.classList.remove("dragging");
+
+      const corkX=bottle.x+187;
+      const corkY=bottle.y+31;
+      const d=Math.hypot(corkX-handTarget.x,corkY-handTarget.y);
+
+      if(d < 135){
+        /*
+          SUCCESS: bottle snaps into her reaching hand.
+        */
+        bottle.complete=true;
+        bottle.x=bottle.finalX;
+        bottle.y=bottle.finalY;
+        missionHint.classList.add("success");
+        bottleDragArea.style.pointerEvents="none";
+
+        syncHitArea();
+        renderScene5();
+
+        /*
+          Ready for the next scene.
+          We will connect this event later.
+        */
+        document.dispatchEvent(
+          new CustomEvent("bottleMissionComplete")
+        );
+      }else{
+        /*
+          Not close enough: smoothly return to the water.
+        */
+        const fromX=bottle.x;
+        const fromY=bottle.y;
+        const start=performance.now();
+        const duration=360;
+
+        function back(now){
+          const t=Math.min(1,(now-start)/duration);
+          const ease=1-Math.pow(1-t,3);
+
+          bottle.x=fromX+(bottle.startX-fromX)*ease;
+          bottle.y=fromY+(bottle.startY-fromY)*ease;
+
+          syncHitArea();
+          renderScene5();
+
+          if(t<1){
+            requestAnimationFrame(back);
+          }
+        }
+
+        requestAnimationFrame(back);
+      }
+    }
+
+    bottleDragArea.addEventListener("pointerdown",startDrag);
+    bottleDragArea.addEventListener("pointermove",dragBottle);
+    bottleDragArea.addEventListener("pointerup",finishDrag);
+    bottleDragArea.addEventListener("pointercancel",finishDrag);
+
+    /*
+      Current story flow.
+      Scene 3 and Scene 4 stay visible longer, as requested earlier.
+    */
+    beginStory.addEventListener("pointerup",e=>{
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(()=>showScene(scene2),220);
+    });
+
+    scene2Continue.addEventListener("pointerup",e=>{
+      e.preventDefault();
+      pulseAt(e);
+
+      setTimeout(()=>{
+        showScene(scene3);
+
+        setTimeout(()=>{
+          showScene(scene4);
+
+          setTimeout(()=>{
+            showScene(scene5);
+            renderScene5();
+            syncHitArea();
+          },3000);
+
+        },3000);
+
+      },260);
+    });
+
+    window.addEventListener("resize",syncHitArea);
+    syncHitArea();
+  })();
   </script>
 </body>
 </html>
