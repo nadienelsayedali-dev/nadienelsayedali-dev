@@ -203,9 +203,11 @@
       100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
     }
   
-    /* ===== Scene 8: break-the-bottle mission ===== */
+    /* ===== Scene 8: Grab -> Lift -> Drop ===== */
     #scene8{
       background:#020b13;
+      touch-action:none;
+      -webkit-tap-highlight-color:transparent;
     }
 
     .scene8State{
@@ -216,7 +218,7 @@
       display:block;
       object-fit:fill;
       opacity:0;
-      transform:scale(1.004);
+      transform:scale(1.003);
       transition:opacity .38s ease, transform .38s ease;
       pointer-events:none;
       -webkit-user-drag:none;
@@ -227,11 +229,23 @@
       transform:scale(1);
     }
 
-    .scene8Hotspot{
+    #scene8Gesture{
       position:absolute;
-      z-index:60;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:55;
+      pointer-events:none;
+    }
+
+    #scene8TapRock{
+      position:absolute;
+      left:68%;
+      top:65%;
+      width:28%;
+      height:31%;
+      z-index:65;
       border:0;
-      outline:0;
       padding:0;
       margin:0;
       background:transparent;
@@ -242,67 +256,50 @@
       -webkit-tap-highlight-color:transparent;
     }
 
-    /*
-      State 1 rock: large glowing rock at the lower-right.
-      Intentionally generous for iPhone/iPad tapping.
-    */
-    #scene8GrabRock{
-      left:70%;
-      top:69%;
-      width:23%;
-      height:24%;
-    }
-
-    /* State 2: raised rock in her hand */
-    #scene8LiftRock{
-      left:46%;
-      top:17%;
-      width:17%;
-      height:28%;
-      pointer-events:none;
-    }
-
-    /*
-      State 3: bottle at the bottom.
-      Tapping it completes the "drop on bottle" action.
-    */
-    #scene8DropBottle{
-      left:33%;
-      top:76%;
-      width:20%;
-      height:20%;
-      pointer-events:none;
-    }
-
-    #scene8Pulse{
+    #scene8Hint{
       position:absolute;
+      left:50%;
+      bottom:2.7%;
+      transform:translateX(-50%);
       z-index:70;
-      width:78px;
-      height:78px;
-      border-radius:50%;
-      border:2px solid rgba(240,190,78,.96);
-      box-shadow:0 0 30px rgba(240,190,78,.82);
+      padding:.43rem .95rem;
+      border:1px solid rgba(232,183,83,.42);
+      border-radius:999px;
+      background:rgba(2,11,19,.46);
+      color:#efd18b;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(12px,1.2vw,20px);
+      letter-spacing:.04em;
+      text-shadow:0 2px 8px #000;
+      backdrop-filter:blur(3px);
       opacity:0;
-      transform:translate(-50%,-50%) scale(.55);
       pointer-events:none;
+      transition:opacity .25s ease;
+      white-space:nowrap;
     }
 
-    #scene8Pulse.go{
-      animation:scene8PulseAnim .46s ease forwards;
-    }
-
-    @keyframes scene8PulseAnim{
-      0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
-      45%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-      100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
+    #scene8.active #scene8Hint{
+      opacity:.95;
     }
 
   
-    /* Direct-touch layer for iPad/iPhone reliability */
-    #scene8{
+    /* ===== Scene 9: broken-bottle reveal ===== */
+    #scene9Continue{
+      position:absolute;
+      left:66%;
+      top:72%;
+      width:24%;
+      height:12%;
+      z-index:40;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
       touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
-      cursor:pointer;
     }
 
   </style>
@@ -349,15 +346,18 @@
     </section>
 
 <section id="scene8" class="scene">
-      <img id="scene8State1" class="scene8State active8" src="./scene8_1.png?v=3" alt="Grab a rock">
-      <img id="scene8State2" class="scene8State" src="./scene8_2.png?v=3" alt="Lift the rock">
-      <img id="scene8State3" class="scene8State" src="./scene8_3.png?v=3" alt="Drop on the bottle">
+      <img id="scene8State1" class="scene8State active8" src="./scene8_1.png?v=8" alt="Grab the Rock">
+      <img id="scene8State2" class="scene8State" src="./scene8_2.png?v=8" alt="Lift It Up">
+      <img id="scene8State3" class="scene8State" src="./scene8_3.png?v=8" alt="Ready to Drop">
 
-      <button id="scene8GrabRock" class="scene8Hotspot" type="button" aria-label="Grab the rock"></button>
-      <button id="scene8LiftRock" class="scene8Hotspot" type="button" aria-label="Lift the rock"></button>
-      <button id="scene8DropBottle" class="scene8Hotspot" type="button" aria-label="Drop the rock on the bottle"></button>
+      <canvas id="scene8Gesture" width="1672" height="941"></canvas>
+      <button id="scene8TapRock" type="button" aria-label="Tap the rock"></button>
+      <div id="scene8Hint">Tap the glowing rock</div>
+    </section>
 
-      <div id="scene8Pulse" aria-hidden="true"></div>
+<section id="scene9" class="scene">
+      <img src="./scene9.png" alt="Adventure has been waiting for you">
+      <button id="scene9Continue" type="button" aria-label="Continue"></button>
     </section>
 
     <div id="tapPulse" aria-hidden="true"></div>
@@ -377,6 +377,7 @@
     const scene6 = document.getElementById("scene6");
     const scene7 = document.getElementById("scene7");
     const scene8 = document.getElementById("scene8");
+    const scene9 = document.getElementById("scene9");
 
     const beginStory = document.getElementById("beginStory");
     const scene2Continue = document.getElementById("scene2Continue");
@@ -391,10 +392,11 @@
     const scene8State1 = document.getElementById("scene8State1");
     const scene8State2 = document.getElementById("scene8State2");
     const scene8State3 = document.getElementById("scene8State3");
-    const scene8GrabRock = document.getElementById("scene8GrabRock");
-    const scene8LiftRock = document.getElementById("scene8LiftRock");
-    const scene8DropBottle = document.getElementById("scene8DropBottle");
-    const scene8Pulse = document.getElementById("scene8Pulse");
+    const scene8Gesture = document.getElementById("scene8Gesture");
+    const scene8Ctx = scene8Gesture.getContext("2d");
+    const scene8TapRock = document.getElementById("scene8TapRock");
+    const scene8Hint = document.getElementById("scene8Hint");
+    const scene9Continue = document.getElementById("scene9Continue");
 
     /*
       Locked coordinates in the 1672 x 941 artwork.
@@ -609,162 +611,271 @@
     });
 
 
-    /* ===== Scene 8 interaction: iPhone/iPad-safe ===== */
-    let scene8Step = 1;
-    let scene8Busy = false;
-    let lastScene8Action = 0;
+    /* ===== Scene 8 interaction =====
+       1) Tap rock -> show grabbed state.
+       2) Drag upward -> draw gold line, then show lifted state.
+       3) Drag downward toward bottle -> draw gold line and complete.
+    */
 
-    ["./scene8_1.png?v=3","./scene8_2.png?v=3","./scene8_3.png?v=3"].forEach(src => {
+    let scene8Phase = 0;
+    let scene8Dragging = false;
+    let scene8PointerId = null;
+    let scene8Start = null;
+
+    const ART_W = 1672;
+    const ART_H = 941;
+
+    /* Coordinates in the locked artwork */
+    const grabbedRock = { x:1040, y:770 };   // Scene 8.2 rock
+    const liftedRock  = { x:930,  y:175 };   // Scene 8.3 raised rock
+    const bottleTarget = { x:700, y:835 };   // bottle in Scene 8.3
+
+    function setScene8State(n){
+      scene8State1.classList.toggle("active8", n === 1);
+      scene8State2.classList.toggle("active8", n === 2);
+      scene8State3.classList.toggle("active8", n === 3);
+    }
+
+    function resetScene8(){
+      scene8Phase = 0;
+      scene8Dragging = false;
+      scene8PointerId = null;
+      scene8Start = null;
+      setScene8State(1);
+      scene8TapRock.style.display = "block";
+      scene8Hint.textContent = "Tap the glowing rock";
+      scene8Ctx.clearRect(0,0,ART_W,ART_H);
+    }
+
+    ["./scene8_1.png?v=8","./scene8_2.png?v=8","./scene8_3.png?v=8"].forEach(src => {
       const img = new Image();
       img.src = src;
     });
 
-    function setScene8State(step){
-      scene8Step = step;
-
-      scene8State1.classList.toggle("active8", step === 1);
-      scene8State2.classList.toggle("active8", step === 2);
-      scene8State3.classList.toggle("active8", step === 3);
-
-      /*
-        Buttons remain as accessibility/fallback targets,
-        but the whole artwork also detects taps directly.
-      */
-      scene8GrabRock.style.pointerEvents = step === 1 ? "auto" : "none";
-      scene8LiftRock.style.pointerEvents = step === 2 ? "auto" : "none";
-      scene8DropBottle.style.pointerEvents = step === 3 ? "auto" : "none";
-    }
-
-    function resetScene8(){
-      scene8Busy = false;
-      lastScene8Action = 0;
-      setScene8State(1);
-    }
-
-    function scene8PulseAtClient(clientX, clientY){
-      const r = scene8.getBoundingClientRect();
-      scene8Pulse.style.left = (clientX - r.left) + "px";
-      scene8Pulse.style.top = (clientY - r.top) + "px";
-      scene8Pulse.classList.remove("go");
-      void scene8Pulse.offsetWidth;
-      scene8Pulse.classList.add("go");
-    }
-
-    /*
-      Convert a screen tap to percentages of the 16:9 artwork.
-      This works even when the artwork is letterboxed on iPad.
-    */
-    function scene8Point(clientX, clientY){
-      const r = scene8.getBoundingClientRect();
+    function artPoint(clientX, clientY){
+      const r = scene8Gesture.getBoundingClientRect();
       return {
-        x: ((clientX - r.left) / r.width) * 100,
-        y: ((clientY - r.top) / r.height) * 100
+        x:(clientX-r.left) * ART_W/r.width,
+        y:(clientY-r.top) * ART_H/r.height
       };
     }
 
-    function isInside(p, left, top, width, height){
-      return (
-        p.x >= left &&
-        p.x <= left + width &&
-        p.y >= top &&
-        p.y <= top + height
-      );
+    function clearScene8Line(){
+      scene8Ctx.clearRect(0,0,ART_W,ART_H);
     }
 
-    function advanceScene8(clientX, clientY, forceStep = null){
-      const now = Date.now();
+    function drawScene8Line(from, to){
+      clearScene8Line();
 
-      /* Prevent pointerup + click from advancing twice. */
-      if(scene8Busy || now - lastScene8Action < 550) return;
+      scene8Ctx.save();
+      scene8Ctx.lineCap = "round";
+      scene8Ctx.lineJoin = "round";
+      scene8Ctx.strokeStyle = "rgba(236,184,77,.96)";
+      scene8Ctx.lineWidth = 4;
+      scene8Ctx.setLineDash([13,10]);
+      scene8Ctx.shadowColor = "rgba(236,184,77,.95)";
+      scene8Ctx.shadowBlur = 16;
 
-      const p = scene8Point(clientX, clientY);
+      scene8Ctx.beginPath();
+      scene8Ctx.moveTo(from.x, from.y);
+      scene8Ctx.lineTo(to.x, to.y);
+      scene8Ctx.stroke();
 
-      let valid = false;
-
-      if(scene8Step === 1){
-        /*
-          Actual glowing rock in scene8_1:
-          x≈72–91%, y≈70–92%.
-          Generous area for fingers.
-        */
-        valid = forceStep === 1 || isInside(p, 68, 64, 29, 34);
-      }
-      else if(scene8Step === 2){
-        /*
-          Raised rock in her right hand:
-          x≈47–61%, y≈18–43%.
-        */
-        valid = forceStep === 2 || isInside(p, 43, 12, 24, 39);
-      }
-      else if(scene8Step === 3){
-        /*
-          Bottle at the lower part of scene8_3:
-          x≈34–52%, y≈76–96%.
-        */
-        valid = forceStep === 3 || isInside(p, 29, 70, 29, 29);
-      }
-
-      if(!valid) return;
-
-      scene8Busy = true;
-      lastScene8Action = now;
-      scene8PulseAtClient(clientX, clientY);
-
-      if(scene8Step === 1){
-        setTimeout(() => {
-          setScene8State(2);
-          scene8Busy = false;
-        }, 260);
-      }
-      else if(scene8Step === 2){
-        setTimeout(() => {
-          setScene8State(3);
-          scene8Busy = false;
-        }, 260);
-      }
-      else if(scene8Step === 3){
-        setTimeout(() => {
-          scene8Busy = false;
-          document.dispatchEvent(new CustomEvent("scene8MissionComplete"));
-        }, 260);
-      }
+      scene8Ctx.setLineDash([]);
+      scene8Ctx.fillStyle = "rgba(255,218,130,.98)";
+      scene8Ctx.beginPath();
+      scene8Ctx.arc(to.x,to.y,8,0,Math.PI*2);
+      scene8Ctx.fill();
+      scene8Ctx.restore();
     }
 
-    /* Accessibility / direct invisible hotspots */
-    scene8GrabRock.addEventListener("pointerup", e => {
+    /* STEP 1: tap rock -> grabbed image */
+    scene8TapRock.addEventListener("pointerup", e => {
       e.preventDefault();
-      advanceScene8(e.clientX, e.clientY, 1);
-    });
+      if(scene8Phase !== 0) return;
 
-    scene8LiftRock.addEventListener("pointerup", e => {
-      e.preventDefault();
-      advanceScene8(e.clientX, e.clientY, 2);
-    });
-
-    scene8DropBottle.addEventListener("pointerup", e => {
-      e.preventDefault();
-      advanceScene8(e.clientX, e.clientY, 3);
+      scene8Phase = 1;
+      setScene8State(2);
+      scene8TapRock.style.display = "none";
+      scene8Hint.textContent = "Drag upward to lift the rock";
     });
 
     /*
-      Main fallback: tapping the artwork itself.
-      This is the important Safari/iPad fix.
+      STEP 2 and STEP 3 use gestures directly on the scene.
     */
-    scene8.addEventListener("pointerup", e => {
+    scene8.addEventListener("pointerdown", e => {
+      if(scene8Phase !== 1 && scene8Phase !== 2) return;
+
       e.preventDefault();
-      advanceScene8(e.clientX, e.clientY);
+      const p = artPoint(e.clientX,e.clientY);
+
+      if(scene8Phase === 1){
+        /* Begin upward drag near the grabbed rock */
+        if(Math.hypot(p.x-grabbedRock.x,p.y-grabbedRock.y) > 240) return;
+      } else {
+        /* Begin downward drag near the raised rock */
+        if(Math.hypot(p.x-liftedRock.x,p.y-liftedRock.y) > 260) return;
+      }
+
+      scene8Dragging = true;
+      scene8PointerId = e.pointerId;
+      scene8Start = p;
+
+      try{ scene8.setPointerCapture(e.pointerId); }catch(_){}
     });
 
-    scene8.addEventListener("touchend", e => {
+    scene8.addEventListener("pointermove", e => {
+      if(!scene8Dragging || !scene8Start) return;
+      e.preventDefault();
+
+      const p = artPoint(e.clientX,e.clientY);
+
+      if(scene8Phase === 1){
+        /* Gold line upward from grabbed rock */
+        drawScene8Line(grabbedRock,p);
+
+        if(p.y < scene8Start.y - 150){
+          scene8Phase = 2;
+          setScene8State(3);
+          clearScene8Line();
+          scene8Hint.textContent = "Now drag downward toward the bottle";
+          scene8Dragging = false;
+
+          try{ scene8.releasePointerCapture(e.pointerId); }catch(_){}
+        }
+      }
+      else if(scene8Phase === 2){
+        /* Gold line downward from lifted rock */
+        drawScene8Line(liftedRock,p);
+
+        const distanceToBottle = Math.hypot(
+          p.x-bottleTarget.x,
+          p.y-bottleTarget.y
+        );
+
+        if(distanceToBottle < 150){
+          scene8Phase = 3;
+          scene8Dragging = false;
+          drawScene8Line(liftedRock,bottleTarget);
+          scene8Hint.textContent = "Ready to break the bottle";
+
+          try{ scene8.releasePointerCapture(e.pointerId); }catch(_){}
+
+          document.dispatchEvent(
+            new CustomEvent("scene8MissionComplete")
+          );
+
+          setTimeout(() => {
+            showScene(scene9);
+          }, 550);
+
+          setTimeout(() => {
+            showScene(scene9);
+          }, 550);
+        }
+      }
+    });
+
+    scene8.addEventListener("pointerup", e => {
+      if(!scene8Dragging) return;
+      e.preventDefault();
+
+      /* If user releases too early, keep the same state and let them retry. */
+      clearScene8Line();
+      scene8Dragging = false;
+      scene8PointerId = null;
+      scene8Start = null;
+
+      if(scene8Phase === 1){
+        scene8Hint.textContent = "Drag upward to lift the rock";
+      }
+      else if(scene8Phase === 2){
+        scene8Hint.textContent = "Drag downward toward the bottle";
+      }
+    });
+
+    scene8.addEventListener("pointercancel", e => {
+      if(!scene8Dragging) return;
+      e.preventDefault();
+      clearScene8Line();
+      scene8Dragging = false;
+      scene8PointerId = null;
+      scene8Start = null;
+    });
+
+    /* Touch fallback for older iPad Safari */
+    let s8Touch = false;
+
+    scene8.addEventListener("touchstart", e => {
+      if(scene8Phase !== 1 && scene8Phase !== 2) return;
+      const t = e.changedTouches && e.changedTouches[0];
+      if(!t) return;
+
+      const p = artPoint(t.clientX,t.clientY);
+
+      if(scene8Phase === 1 && Math.hypot(p.x-grabbedRock.x,p.y-grabbedRock.y) > 240) return;
+      if(scene8Phase === 2 && Math.hypot(p.x-liftedRock.x,p.y-liftedRock.y) > 260) return;
+
+      e.preventDefault();
+      s8Touch = true;
+      scene8Dragging = true;
+      scene8Start = p;
+    }, {passive:false});
+
+    scene8.addEventListener("touchmove", e => {
+      if(!s8Touch || !scene8Dragging) return;
       const t = e.changedTouches && e.changedTouches[0];
       if(!t) return;
       e.preventDefault();
-      advanceScene8(t.clientX, t.clientY);
-    }, { passive:false });
 
-    scene8.addEventListener("click", e => {
+      const p = artPoint(t.clientX,t.clientY);
+
+      if(scene8Phase === 1){
+        drawScene8Line(grabbedRock,p);
+
+        if(p.y < scene8Start.y - 150){
+          scene8Phase = 2;
+          setScene8State(3);
+          clearScene8Line();
+          scene8Hint.textContent = "Now drag downward toward the bottle";
+          scene8Dragging = false;
+          s8Touch = false;
+        }
+      }
+      else if(scene8Phase === 2){
+        drawScene8Line(liftedRock,p);
+
+        if(Math.hypot(p.x-bottleTarget.x,p.y-bottleTarget.y) < 150){
+          scene8Phase = 3;
+          drawScene8Line(liftedRock,bottleTarget);
+          scene8Hint.textContent = "Ready to break the bottle";
+          scene8Dragging = false;
+          s8Touch = false;
+
+          document.dispatchEvent(
+            new CustomEvent("scene8MissionComplete")
+          );
+        }
+      }
+    }, {passive:false});
+
+    scene8.addEventListener("touchend", e => {
+      if(!s8Touch) return;
       e.preventDefault();
-      advanceScene8(e.clientX, e.clientY);
+      clearScene8Line();
+      s8Touch = false;
+      scene8Dragging = false;
+      scene8Start = null;
+    }, {passive:false});
+
+
+    /* Scene 9 CONTINUE button - ready for the next scene */
+    scene9Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      /*
+        The next scene will be connected here.
+      */
     });
 
   })();
