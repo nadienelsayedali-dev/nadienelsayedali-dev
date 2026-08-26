@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#020b13" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#020b13">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Our Little Adventure</title>
+
   <style>
+    :root {
+      --scene-ratio: 1672 / 941;
+      --gold: #e8b753;
+      --bg: #020b13;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -15,80 +24,109 @@
     html, body {
       width: 100%;
       height: 100%;
+      min-height: 100dvh;
       overflow: hidden;
-      background: #020b13;
+      background: var(--bg);
     }
 
     body {
-      font-family: Georgia, "Times New Roman", serif;
+      position: fixed;
+      inset: 0;
       -webkit-user-select: none;
       user-select: none;
-      touch-action: manipulation;
+      -webkit-touch-callout: none;
       overscroll-behavior: none;
+      touch-action: manipulation;
     }
 
     #app {
       position: fixed;
       inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #020b13;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: var(--bg);
     }
 
-    #scene1 {
+    .scene {
+      position: absolute;
+      width: min(100vw, calc(100dvh * 1672 / 941));
+      height: min(100dvh, calc(100vw * 941 / 1672));
+      aspect-ratio: var(--scene-ratio);
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.006);
+      transition: opacity .48s ease, transform .48s ease;
+      background: var(--bg);
+    }
+
+    .scene.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    .scene img {
       position: absolute;
       inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 1;
-      transition: opacity .45s ease;
-    }
-
-    #scene1 img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      object-position: center;
-      background: #020b13;
+      display: block;
+      object-fit: fill;
       pointer-events: none;
       -webkit-user-drag: none;
     }
 
-    /* Invisible tap area over BEGIN THE STORY */
-    #beginStory {
+    .hotspot {
       position: absolute;
-      left: 62%;
-      top: 70%;
-      width: 27%;
-      height: 14%;
+      z-index: 10;
       border: 0;
+      outline: 0;
       padding: 0;
+      margin: 0;
       background: transparent;
       cursor: pointer;
-      z-index: 10;
+      appearance: none;
+      -webkit-appearance: none;
+      touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Scene 1: BEGIN THE STORY */
+    #beginStory {
+      left: 63.2%;
+      top: 75.0%;
+      width: 21.5%;
+      height: 10.5%;
+    }
+
+    /* Scene 2: TAP TO SAIL FORWARD */
+    #scene2Continue {
+      left: 64.3%;
+      top: 82.0%;
+      width: 24.5%;
+      height: 8.5%;
     }
 
     #tapPulse {
       position: absolute;
-      width: 84px;
-      height: 84px;
+      z-index: 30;
+      width: clamp(38px, 5.2vw, 84px);
+      height: clamp(38px, 5.2vw, 84px);
       border-radius: 50%;
-      border: 2px solid rgba(232, 183, 83, .95);
-      box-shadow: 0 0 30px rgba(232, 183, 83, .75);
+      border: 2px solid rgba(232, 183, 83, .96);
+      box-shadow: 0 0 28px rgba(232, 183, 83, .82);
       opacity: 0;
       transform: translate(-50%, -50%) scale(.55);
       pointer-events: none;
-      z-index: 20;
     }
 
     #tapPulse.play {
-      animation: pulse .48s ease forwards;
+      animation: tapPulse .48s ease forwards;
     }
 
-    @keyframes pulse {
+    @keyframes tapPulse {
       0% {
         opacity: 0;
         transform: translate(-50%, -50%) scale(.55);
@@ -102,40 +140,70 @@
         transform: translate(-50%, -50%) scale(1.45);
       }
     }
+
+    @media (orientation: portrait) {
+      .scene {
+        width: 100vw;
+        height: auto;
+      }
+    }
   </style>
 </head>
+
 <body>
   <main id="app">
-    <section id="scene1" aria-label="Scene 1">
-      <img src="scene%201.png" alt="Our Little Adventure" />
-      <button id="beginStory" aria-label="Begin the story"></button>
-      <div id="tapPulse"></div>
+    <section id="scene1" class="scene active" aria-label="Scene 1">
+      <img src="./scene 1.png" alt="Our Little Adventure" draggable="false">
+      <button id="beginStory" class="hotspot" type="button" aria-label="Begin the story"></button>
     </section>
+
+    <section id="scene2" class="scene" aria-label="Scene 2">
+      <img src="./scene2.png" alt="Across the Waves" draggable="false">
+      <button id="scene2Continue" class="hotspot" type="button" aria-label="Sail forward"></button>
+    </section>
+
+    <div id="tapPulse" aria-hidden="true"></div>
   </main>
 
   <script>
-    const beginStory = document.getElementById("beginStory");
-    const tapPulse = document.getElementById("tapPulse");
-    const scene1 = document.getElementById("scene1");
+    (() => {
+      const scene1 = document.getElementById("scene1");
+      const scene2 = document.getElementById("scene2");
+      const beginStory = document.getElementById("beginStory");
+      const scene2Continue = document.getElementById("scene2Continue");
+      const tapPulse = document.getElementById("tapPulse");
 
-    function pulseAt(event) {
-      const rect = scene1.getBoundingClientRect();
-      tapPulse.style.left = (event.clientX - rect.left) + "px";
-      tapPulse.style.top = (event.clientY - rect.top) + "px";
-      tapPulse.classList.remove("play");
-      void tapPulse.offsetWidth;
-      tapPulse.classList.add("play");
-    }
+      function pulseAt(event) {
+        tapPulse.style.left = event.clientX + "px";
+        tapPulse.style.top = event.clientY + "px";
+        tapPulse.classList.remove("play");
+        void tapPulse.offsetWidth;
+        tapPulse.classList.add("play");
+      }
 
-    beginStory.addEventListener("pointerup", (event) => {
-      event.preventDefault();
-      pulseAt(event);
+      function showScene(next) {
+        document.querySelectorAll(".scene").forEach(scene => {
+          scene.classList.remove("active");
+        });
+        next.classList.add("active");
+      }
 
-      /*
-        Scene 2 will be connected here next.
-        Keeping Scene 1 standalone prevents broken links while you upload it.
-      */
-    });
+      beginStory.addEventListener("pointerup", (event) => {
+        event.preventDefault();
+        pulseAt(event);
+        setTimeout(() => showScene(scene2), 220);
+      });
+
+      scene2Continue.addEventListener("pointerup", (event) => {
+        event.preventDefault();
+        pulseAt(event);
+
+        /*
+          Scene 3 will connect here next.
+          Scene 2 remains visible until Scene 3 is added.
+        */
+      });
+    })();
   </script>
 </body>
 </html>
