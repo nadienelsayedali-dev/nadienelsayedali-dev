@@ -12,7 +12,7 @@
     :root{
       --bg:#020b13;
       --ratio:1672/941;
-      --gold:#e6b85a;
+      --gold:#e8b753;
     }
 
     *{
@@ -65,27 +65,25 @@
       pointer-events:auto;
     }
 
-    .scene img,
-    #scene5Canvas{
+    .scene img{
       position:absolute;
       inset:0;
       width:100%;
       height:100%;
       display:block;
       object-fit:fill;
-      -webkit-user-drag:none;
       pointer-events:none;
+      -webkit-user-drag:none;
     }
 
     .hotspot{
       position:absolute;
-      z-index:20;
+      z-index:30;
       border:0;
       outline:0;
       padding:0;
       margin:0;
       background:transparent;
-      cursor:pointer;
       appearance:none;
       -webkit-appearance:none;
       touch-action:none;
@@ -108,46 +106,59 @@
       height:11%;
     }
 
-    /* Scene 5 draggable bottle hit area */
-    #bottleDragArea{
-      left:52.5%;
-      top:66%;
-      width:17%;
-      height:27%;
-      cursor:grab;
-      z-index:50;
+    /* Scene 5 line-drag layer */
+    #reachCanvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:20;
+      pointer-events:none;
     }
 
-    #bottleDragArea.dragging{
+    /*
+      Invisible start area around her reaching hand.
+      The bottle itself never moves.
+    */
+    #handDragStart{
+      left:47%;
+      top:61%;
+      width:13%;
+      height:17%;
+      z-index:40;
+      cursor:grab;
+    }
+
+    #handDragStart.dragging{
       cursor:grabbing;
     }
 
     #missionHint{
       position:absolute;
-      left:49%;
-      bottom:3.4%;
-      z-index:45;
-      padding:.45rem .9rem;
-      border:1px solid rgba(230,184,90,.42);
+      left:50%;
+      bottom:2.7%;
+      transform:translateX(-50%);
+      z-index:35;
+      padding:.42rem .9rem;
+      border:1px solid rgba(232,183,83,.4);
       border-radius:999px;
-      background:rgba(2,11,19,.46);
-      color:#f2d28c;
+      background:rgba(2,11,19,.42);
+      color:#efd18c;
       font-family:Georgia,"Times New Roman",serif;
-      font-size:clamp(12px,1.4vw,23px);
-      letter-spacing:.04em;
+      font-size:clamp(12px,1.25vw,21px);
+      letter-spacing:.045em;
+      text-shadow:0 2px 8px #000;
       opacity:0;
       pointer-events:none;
-      transform:translateX(-50%);
-      transition:opacity .35s ease;
-      text-shadow:0 1px 8px #000;
+      transition:opacity .3s ease;
       backdrop-filter:blur(3px);
     }
 
     #scene5.active #missionHint{
-      opacity:.92;
+      opacity:.94;
     }
 
-    #missionHint.success{
+    #missionHint.done{
       opacity:0 !important;
     }
 
@@ -198,10 +209,10 @@
     </section>
 
     <section id="scene5" class="scene">
-      <!-- The PNG stays unchanged. Canvas only makes the bottle draggable. -->
-      <canvas id="scene5Canvas" width="1672" height="941" aria-label="Your mission"></canvas>
-      <button id="bottleDragArea" class="hotspot" aria-label="Drag the bottle closer"></button>
-      <div id="missionHint">DRAG THE BOTTLE TOWARD HER HAND</div>
+      <img src="./scene5.png" alt="Your Mission">
+      <canvas id="reachCanvas" width="1672" height="941"></canvas>
+      <button id="handDragStart" class="hotspot" aria-label="Drag from her hand to the bottle"></button>
+      <div id="missionHint">DRAG FROM HER HAND TO THE BOTTLE</div>
     </section>
 
     <div id="tapPulse" aria-hidden="true"></div>
@@ -223,38 +234,22 @@
     const scene2Continue = document.getElementById("scene2Continue");
     const tapPulse = document.getElementById("tapPulse");
 
-    const canvas = document.getElementById("scene5Canvas");
-    const ctx = canvas.getContext("2d");
-    const bottleDragArea = document.getElementById("bottleDragArea");
+    const reachCanvas = document.getElementById("reachCanvas");
+    const ctx = reachCanvas.getContext("2d");
+    const handDragStart = document.getElementById("handDragStart");
     const missionHint = document.getElementById("missionHint");
 
-    const scene5Image = new Image();
-    scene5Image.src = "./scene5.png";
-
     /*
-      Bottle crop from the EXISTING scene5.png.
-      No additional PNG is needed.
+      Locked coordinates in the 1672 x 941 artwork.
+      Nothing in the PNG is moved.
     */
-    const bottle = {
-      sx:900,
-      sy:640,
-      sw:220,
-      sh:235,
+    const hand = { x: 914, y: 657 };
+    const bottle = { x: 1005, y: 757 };
+    const bottleRadius = 105;
 
-      x:900,
-      y:640,
-
-      startX:900,
-      startY:640,
-
-      finalX:720,
-      finalY:610,
-
-      dragging:false,
-      complete:false
-    };
-
-    const handTarget = { x:918, y:648 };
+    let dragging = false;
+    let complete = false;
+    let current = { x: hand.x, y: hand.y };
 
     function showScene(next){
       scenes.forEach(s => s.classList.remove("active"));
@@ -270,242 +265,144 @@
       tapPulse.classList.add("play");
     }
 
-    /*
-      Converts phone/iPad coordinates to the original 1672x941 artwork.
-    */
     function pointInArtwork(e){
-      const r = canvas.getBoundingClientRect();
+      const r = reachCanvas.getBoundingClientRect();
       return {
         x:(e.clientX-r.left) * W/r.width,
         y:(e.clientY-r.top) * H/r.height
       };
     }
 
-    function drawBottleShape(x,y){
-      ctx.save();
-
-      /*
-        Clip around the bottle so we move the bottle itself,
-        not a large square of ocean.
-      */
-      ctx.beginPath();
-      ctx.moveTo(x+163,y+5);
-      ctx.lineTo(x+216,y+16);
-      ctx.lineTo(x+207,y+55);
-      ctx.lineTo(x+190,y+70);
-      ctx.lineTo(x+200,y+98);
-      ctx.lineTo(x+181,y+135);
-      ctx.lineTo(x+145,y+199);
-      ctx.lineTo(x+112,y+232);
-      ctx.lineTo(x+30,y+222);
-      ctx.lineTo(x+13,y+197);
-      ctx.lineTo(x+24,y+165);
-      ctx.lineTo(x+65,y+120);
-      ctx.lineTo(x+103,y+88);
-      ctx.lineTo(x+143,y+59);
-      ctx.lineTo(x+148,y+35);
-      ctx.closePath();
-      ctx.clip();
-
-      ctx.shadowColor = "rgba(255,197,88,.78)";
-      ctx.shadowBlur = 18;
-
-      ctx.drawImage(
-        scene5Image,
-        bottle.sx,bottle.sy,bottle.sw,bottle.sh,
-        x,y,bottle.sw,bottle.sh
-      );
-
-      ctx.restore();
-    }
-
-    function coverOriginalBottle(){
-      /*
-        A clean piece of water from the SAME scene image
-        covers the original baked-in bottle while dragging.
-      */
-      ctx.save();
-      ctx.globalAlpha = .98;
-      ctx.drawImage(
-        scene5Image,
-        1120,690,220,235,
-        900,640,220,235
-      );
-
-      /* soft blend around the patch */
-      const g = ctx.createRadialGradient(1010,755,35,1010,755,150);
-      g.addColorStop(0,"rgba(4,20,35,0)");
-      g.addColorStop(.72,"rgba(4,20,35,.04)");
-      g.addColorStop(1,"rgba(4,20,35,.18)");
-      ctx.fillStyle=g;
-      ctx.fillRect(875,615,270,285);
-      ctx.restore();
-    }
-
-    function drawGuide(){
-      if(!bottle.dragging || bottle.complete) return;
-
-      /* cork position on moved bottle */
-      const corkX = bottle.x + 187;
-      const corkY = bottle.y + 31;
-
-      ctx.save();
-      ctx.strokeStyle="rgba(238,190,82,.72)";
-      ctx.lineWidth=3;
-      ctx.setLineDash([10,10]);
-      ctx.shadowColor="rgba(238,190,82,.65)";
-      ctx.shadowBlur=10;
-
-      ctx.beginPath();
-      ctx.moveTo(handTarget.x,handTarget.y);
-      ctx.lineTo(corkX,corkY);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function renderScene5(){
-      if(!scene5Image.complete) return;
-
+    function clearLine(){
       ctx.clearRect(0,0,W,H);
-      ctx.drawImage(scene5Image,0,0,W,H);
-
-      if(bottle.dragging || bottle.complete){
-        coverOriginalBottle();
-        drawBottleShape(bottle.x,bottle.y);
-        drawGuide();
-      }
-
-      if(bottle.complete){
-        ctx.save();
-        ctx.strokeStyle="rgba(255,210,108,.88)";
-        ctx.lineWidth=4;
-        ctx.shadowColor="rgba(255,194,65,.95)";
-        ctx.shadowBlur=28;
-        ctx.beginPath();
-        ctx.arc(handTarget.x,handTarget.y,48,0,Math.PI*2);
-        ctx.stroke();
-        ctx.restore();
-      }
     }
 
-    scene5Image.onload = renderScene5;
+    function drawLine(endX,endY,success=false){
+      clearLine();
 
-    function syncHitArea(){
+      ctx.save();
+      ctx.lineCap="round";
+      ctx.lineJoin="round";
+
+      /* soft glow */
+      ctx.shadowColor = success
+        ? "rgba(255,220,130,.98)"
+        : "rgba(232,183,83,.9)";
+      ctx.shadowBlur = success ? 28 : 17;
+
+      ctx.strokeStyle = success
+        ? "rgba(255,222,146,.98)"
+        : "rgba(232,183,83,.92)";
+
+      ctx.lineWidth = success ? 5 : 4;
+      ctx.setLineDash(success ? [] : [12,10]);
+
+      ctx.beginPath();
+      ctx.moveTo(hand.x,hand.y);
+
       /*
-        Keep the invisible drag area over the CURRENT bottle position.
+        Slight curve makes the reach feel more elegant
+        than a rigid straight line.
       */
-      bottleDragArea.style.left = (bottle.x/W*100) + "%";
-      bottleDragArea.style.top = (bottle.y/H*100) + "%";
-      bottleDragArea.style.width = (bottle.sw/W*100) + "%";
-      bottleDragArea.style.height = (bottle.sh/H*100) + "%";
+      const mx=(hand.x+endX)/2;
+      const my=(hand.y+endY)/2 - 24;
+      ctx.quadraticCurveTo(mx,my,endX,endY);
+      ctx.stroke();
+
+      /* small glowing end point */
+      ctx.setLineDash([]);
+      ctx.fillStyle = success
+        ? "rgba(255,229,166,.98)"
+        : "rgba(239,196,101,.95)";
+      ctx.beginPath();
+      ctx.arc(endX,endY,success ? 10 : 7,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.restore();
     }
 
-    function startDrag(e){
-      if(bottle.complete) return;
+    function startReach(e){
+      if(complete) return;
 
       e.preventDefault();
-      bottle.dragging=true;
-      bottleDragArea.classList.add("dragging");
+      dragging=true;
+      handDragStart.classList.add("dragging");
 
-      const p=pointInArtwork(e);
-
-      /*
-        Preserve where inside the bottle the user grabbed it.
-      */
-      bottle.grabDX=p.x-bottle.x;
-      bottle.grabDY=p.y-bottle.y;
-
-      renderScene5();
+      current = pointInArtwork(e);
+      drawLine(current.x,current.y);
 
       try{
-        bottleDragArea.setPointerCapture(e.pointerId);
+        handDragStart.setPointerCapture(e.pointerId);
       }catch(_){}
     }
 
-    function dragBottle(e){
-      if(!bottle.dragging || bottle.complete) return;
+    function moveReach(e){
+      if(!dragging || complete) return;
 
       e.preventDefault();
-      const p=pointInArtwork(e);
+      current=pointInArtwork(e);
+      drawLine(current.x,current.y);
 
-      bottle.x=p.x-bottle.grabDX;
-      bottle.y=p.y-bottle.grabDY;
+      /*
+        Complete immediately when the drawn line reaches the bottle.
+      */
+      const d=Math.hypot(current.x-bottle.x,current.y-bottle.y);
 
-      /* Keep it inside the artwork */
-      bottle.x=Math.max(0,Math.min(W-bottle.sw,bottle.x));
-      bottle.y=Math.max(0,Math.min(H-bottle.sh,bottle.y));
-
-      syncHitArea();
-      renderScene5();
-    }
-
-    function finishDrag(e){
-      if(!bottle.dragging || bottle.complete) return;
-
-      e.preventDefault();
-      bottle.dragging=false;
-      bottleDragArea.classList.remove("dragging");
-
-      const corkX=bottle.x+187;
-      const corkY=bottle.y+31;
-      const d=Math.hypot(corkX-handTarget.x,corkY-handTarget.y);
-
-      if(d < 135){
-        /*
-          SUCCESS: bottle snaps into her reaching hand.
-        */
-        bottle.complete=true;
-        bottle.x=bottle.finalX;
-        bottle.y=bottle.finalY;
-        missionHint.classList.add("success");
-        bottleDragArea.style.pointerEvents="none";
-
-        syncHitArea();
-        renderScene5();
-
-        /*
-          Ready for the next scene.
-          We will connect this event later.
-        */
-        document.dispatchEvent(
-          new CustomEvent("bottleMissionComplete")
-        );
-      }else{
-        /*
-          Not close enough: smoothly return to the water.
-        */
-        const fromX=bottle.x;
-        const fromY=bottle.y;
-        const start=performance.now();
-        const duration=360;
-
-        function back(now){
-          const t=Math.min(1,(now-start)/duration);
-          const ease=1-Math.pow(1-t,3);
-
-          bottle.x=fromX+(bottle.startX-fromX)*ease;
-          bottle.y=fromY+(bottle.startY-fromY)*ease;
-
-          syncHitArea();
-          renderScene5();
-
-          if(t<1){
-            requestAnimationFrame(back);
-          }
-        }
-
-        requestAnimationFrame(back);
+      if(d <= bottleRadius){
+        completeMission();
       }
     }
 
-    bottleDragArea.addEventListener("pointerdown",startDrag);
-    bottleDragArea.addEventListener("pointermove",dragBottle);
-    bottleDragArea.addEventListener("pointerup",finishDrag);
-    bottleDragArea.addEventListener("pointercancel",finishDrag);
+    function endReach(e){
+      if(!dragging || complete) return;
+
+      e.preventDefault();
+      dragging=false;
+      handDragStart.classList.remove("dragging");
+
+      const p=pointInArtwork(e);
+      const d=Math.hypot(p.x-bottle.x,p.y-bottle.y);
+
+      if(d <= bottleRadius){
+        completeMission();
+      }else{
+        /*
+          Missed the bottle:
+          line disappears and user can try again.
+        */
+        clearLine();
+      }
+    }
+
+    function completeMission(){
+      if(complete) return;
+
+      complete=true;
+      dragging=false;
+      handDragStart.classList.remove("dragging");
+      handDragStart.style.pointerEvents="none";
+      missionHint.classList.add("done");
+
+      /*
+        Snap ONLY THE LINE to the bottle.
+        The bottle PNG stays 100% unchanged.
+      */
+      drawLine(bottle.x,bottle.y,true);
+
+      document.dispatchEvent(
+        new CustomEvent("bottleMissionComplete")
+      );
+    }
+
+    handDragStart.addEventListener("pointerdown",startReach);
+    handDragStart.addEventListener("pointermove",moveReach);
+    handDragStart.addEventListener("pointerup",endReach);
+    handDragStart.addEventListener("pointercancel",endReach);
 
     /*
-      Current story flow.
-      Scene 3 and Scene 4 stay visible longer, as requested earlier.
+      Existing story flow.
+      Scene 3 = 3 seconds.
+      Scene 4 = 3 seconds.
     */
     beginStory.addEventListener("pointerup",e=>{
       e.preventDefault();
@@ -525,17 +422,12 @@
 
           setTimeout(()=>{
             showScene(scene5);
-            renderScene5();
-            syncHitArea();
           },3000);
 
         },3000);
 
       },260);
     });
-
-    window.addEventListener("resize",syncHitArea);
-    syncHitArea();
   })();
   </script>
 </body>
