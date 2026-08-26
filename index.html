@@ -297,6 +297,14 @@
       100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
     }
 
+  
+    /* Direct-touch layer for iPad/iPhone reliability */
+    #scene8{
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+      cursor:pointer;
+    }
+
   </style>
 </head>
 
@@ -341,9 +349,9 @@
     </section>
 
 <section id="scene8" class="scene">
-      <img id="scene8State1" class="scene8State active8" src="./scene8_1.png" alt="Grab a rock">
-      <img id="scene8State2" class="scene8State" src="./scene8_2.png" alt="Lift the rock">
-      <img id="scene8State3" class="scene8State" src="./scene8_3.png" alt="Drop on the bottle">
+      <img id="scene8State1" class="scene8State active8" src="./scene8_1.png?v=3" alt="Grab a rock">
+      <img id="scene8State2" class="scene8State" src="./scene8_2.png?v=3" alt="Lift the rock">
+      <img id="scene8State3" class="scene8State" src="./scene8_3.png?v=3" alt="Drop on the bottle">
 
       <button id="scene8GrabRock" class="scene8Hotspot" type="button" aria-label="Grab the rock"></button>
       <button id="scene8LiftRock" class="scene8Hotspot" type="button" aria-label="Lift the rock"></button>
@@ -601,11 +609,12 @@
     });
 
 
-    /* ===== Scene 8 interaction ===== */
+    /* ===== Scene 8 interaction: iPhone/iPad-safe ===== */
     let scene8Step = 1;
+    let scene8Busy = false;
+    let lastScene8Action = 0;
 
-    // Preload the next frames so taps feel immediate on Safari.
-    ["./scene8_1.png","./scene8_2.png","./scene8_3.png"].forEach(src => {
+    ["./scene8_1.png?v=3","./scene8_2.png?v=3","./scene8_3.png?v=3"].forEach(src => {
       const img = new Image();
       img.src = src;
     });
@@ -617,62 +626,145 @@
       scene8State2.classList.toggle("active8", step === 2);
       scene8State3.classList.toggle("active8", step === 3);
 
+      /*
+        Buttons remain as accessibility/fallback targets,
+        but the whole artwork also detects taps directly.
+      */
       scene8GrabRock.style.pointerEvents = step === 1 ? "auto" : "none";
       scene8LiftRock.style.pointerEvents = step === 2 ? "auto" : "none";
       scene8DropBottle.style.pointerEvents = step === 3 ? "auto" : "none";
     }
 
     function resetScene8(){
+      scene8Busy = false;
+      lastScene8Action = 0;
       setScene8State(1);
     }
 
-    function scene8PulseAt(e){
+    function scene8PulseAtClient(clientX, clientY){
       const r = scene8.getBoundingClientRect();
-      const x = typeof e.clientX === "number" ? e.clientX - r.left : r.width/2;
-      const y = typeof e.clientY === "number" ? e.clientY - r.top : r.height/2;
-
-      scene8Pulse.style.left = x + "px";
-      scene8Pulse.style.top = y + "px";
+      scene8Pulse.style.left = (clientX - r.left) + "px";
+      scene8Pulse.style.top = (clientY - r.top) + "px";
       scene8Pulse.classList.remove("go");
       void scene8Pulse.offsetWidth;
       scene8Pulse.classList.add("go");
     }
 
+    /*
+      Convert a screen tap to percentages of the 16:9 artwork.
+      This works even when the artwork is letterboxed on iPad.
+    */
+    function scene8Point(clientX, clientY){
+      const r = scene8.getBoundingClientRect();
+      return {
+        x: ((clientX - r.left) / r.width) * 100,
+        y: ((clientY - r.top) / r.height) * 100
+      };
+    }
+
+    function isInside(p, left, top, width, height){
+      return (
+        p.x >= left &&
+        p.x <= left + width &&
+        p.y >= top &&
+        p.y <= top + height
+      );
+    }
+
+    function advanceScene8(clientX, clientY, forceStep = null){
+      const now = Date.now();
+
+      /* Prevent pointerup + click from advancing twice. */
+      if(scene8Busy || now - lastScene8Action < 550) return;
+
+      const p = scene8Point(clientX, clientY);
+
+      let valid = false;
+
+      if(scene8Step === 1){
+        /*
+          Actual glowing rock in scene8_1:
+          x≈72–91%, y≈70–92%.
+          Generous area for fingers.
+        */
+        valid = forceStep === 1 || isInside(p, 68, 64, 29, 34);
+      }
+      else if(scene8Step === 2){
+        /*
+          Raised rock in her right hand:
+          x≈47–61%, y≈18–43%.
+        */
+        valid = forceStep === 2 || isInside(p, 43, 12, 24, 39);
+      }
+      else if(scene8Step === 3){
+        /*
+          Bottle at the lower part of scene8_3:
+          x≈34–52%, y≈76–96%.
+        */
+        valid = forceStep === 3 || isInside(p, 29, 70, 29, 29);
+      }
+
+      if(!valid) return;
+
+      scene8Busy = true;
+      lastScene8Action = now;
+      scene8PulseAtClient(clientX, clientY);
+
+      if(scene8Step === 1){
+        setTimeout(() => {
+          setScene8State(2);
+          scene8Busy = false;
+        }, 260);
+      }
+      else if(scene8Step === 2){
+        setTimeout(() => {
+          setScene8State(3);
+          scene8Busy = false;
+        }, 260);
+      }
+      else if(scene8Step === 3){
+        setTimeout(() => {
+          scene8Busy = false;
+          document.dispatchEvent(new CustomEvent("scene8MissionComplete"));
+        }, 260);
+      }
+    }
+
+    /* Accessibility / direct invisible hotspots */
     scene8GrabRock.addEventListener("pointerup", e => {
       e.preventDefault();
-      if(scene8Step !== 1) return;
-
-      scene8PulseAt(e);
-      scene8GrabRock.style.pointerEvents = "none";
-
-      setTimeout(() => {
-        setScene8State(2);
-      }, 220);
+      advanceScene8(e.clientX, e.clientY, 1);
     });
 
     scene8LiftRock.addEventListener("pointerup", e => {
       e.preventDefault();
-      if(scene8Step !== 2) return;
-
-      scene8PulseAt(e);
-      scene8LiftRock.style.pointerEvents = "none";
-
-      setTimeout(() => {
-        setScene8State(3);
-      }, 220);
+      advanceScene8(e.clientX, e.clientY, 2);
     });
 
     scene8DropBottle.addEventListener("pointerup", e => {
       e.preventDefault();
-      if(scene8Step !== 3) return;
+      advanceScene8(e.clientX, e.clientY, 3);
+    });
 
-      scene8PulseAt(e);
-      scene8DropBottle.style.pointerEvents = "none";
+    /*
+      Main fallback: tapping the artwork itself.
+      This is the important Safari/iPad fix.
+    */
+    scene8.addEventListener("pointerup", e => {
+      e.preventDefault();
+      advanceScene8(e.clientX, e.clientY);
+    });
 
-      /*
-        The bottle-breaking success scene will connect here next.
-      */
-      document.dispatchEvent(new CustomEvent("scene8MissionComplete"));
+    scene8.addEventListener("touchend", e => {
+      const t = e.changedTouches && e.changedTouches[0];
+      if(!t) return;
+      e.preventDefault();
+      advanceScene8(t.clientX, t.clientY);
+    }, { passive:false });
+
+    scene8.addEventListener("click", e => {
+      e.preventDefault();
+      advanceScene8(e.clientX, e.clientY);
     });
 
   })();
