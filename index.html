@@ -321,6 +321,26 @@
       -webkit-tap-highlight-color:transparent;
     }
 
+  
+    /* ===== Scene 11: The First Clue ===== */
+    #scene11Continue{
+      position:absolute;
+      left:59%;
+      top:80%;
+      width:29%;
+      height:10%;
+      z-index:45;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
   </style>
 </head>
 
@@ -384,6 +404,11 @@
       <button id="scene10Continue" type="button" aria-label="Continue"></button>
     </section>
 
+<section id="scene11" class="scene">
+      <img src="./scene11.png?v=11" alt="The First Clue">
+      <button id="scene11Continue" type="button" aria-label="Follow the glow"></button>
+    </section>
+
     <div id="tapPulse" aria-hidden="true"></div>
   </main>
 
@@ -403,6 +428,7 @@
     const scene8 = document.getElementById("scene8");
     const scene9 = document.getElementById("scene9");
     const scene10 = document.getElementById("scene10");
+    const scene11 = document.getElementById("scene11");
 
     const beginStory = document.getElementById("beginStory");
     const scene2Continue = document.getElementById("scene2Continue");
@@ -423,6 +449,7 @@
     const scene8Hint = document.getElementById("scene8Hint");
     const scene9Continue = document.getElementById("scene9Continue");
     const scene10Continue = document.getElementById("scene10Continue");
+    const scene11Continue = document.getElementById("scene11Continue");
 
     /*
       Locked coordinates in the 1672 x 941 artwork.
@@ -902,11 +929,20 @@
       setTimeout(() => showScene(scene10), 260);
     });
 
-    /* Scene 10: tap anywhere to continue later */
+    /* Scene 10 -> Scene 11 */
     scene10Continue.addEventListener("pointerup", e => {
       e.preventDefault();
       pulseAt(e);
-      /* Mission 1 will be connected here next. */
+      setTimeout(() => showScene(scene11), 260);
+    });
+
+    /* Scene 11: FOLLOW THE GLOW - ready for the chest-discovery scene */
+    scene11Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      /*
+        The chest-discovery scene will be connected here next.
+      */
     });
 
   })();
