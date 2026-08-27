@@ -302,6 +302,25 @@
       -webkit-tap-highlight-color:transparent;
     }
 
+  
+    /* ===== Scene 10: message letter ===== */
+    #scene10Continue{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:40;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
   </style>
 </head>
 
@@ -360,6 +379,11 @@
       <button id="scene9Continue" type="button" aria-label="Continue"></button>
     </section>
 
+<section id="scene10" class="scene">
+      <img src="./scene10.png" alt="To get your surprise, you must complete three missions">
+      <button id="scene10Continue" type="button" aria-label="Continue"></button>
+    </section>
+
     <div id="tapPulse" aria-hidden="true"></div>
   </main>
 
@@ -378,6 +402,7 @@
     const scene7 = document.getElementById("scene7");
     const scene8 = document.getElementById("scene8");
     const scene9 = document.getElementById("scene9");
+    const scene10 = document.getElementById("scene10");
 
     const beginStory = document.getElementById("beginStory");
     const scene2Continue = document.getElementById("scene2Continue");
@@ -397,6 +422,7 @@
     const scene8TapRock = document.getElementById("scene8TapRock");
     const scene8Hint = document.getElementById("scene8Hint");
     const scene9Continue = document.getElementById("scene9Continue");
+    const scene10Continue = document.getElementById("scene10Continue");
 
     /*
       Locked coordinates in the 1672 x 941 artwork.
@@ -869,13 +895,18 @@
     }, {passive:false});
 
 
-    /* Scene 9 CONTINUE button - ready for the next scene */
+    /* Scene 9 -> Scene 10 */
     scene9Continue.addEventListener("pointerup", e => {
       e.preventDefault();
       pulseAt(e);
-      /*
-        The next scene will be connected here.
-      */
+      setTimeout(() => showScene(scene10), 260);
+    });
+
+    /* Scene 10: tap anywhere to continue later */
+    scene10Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      /* Mission 1 will be connected here next. */
     });
 
   })();
