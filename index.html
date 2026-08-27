@@ -488,6 +488,18 @@
       }
     }
 
+  
+    /* ===== Gentle iPhone landscape zoom =====
+       1.08 = slightly wider/larger, while keeping the important content visible.
+       The whole scene (including hotspots/canvases) scales together.
+    */
+    @media (orientation:landscape){
+      .scene{
+        transform:translate(-50%,-50%) scale(1.08) !important;
+        transform-origin:center center !important;
+      }
+    }
+
   </style>
 </head>
 
