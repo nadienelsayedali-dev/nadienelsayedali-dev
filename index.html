@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#020b13">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Our Little Adventure</title>
 
@@ -41,43 +42,23 @@
 
     #app{
       position:fixed;
-      left:0;
-      top:0;
-      width:100vw;
-      height:100dvh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      inset:0;
+      display:grid;
+      place-items:center;
       overflow:hidden;
       background:var(--bg);
-
-      /* Keep artwork clear of the iPhone notch/home indicator */
-      padding:
-        env(safe-area-inset-top)
-        env(safe-area-inset-right)
-        env(safe-area-inset-bottom)
-        env(safe-area-inset-left);
     }
 
     .scene{
       position:absolute;
-
-      /*
-        JavaScript updates these from the ACTUAL visible Safari viewport.
-        This keeps every 1672×941 scene fully visible with no stretching.
-      */
-      width:var(--scene-w, 100vw);
-      height:var(--scene-h, calc(100vw * 941 / 1672));
-      aspect-ratio:1672 / 941;
-
+      width:min(100vw,calc(100dvh * 1672 / 941));
+      height:min(100dvh,calc(100vw * 941 / 1672));
+      aspect-ratio:var(--ratio);
       overflow:hidden;
       opacity:0;
       pointer-events:none;
       background:var(--bg);
       transition:opacity .62s ease;
-
-      /* keep all percentage hotspots anchored to the artwork */
-      flex:none;
     }
 
     .scene.active{
@@ -91,8 +72,7 @@
       width:100%;
       height:100%;
       display:block;
-      object-fit:contain;
-      object-position:center;
+      object-fit:fill;
       pointer-events:none;
       -webkit-user-drag:none;
     }
@@ -237,8 +217,7 @@
       width:100%;
       height:100%;
       display:block;
-      object-fit:contain;
-      object-position:center;
+      object-fit:fill;
       opacity:0;
       transform:scale(1.003);
       transition:opacity .38s ease, transform .38s ease;
@@ -364,223 +343,139 @@
     }
 
   
-    /* Full-screen portrait backdrop so iPhone does not show large empty bands. */
-    #sceneBackdrop{
-      position:absolute;
-      z-index:0;
-      left:-8%;
-      top:-8%;
-      width:116%;
-      height:116%;
-      object-fit:cover;
-      object-position:center;
-      filter:blur(24px) brightness(.42) saturate(1.06);
-      transform:scale(1.08);
-      opacity:1;
-      pointer-events:none;
-      transition:opacity .35s ease;
+    /* ===== TRUE iPHONE LANDSCAPE FILL =====
+       The 16:9 artwork is enlarged to COVER the available iPhone viewport.
+       Hotspots stay aligned because the whole .scene is scaled/cropped as one unit.
+    */
+    html, body{
+      width:100% !important;
+      height:100% !important;
+      min-height:0 !important;
+      margin:0 !important;
+      padding:0 !important;
+      overflow:hidden !important;
+      background:#020b13 !important;
     }
 
-    #app::after{
-      content:"";
-      position:absolute;
-      z-index:1;
-      inset:0;
-      pointer-events:none;
-      background:linear-gradient(
-        to bottom,
-        rgba(2,11,19,.18),
-        rgba(2,11,19,.02) 34%,
-        rgba(2,11,19,.02) 66%,
-        rgba(2,11,19,.20)
-      );
+    body{
+      position:fixed !important;
+      inset:0 !important;
+    }
+
+    #app{
+      position:fixed !important;
+      inset:0 !important;
+      width:100% !important;
+      height:100% !important;
+      min-width:0 !important;
+      min-height:0 !important;
+      padding:0 !important;
+      margin:0 !important;
+      overflow:hidden !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+      background:#020b13 !important;
     }
 
     .scene{
-      z-index:5;
-      box-shadow:0 0 38px rgba(0,0,0,.30);
+      position:absolute !important;
+      left:50% !important;
+      top:50% !important;
+      width:var(--cover-w, 100vw) !important;
+      height:var(--cover-h, calc(100vw * 941 / 1672)) !important;
+      aspect-ratio:1672 / 941 !important;
+      transform:translate(-50%,-50%) !important;
+      margin:0 !important;
+      max-width:none !important;
+      max-height:none !important;
+      flex:none !important;
     }
 
-  
-    /* ===== iPhone landscape experience ===== */
+    .scene img,
+    .scene8State{
+      position:absolute !important;
+      inset:0 !important;
+      width:100% !important;
+      height:100% !important;
+      object-fit:fill !important;
+      object-position:center !important;
+    }
 
-    #rotateOverlay{
+    /* Keep gesture canvases exactly on top of the oversized artwork. */
+    #reachCanvas,
+    #scene5Canvas,
+    #scene8Gesture{
+      position:absolute !important;
+      inset:0 !important;
+      width:100% !important;
+      height:100% !important;
+    }
+
+    /* Portrait is not useful for this cinematic 16:9 card. */
+    #rotatePhone{
+      display:none;
       position:fixed;
       inset:0;
-      z-index:9999;
-      display:none;
+      z-index:10000;
       align-items:center;
       justify-content:center;
       padding:28px;
-      background:
-        radial-gradient(circle at 50% 35%, rgba(35,67,92,.34), transparent 42%),
-        #020b13;
-      color:#e8bc69;
       text-align:center;
-    }
-
-    .rotateCard{
-      max-width:430px;
-      padding:28px 24px;
-      border:1px solid rgba(232,188,105,.38);
-      border-radius:24px;
-      background:rgba(5,17,29,.76);
-      box-shadow:0 0 40px rgba(0,0,0,.35);
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
+      background:#020b13;
+      color:#efc978;
       font-family:Georgia,"Times New Roman",serif;
     }
 
-    .rotateIcon{
+    #rotatePhone .rotateInner{
+      padding:26px 24px;
+      max-width:420px;
+      border:1px solid rgba(239,201,120,.38);
+      border-radius:22px;
+      background:rgba(7,20,32,.82);
+      box-shadow:0 0 35px rgba(0,0,0,.35);
+    }
+
+    #rotatePhone .rotateSymbol{
       font-size:54px;
       line-height:1;
       margin-bottom:12px;
-      text-shadow:0 0 20px rgba(232,188,105,.55);
     }
 
-    .rotateTitle{
-      font-size:26px;
+    #rotatePhone .rotateHeading{
+      font-size:24px;
       letter-spacing:.08em;
-      margin-bottom:10px;
+      margin-bottom:8px;
     }
 
-    .rotateText{
-      color:#f3dfb4;
+    #rotatePhone .rotateCopy{
+      color:#f5e4ba;
       font-size:16px;
       line-height:1.45;
     }
 
-    /*
-      Portrait:
-      Do not squeeze a 16:9 cinematic scene into the phone.
-      Show the rotate prompt instead.
-    */
     @media (orientation:portrait){
-      #rotateOverlay{display:flex}
+      #rotatePhone{display:flex}
       #app{visibility:hidden}
     }
 
-    /*
-      Landscape:
-      Match the user's screenshot:
-      - full scene height
-      - no stretch
-      - no crop
-      - centered
-      - subtle side fill
-    */
     @media (orientation:landscape){
-      #rotateOverlay{display:none}
-      #app{
-        visibility:visible;
-        position:fixed;
-        inset:0;
-        width:100%;
-        height:100%;
-        padding:
-          env(safe-area-inset-top)
-          env(safe-area-inset-right)
-          env(safe-area-inset-bottom)
-          env(safe-area-inset-left);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        overflow:hidden;
-        background:#020b13;
-      }
-
-      .scene{
-        position:absolute;
-        width:min(
-          calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right)),
-          calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 1672 / 941)
-        );
-        height:min(
-          calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)),
-          calc((100vw - env(safe-area-inset-left) - env(safe-area-inset-right)) * 941 / 1672)
-        );
-        aspect-ratio:1672/941;
-        margin:auto;
-      }
-
-      .scene img,
-      .scene8State{
-        width:100%;
-        height:100%;
-        object-fit:contain !important;
-        object-position:center !important;
-      }
-    }
-
-  
-    /* ===== FINAL LANDSCAPE MAX-FILL FIX ===== */
-    @media (orientation:landscape){
-      html, body{
-        width:100% !important;
-        height:100% !important;
-        min-height:0 !important;
-        margin:0 !important;
-        padding:0 !important;
-        overflow:hidden !important;
-        background:#020b13 !important;
-      }
-
-      body{
-        position:fixed !important;
-        inset:0 !important;
-      }
-
-      #app{
-        position:fixed !important;
-        inset:0 !important;
-        width:auto !important;
-        height:auto !important;
-        min-width:0 !important;
-        min-height:0 !important;
-        padding:0 !important;
-        margin:0 !important;
-        display:flex !important;
-        align-items:center !important;
-        justify-content:center !important;
-        overflow:hidden !important;
-      }
-
-      .scene{
-        width:var(--real-scene-w) !important;
-        height:var(--real-scene-h) !important;
-        min-width:0 !important;
-        min-height:0 !important;
-        max-width:none !important;
-        max-height:none !important;
-        aspect-ratio:1672 / 941 !important;
-        margin:0 !important;
-      }
-
-      .scene img,
-      .scene8State,
-      #scene5Canvas,
-      #reachCanvas,
-      #scene8Gesture{
-        width:100% !important;
-        height:100% !important;
-        object-fit:fill !important;
-        object-position:center !important;
-      }
+      #rotatePhone{display:none}
+      #app{visibility:visible}
     }
 
   </style>
 </head>
 
 <body>
-  <div id="rotateOverlay" aria-hidden="true">
-    <div class="rotateCard">
-      <div class="rotateIcon">↻</div>
-      <div class="rotateTitle">TURN YOUR PHONE</div>
-      <div class="rotateText">The adventure is best experienced in landscape.</div>
+  <div id="rotatePhone" aria-hidden="true">
+    <div class="rotateInner">
+      <div class="rotateSymbol">↻</div>
+      <div class="rotateHeading">TURN YOUR PHONE</div>
+      <div class="rotateCopy">Rotate to landscape to enter the adventure.</div>
     </div>
   </div>
   <main id="app">
-    <img id="sceneBackdrop" aria-hidden="true" alt="">
 
     <section id="scene1" class="scene active">
       <img src="./scene 1.png" alt="Our Little Adventure">
@@ -649,69 +544,10 @@
 
   <script>
   (() => {
-    /*
-      iPhone / iPad auto-fit
-      ----------------------
-      Safari's visible viewport changes when its browser bars expand/collapse.
-      Recalculate the exact 16:9 artwork stage from VisualViewport so the
-      picture always fits without cropping or distortion.
-    */
-    const ART_ASPECT = 1672 / 941;
-
-    function fitArtworkToScreen(){
-      const vv = window.visualViewport;
-
-      const viewportWidth = vv ? vv.width : window.innerWidth;
-      const viewportHeight = vv ? vv.height : window.innerHeight;
-
-      /*
-        Leave a tiny breathing margin so Safari never clips the gold border.
-      */
-      const availableWidth = Math.max(1, viewportWidth - 2);
-      const availableHeight = Math.max(1, viewportHeight - 2);
-
-      let sceneWidth;
-      let sceneHeight;
-
-      if((availableWidth / availableHeight) > ART_ASPECT){
-        sceneHeight = availableHeight;
-        sceneWidth = sceneHeight * ART_ASPECT;
-      }else{
-        sceneWidth = availableWidth;
-        sceneHeight = sceneWidth / ART_ASPECT;
-      }
-
-      document.documentElement.style.setProperty("--scene-w", sceneWidth + "px");
-      document.documentElement.style.setProperty("--scene-h", sceneHeight + "px");
-
-      /*
-        Use the actual visible Safari height rather than an outdated 100vh.
-      */
-      const app = document.getElementById("app");
-      if(app){
-        app.style.width = viewportWidth + "px";
-        app.style.height = viewportHeight + "px";
-      }
-    }
-
-    fitArtworkToScreen();
-
-    window.addEventListener("resize", fitArtworkToScreen, {passive:true});
-    window.addEventListener("orientationchange", () => {
-      setTimeout(fitArtworkToScreen, 80);
-      setTimeout(fitArtworkToScreen, 350);
-    }, {passive:true});
-
-    if(window.visualViewport){
-      window.visualViewport.addEventListener("resize", fitArtworkToScreen, {passive:true});
-      window.visualViewport.addEventListener("scroll", fitArtworkToScreen, {passive:true});
-    }
-
     const W = 1672;
     const H = 941;
 
     const scenes = [...document.querySelectorAll(".scene")];
-    const sceneBackdrop = document.getElementById("sceneBackdrop");
     const scene1 = document.getElementById("scene1");
     const scene2 = document.getElementById("scene2");
     const scene3 = document.getElementById("scene3");
@@ -757,33 +593,9 @@
     let complete = false;
     let current = { x: hand.x, y: hand.y };
 
-    function updateBackdrop(scene){
-      if(!sceneBackdrop || !scene) return;
-      const img = scene.querySelector("img");
-      if(!img) return;
-
-      const newSrc = img.currentSrc || img.getAttribute("src") || "";
-      if(!newSrc) return;
-
-      if(sceneBackdrop.getAttribute("src") !== newSrc){
-        sceneBackdrop.style.opacity = "0";
-        const temp = new Image();
-        temp.onload = () => {
-          sceneBackdrop.src = newSrc;
-          requestAnimationFrame(() => {
-            sceneBackdrop.style.opacity = "1";
-          });
-        };
-        temp.src = newSrc;
-      }else{
-        sceneBackdrop.style.opacity = "1";
-      }
-    }
-
     function showScene(next){
       scenes.forEach(s => s.classList.remove("active"));
       next.classList.add("active");
-      updateBackdrop(next);
     }
 
     function pulseAt(e){
@@ -1264,96 +1076,80 @@
     });
 
 
-    window.addEventListener("load", () => {
-      fitArtworkToScreen();
-      setTimeout(fitArtworkToScreen, 150);
-      setTimeout(fitArtworkToScreen, 600);
-    }, {once:true});
+    const IPHONE_ART_RATIO = 1672 / 941;
 
+    function fitAdventureCover(){
+      /*
+        Use the page's real client box. In landscape, cover means:
+        - no empty bars
+        - scene may crop a little from top/bottom on extra-wide iPhones
+        - all hotspots remain aligned because they are inside the same .scene
+      */
+      const vw = document.documentElement.clientWidth || window.innerWidth;
+      const vh = document.documentElement.clientHeight || window.innerHeight;
 
-    window.addEventListener("load", () => {
-      const firstActive = document.querySelector(".scene.active") || document.getElementById("scene1");
-      if(firstActive) updateBackdrop(firstActive);
-    }, {once:true});
+      if(!vw || !vh) return;
 
-
-    function refreshLandscapeLayout(){
-      const vv = window.visualViewport;
-      const app = document.getElementById("app");
-      if(!app) return;
-
-      if(vv){
-        app.style.width = vv.width + "px";
-        app.style.height = vv.height + "px";
-      }else{
-        app.style.width = window.innerWidth + "px";
-        app.style.height = window.innerHeight + "px";
-      }
-    }
-
-    window.addEventListener("orientationchange", () => {
-      setTimeout(refreshLandscapeLayout, 100);
-      setTimeout(refreshLandscapeLayout, 400);
-    }, {passive:true});
-
-    window.addEventListener("resize", refreshLandscapeLayout, {passive:true});
-
-    if(window.visualViewport){
-      window.visualViewport.addEventListener("resize", refreshLandscapeLayout, {passive:true});
-    }
-
-    window.addEventListener("load", () => {
-      refreshLandscapeLayout();
-      setTimeout(refreshLandscapeLayout, 250);
-    }, {once:true});
-
-
-    function fitSceneFromActualApp(){
-      const app = document.getElementById("app");
-      if(!app) return;
-
-      app.style.removeProperty("width");
-      app.style.removeProperty("height");
-
-      const rect = app.getBoundingClientRect();
-      const availableW = Math.max(rect.width || 0, document.documentElement.clientWidth || 0);
-      const availableH = Math.max(rect.height || 0, document.documentElement.clientHeight || 0);
-
-      if(!availableW || !availableH) return;
-
-      const ratio = 1672 / 941;
       let w, h;
 
-      if((availableW / availableH) > ratio){
-        h = availableH;
-        w = h * ratio;
+      if((vw / vh) > IPHONE_ART_RATIO){
+        // Phone viewport is wider than the artwork:
+        // fill width, artwork becomes taller, crop top/bottom.
+        w = vw;
+        h = w / IPHONE_ART_RATIO;
       }else{
-        w = availableW;
-        h = w / ratio;
+        // Viewport is taller:
+        // fill height, artwork becomes wider, crop left/right.
+        h = vh;
+        w = h * IPHONE_ART_RATIO;
       }
 
-      document.documentElement.style.setProperty("--real-scene-w", w + "px");
-      document.documentElement.style.setProperty("--real-scene-h", h + "px");
+      document.documentElement.style.setProperty("--cover-w", Math.ceil(w) + "px");
+      document.documentElement.style.setProperty("--cover-h", Math.ceil(h) + "px");
     }
 
-    function refitSceneSeveralTimes(){
-      fitSceneFromActualApp();
-      requestAnimationFrame(fitSceneFromActualApp);
-      setTimeout(fitSceneFromActualApp, 80);
-      setTimeout(fitSceneFromActualApp, 250);
-      setTimeout(fitSceneFromActualApp, 700);
+    function refitAdventure(){
+      fitAdventureCover();
+      requestAnimationFrame(fitAdventureCover);
+      setTimeout(fitAdventureCover, 80);
+      setTimeout(fitAdventureCover, 250);
+      setTimeout(fitAdventureCover, 600);
     }
 
-    window.addEventListener("load", refitSceneSeveralTimes);
-    window.addEventListener("resize", refitSceneSeveralTimes, {passive:true});
-    window.addEventListener("orientationchange", refitSceneSeveralTimes, {passive:true});
+    window.addEventListener("load", refitAdventure, {once:true});
+    window.addEventListener("resize", refitAdventure, {passive:true});
+    window.addEventListener("orientationchange", refitAdventure, {passive:true});
 
-    if(window.ResizeObserver){
-      const appToWatch = document.getElementById("app");
-      if(appToWatch){
-        new ResizeObserver(() => fitSceneFromActualApp()).observe(appToWatch);
+    /*
+      Try to enter browser fullscreen from the user's first real tap.
+      Browsers only allow fullscreen from a user gesture.
+    */
+    async function tryAdventureFullscreen(){
+      try{
+        const el = document.documentElement;
+        if(document.fullscreenElement || document.webkitFullscreenElement) return;
+
+        if(el.requestFullscreen){
+          await el.requestFullscreen({navigationUI:"hide"});
+        }else if(el.webkitRequestFullscreen){
+          el.webkitRequestFullscreen();
+        }
+
+        setTimeout(refitAdventure, 100);
+        setTimeout(refitAdventure, 400);
+      }catch(_){
+        /* Safari may keep its bars; the layout still fills the content area. */
       }
     }
+
+    const firstStartButton = document.getElementById("beginStory");
+    if(firstStartButton){
+      firstStartButton.addEventListener("pointerup", () => {
+        tryAdventureFullscreen();
+      }, {once:true});
+    }
+
+    refitAdventure();
 
   })();
   </script>
