@@ -401,10 +401,128 @@
       box-shadow:0 0 38px rgba(0,0,0,.30);
     }
 
+  
+    /* ===== iPhone landscape experience ===== */
+
+    #rotateOverlay{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(35,67,92,.34), transparent 42%),
+        #020b13;
+      color:#e8bc69;
+      text-align:center;
+    }
+
+    .rotateCard{
+      max-width:430px;
+      padding:28px 24px;
+      border:1px solid rgba(232,188,105,.38);
+      border-radius:24px;
+      background:rgba(5,17,29,.76);
+      box-shadow:0 0 40px rgba(0,0,0,.35);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+      font-family:Georgia,"Times New Roman",serif;
+    }
+
+    .rotateIcon{
+      font-size:54px;
+      line-height:1;
+      margin-bottom:12px;
+      text-shadow:0 0 20px rgba(232,188,105,.55);
+    }
+
+    .rotateTitle{
+      font-size:26px;
+      letter-spacing:.08em;
+      margin-bottom:10px;
+    }
+
+    .rotateText{
+      color:#f3dfb4;
+      font-size:16px;
+      line-height:1.45;
+    }
+
+    /*
+      Portrait:
+      Do not squeeze a 16:9 cinematic scene into the phone.
+      Show the rotate prompt instead.
+    */
+    @media (orientation:portrait){
+      #rotateOverlay{display:flex}
+      #app{visibility:hidden}
+    }
+
+    /*
+      Landscape:
+      Match the user's screenshot:
+      - full scene height
+      - no stretch
+      - no crop
+      - centered
+      - subtle side fill
+    */
+    @media (orientation:landscape){
+      #rotateOverlay{display:none}
+      #app{
+        visibility:visible;
+        position:fixed;
+        inset:0;
+        width:100%;
+        height:100%;
+        padding:
+          env(safe-area-inset-top)
+          env(safe-area-inset-right)
+          env(safe-area-inset-bottom)
+          env(safe-area-inset-left);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        overflow:hidden;
+        background:#020b13;
+      }
+
+      .scene{
+        position:absolute;
+        width:min(
+          calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right)),
+          calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 1672 / 941)
+        );
+        height:min(
+          calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)),
+          calc((100vw - env(safe-area-inset-left) - env(safe-area-inset-right)) * 941 / 1672)
+        );
+        aspect-ratio:1672/941;
+        margin:auto;
+      }
+
+      .scene img,
+      .scene8State{
+        width:100%;
+        height:100%;
+        object-fit:contain !important;
+        object-position:center !important;
+      }
+    }
+
   </style>
 </head>
 
 <body>
+  <div id="rotateOverlay" aria-hidden="true">
+    <div class="rotateCard">
+      <div class="rotateIcon">↻</div>
+      <div class="rotateTitle">TURN YOUR PHONE</div>
+      <div class="rotateText">The adventure is best experienced in landscape.</div>
+    </div>
+  </div>
   <main id="app">
     <img id="sceneBackdrop" aria-hidden="true" alt="">
 
@@ -1100,6 +1218,37 @@
     window.addEventListener("load", () => {
       const firstActive = document.querySelector(".scene.active") || document.getElementById("scene1");
       if(firstActive) updateBackdrop(firstActive);
+    }, {once:true});
+
+
+    function refreshLandscapeLayout(){
+      const vv = window.visualViewport;
+      const app = document.getElementById("app");
+      if(!app) return;
+
+      if(vv){
+        app.style.width = vv.width + "px";
+        app.style.height = vv.height + "px";
+      }else{
+        app.style.width = window.innerWidth + "px";
+        app.style.height = window.innerHeight + "px";
+      }
+    }
+
+    window.addEventListener("orientationchange", () => {
+      setTimeout(refreshLandscapeLayout, 100);
+      setTimeout(refreshLandscapeLayout, 400);
+    }, {passive:true});
+
+    window.addEventListener("resize", refreshLandscapeLayout, {passive:true});
+
+    if(window.visualViewport){
+      window.visualViewport.addEventListener("resize", refreshLandscapeLayout, {passive:true});
+    }
+
+    window.addEventListener("load", () => {
+      refreshLandscapeLayout();
+      setTimeout(refreshLandscapeLayout, 250);
     }, {once:true});
 
   })();
