@@ -512,6 +512,62 @@
       }
     }
 
+  
+    /* ===== FINAL LANDSCAPE MAX-FILL FIX ===== */
+    @media (orientation:landscape){
+      html, body{
+        width:100% !important;
+        height:100% !important;
+        min-height:0 !important;
+        margin:0 !important;
+        padding:0 !important;
+        overflow:hidden !important;
+        background:#020b13 !important;
+      }
+
+      body{
+        position:fixed !important;
+        inset:0 !important;
+      }
+
+      #app{
+        position:fixed !important;
+        inset:0 !important;
+        width:auto !important;
+        height:auto !important;
+        min-width:0 !important;
+        min-height:0 !important;
+        padding:0 !important;
+        margin:0 !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        overflow:hidden !important;
+      }
+
+      .scene{
+        width:var(--real-scene-w) !important;
+        height:var(--real-scene-h) !important;
+        min-width:0 !important;
+        min-height:0 !important;
+        max-width:none !important;
+        max-height:none !important;
+        aspect-ratio:1672 / 941 !important;
+        margin:0 !important;
+      }
+
+      .scene img,
+      .scene8State,
+      #scene5Canvas,
+      #reachCanvas,
+      #scene8Gesture{
+        width:100% !important;
+        height:100% !important;
+        object-fit:fill !important;
+        object-position:center !important;
+      }
+    }
+
   </style>
 </head>
 
@@ -1250,6 +1306,54 @@
       refreshLandscapeLayout();
       setTimeout(refreshLandscapeLayout, 250);
     }, {once:true});
+
+
+    function fitSceneFromActualApp(){
+      const app = document.getElementById("app");
+      if(!app) return;
+
+      app.style.removeProperty("width");
+      app.style.removeProperty("height");
+
+      const rect = app.getBoundingClientRect();
+      const availableW = Math.max(rect.width || 0, document.documentElement.clientWidth || 0);
+      const availableH = Math.max(rect.height || 0, document.documentElement.clientHeight || 0);
+
+      if(!availableW || !availableH) return;
+
+      const ratio = 1672 / 941;
+      let w, h;
+
+      if((availableW / availableH) > ratio){
+        h = availableH;
+        w = h * ratio;
+      }else{
+        w = availableW;
+        h = w / ratio;
+      }
+
+      document.documentElement.style.setProperty("--real-scene-w", w + "px");
+      document.documentElement.style.setProperty("--real-scene-h", h + "px");
+    }
+
+    function refitSceneSeveralTimes(){
+      fitSceneFromActualApp();
+      requestAnimationFrame(fitSceneFromActualApp);
+      setTimeout(fitSceneFromActualApp, 80);
+      setTimeout(fitSceneFromActualApp, 250);
+      setTimeout(fitSceneFromActualApp, 700);
+    }
+
+    window.addEventListener("load", refitSceneSeveralTimes);
+    window.addEventListener("resize", refitSceneSeveralTimes, {passive:true});
+    window.addEventListener("orientationchange", refitSceneSeveralTimes, {passive:true});
+
+    if(window.ResizeObserver){
+      const appToWatch = document.getElementById("app");
+      if(appToWatch){
+        new ResizeObserver(() => fitSceneFromActualApp()).observe(appToWatch);
+      }
+    }
 
   })();
   </script>
