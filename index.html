@@ -41,23 +41,43 @@
 
     #app{
       position:fixed;
-      inset:0;
-      display:grid;
-      place-items:center;
+      left:0;
+      top:0;
+      width:100vw;
+      height:100dvh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       overflow:hidden;
       background:var(--bg);
+
+      /* Keep artwork clear of the iPhone notch/home indicator */
+      padding:
+        env(safe-area-inset-top)
+        env(safe-area-inset-right)
+        env(safe-area-inset-bottom)
+        env(safe-area-inset-left);
     }
 
     .scene{
       position:absolute;
-      width:min(100vw,calc(100dvh * 1672 / 941));
-      height:min(100dvh,calc(100vw * 941 / 1672));
-      aspect-ratio:var(--ratio);
+
+      /*
+        JavaScript updates these from the ACTUAL visible Safari viewport.
+        This keeps every 1672×941 scene fully visible with no stretching.
+      */
+      width:var(--scene-w, 100vw);
+      height:var(--scene-h, calc(100vw * 941 / 1672));
+      aspect-ratio:1672 / 941;
+
       overflow:hidden;
       opacity:0;
       pointer-events:none;
       background:var(--bg);
       transition:opacity .62s ease;
+
+      /* keep all percentage hotspots anchored to the artwork */
+      flex:none;
     }
 
     .scene.active{
@@ -71,7 +91,8 @@
       width:100%;
       height:100%;
       display:block;
-      object-fit:fill;
+      object-fit:contain;
+      object-position:center;
       pointer-events:none;
       -webkit-user-drag:none;
     }
@@ -216,7 +237,8 @@
       width:100%;
       height:100%;
       display:block;
-      object-fit:fill;
+      object-fit:contain;
+      object-position:center;
       opacity:0;
       transform:scale(1.003);
       transition:opacity .38s ease, transform .38s ease;
@@ -414,6 +436,64 @@
 
   <script>
   (() => {
+    /*
+      iPhone / iPad auto-fit
+      ----------------------
+      Safari's visible viewport changes when its browser bars expand/collapse.
+      Recalculate the exact 16:9 artwork stage from VisualViewport so the
+      picture always fits without cropping or distortion.
+    */
+    const ART_ASPECT = 1672 / 941;
+
+    function fitArtworkToScreen(){
+      const vv = window.visualViewport;
+
+      const viewportWidth = vv ? vv.width : window.innerWidth;
+      const viewportHeight = vv ? vv.height : window.innerHeight;
+
+      /*
+        Leave a tiny breathing margin so Safari never clips the gold border.
+      */
+      const availableWidth = Math.max(1, viewportWidth - 2);
+      const availableHeight = Math.max(1, viewportHeight - 2);
+
+      let sceneWidth;
+      let sceneHeight;
+
+      if((availableWidth / availableHeight) > ART_ASPECT){
+        sceneHeight = availableHeight;
+        sceneWidth = sceneHeight * ART_ASPECT;
+      }else{
+        sceneWidth = availableWidth;
+        sceneHeight = sceneWidth / ART_ASPECT;
+      }
+
+      document.documentElement.style.setProperty("--scene-w", sceneWidth + "px");
+      document.documentElement.style.setProperty("--scene-h", sceneHeight + "px");
+
+      /*
+        Use the actual visible Safari height rather than an outdated 100vh.
+      */
+      const app = document.getElementById("app");
+      if(app){
+        app.style.width = viewportWidth + "px";
+        app.style.height = viewportHeight + "px";
+      }
+    }
+
+    fitArtworkToScreen();
+
+    window.addEventListener("resize", fitArtworkToScreen, {passive:true});
+    window.addEventListener("orientationchange", () => {
+      setTimeout(fitArtworkToScreen, 80);
+      setTimeout(fitArtworkToScreen, 350);
+    }, {passive:true});
+
+    if(window.visualViewport){
+      window.visualViewport.addEventListener("resize", fitArtworkToScreen, {passive:true});
+      window.visualViewport.addEventListener("scroll", fitArtworkToScreen, {passive:true});
+    }
+
     const W = 1672;
     const H = 941;
 
@@ -944,6 +1024,13 @@
         The chest-discovery scene will be connected here next.
       */
     });
+
+
+    window.addEventListener("load", () => {
+      fitArtworkToScreen();
+      setTimeout(fitArtworkToScreen, 150);
+      setTimeout(fitArtworkToScreen, 600);
+    }, {once:true});
 
   })();
   </script>
