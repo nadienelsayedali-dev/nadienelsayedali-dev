@@ -1,61 +1,1246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Scene 13 - Locked Secret</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#020b13">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Our Little Adventure</title>
+
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #020814;
-      overflow: hidden;
-      font-family: Georgia, serif;
+    :root{
+      --bg:#020b13;
+      --ratio:1672/941;
+      --gold:#e8b753;
     }
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
     }
-    .stage {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at center, rgba(15,30,55,0.35), rgba(2,8,20,1) 75%);
+
+    html,body{
+      width:100%;
+      height:100%;
+      min-height:100dvh;
+      overflow:hidden;
+      background:var(--bg);
     }
-    img {
-      width: 100vw;
-      height: 100vh;
-      object-fit: contain;
-      object-position: center center;
-      display: block;
-      user-select: none;
-      -webkit-user-drag: none;
+
+    body{
+      position:fixed;
+      inset:0;
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-touch-callout:none;
+      touch-action:none;
+      overscroll-behavior:none;
     }
-    @media (orientation: landscape) {
-      img {
-        width: 100vw;
-        height: 100vh;
-        object-fit: contain;
+
+    #app{
+      position:fixed;
+      inset:0;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      background:var(--bg);
+    }
+
+    .scene{
+      position:absolute;
+      width:min(100vw,calc(100dvh * 1672 / 941));
+      height:min(100dvh,calc(100vw * 941 / 1672));
+      aspect-ratio:var(--ratio);
+      overflow:hidden;
+      opacity:0;
+      pointer-events:none;
+      background:var(--bg);
+      transition:opacity .62s ease;
+    }
+
+    .scene.active{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .scene img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:fill;
+      pointer-events:none;
+      -webkit-user-drag:none;
+    }
+
+    .hotspot{
+      position:absolute;
+      z-index:30;
+      border:0;
+      outline:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      touch-action:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    /* Scene 1 */
+    #beginStory{
+      left:63.2%;
+      top:75%;
+      width:21.5%;
+      height:10.5%;
+    }
+
+    /* Scene 2 */
+    #scene2Continue{
+      left:61%;
+      top:79%;
+      width:30%;
+      height:11%;
+    }
+
+    /* Scene 5 line-drag layer */
+    #reachCanvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:20;
+      pointer-events:none;
+    }
+
+    /*
+      Invisible start area around her reaching hand.
+      The bottle itself never moves.
+    */
+    #handDragStart{
+      left:47%;
+      top:61%;
+      width:13%;
+      height:17%;
+      z-index:40;
+      cursor:grab;
+    }
+
+    #handDragStart.dragging{
+      cursor:grabbing;
+    }
+
+    /* Success scene: CONTINUE button */
+    #scene6Continue{
+      left:67.5%;
+      top:72.5%;
+      width:21.5%;
+      height:11%;
+      z-index:40;
+    }
+
+    /* Scene 7: CONTINUE button */
+    #scene7Continue{
+      left:67%;
+      top:73%;
+      width:22%;
+      height:11%;
+      z-index:40;
+    }
+
+    #missionHint{
+      position:absolute;
+      left:50%;
+      bottom:2.7%;
+      transform:translateX(-50%);
+      z-index:35;
+      padding:.42rem .9rem;
+      border:1px solid rgba(232,183,83,.4);
+      border-radius:999px;
+      background:rgba(2,11,19,.42);
+      color:#efd18c;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(12px,1.25vw,21px);
+      letter-spacing:.045em;
+      text-shadow:0 2px 8px #000;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .3s ease;
+      backdrop-filter:blur(3px);
+    }
+
+    #scene5.active #missionHint{
+      opacity:.94;
+    }
+
+    #missionHint.done{
+      opacity:0 !important;
+    }
+
+    #tapPulse{
+      position:fixed;
+      z-index:80;
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      border:2px solid rgba(232,183,83,.96);
+      box-shadow:0 0 28px rgba(232,183,83,.82);
+      opacity:0;
+      transform:translate(-50%,-50%) scale(.55);
+      pointer-events:none;
+    }
+
+    #tapPulse.play{
+      animation:tapPulse .45s ease forwards;
+    }
+
+    @keyframes tapPulse{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
+      45%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+      100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
+    }
+  
+    /* ===== Scene 8: Grab -> Lift -> Drop ===== */
+    #scene8{
+      background:#020b13;
+      touch-action:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .scene8State{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:fill;
+      opacity:0;
+      transform:scale(1.003);
+      transition:opacity .38s ease, transform .38s ease;
+      pointer-events:none;
+      -webkit-user-drag:none;
+    }
+
+    .scene8State.active8{
+      opacity:1;
+      transform:scale(1);
+    }
+
+    #scene8Gesture{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:55;
+      pointer-events:none;
+    }
+
+    #scene8TapRock{
+      position:absolute;
+      left:68%;
+      top:65%;
+      width:28%;
+      height:31%;
+      z-index:65;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    #scene8Hint{
+      position:absolute;
+      left:50%;
+      bottom:2.7%;
+      transform:translateX(-50%);
+      z-index:70;
+      padding:.43rem .95rem;
+      border:1px solid rgba(232,183,83,.42);
+      border-radius:999px;
+      background:rgba(2,11,19,.46);
+      color:#efd18b;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(12px,1.2vw,20px);
+      letter-spacing:.04em;
+      text-shadow:0 2px 8px #000;
+      backdrop-filter:blur(3px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .25s ease;
+      white-space:nowrap;
+    }
+
+    #scene8.active #scene8Hint{
+      opacity:.95;
+    }
+
+  
+    /* ===== Scene 9: broken-bottle reveal ===== */
+    #scene9Continue{
+      position:absolute;
+      left:66%;
+      top:72%;
+      width:24%;
+      height:12%;
+      z-index:40;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+  
+    /* ===== Scene 10: message letter ===== */
+    #scene10Continue{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:40;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+  
+    /* ===== Scene 11: The First Clue ===== */
+    #scene11Continue{
+      position:absolute;
+      left:59%;
+      top:80%;
+      width:29%;
+      height:10%;
+      z-index:45;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+  
+    /* ===== Scene 12: hidden chest discovery ===== */
+    #scene12Continue{
+      position:absolute;
+      left:54%;
+      top:54%;
+      width:39%;
+      height:38%;
+      z-index:45;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    /* ===== Scene 13: locked secret ===== */
+    #scene13Lock{
+      position:absolute;
+      left:56%;
+      top:61%;
+      width:18%;
+      height:25%;
+      z-index:50;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    /* =========================================================
+       iPHONE BEST-FIT LAYOUT
+       Full artwork visible, maximum height, soft side fill.
+       ========================================================= */
+
+    #rotatePhone{
+      display:none;
+      position:fixed;
+      inset:0;
+      z-index:10000;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+      background:#020b13;
+      color:#efc978;
+      text-align:center;
+      font-family:Georgia,"Times New Roman",serif;
+    }
+
+    .rotateCard{
+      max-width:420px;
+      padding:26px 24px;
+      border:1px solid rgba(239,201,120,.38);
+      border-radius:22px;
+      background:rgba(7,20,32,.84);
+      box-shadow:0 0 35px rgba(0,0,0,.35);
+    }
+
+    .rotateIcon{
+      font-size:52px;
+      line-height:1;
+      margin-bottom:12px;
+    }
+
+    .rotateTitle{
+      font-size:24px;
+      letter-spacing:.08em;
+      margin-bottom:8px;
+    }
+
+    .rotateText{
+      color:#f5e4ba;
+      font-size:16px;
+      line-height:1.45;
+    }
+
+    #sceneBackdrop{
+      position:absolute;
+      z-index:0;
+      inset:-8%;
+      width:116%;
+      height:116%;
+      object-fit:cover;
+      object-position:center;
+      filter:blur(28px) brightness(.34) saturate(1.08);
+      transform:scale(1.06);
+      opacity:1;
+      pointer-events:none;
+      transition:opacity .35s ease;
+    }
+
+    #app::after{
+      content:"";
+      position:absolute;
+      z-index:1;
+      inset:0;
+      pointer-events:none;
+      background:rgba(2,11,19,.12);
+    }
+
+    @media (orientation:portrait){
+      #rotatePhone{display:flex !important;}
+      #app{visibility:hidden !important;}
+    }
+
+    @media (orientation:landscape){
+      html,body{
+        width:100% !important;
+        height:100% !important;
+        min-height:0 !important;
+        margin:0 !important;
+        padding:0 !important;
+        overflow:hidden !important;
+        background:#020b13 !important;
+      }
+
+      body{
+        position:fixed !important;
+        inset:0 !important;
+      }
+
+      #rotatePhone{display:none !important;}
+
+      #app{
+        visibility:visible !important;
+        position:fixed !important;
+        left:0 !important;
+        top:0 !important;
+        width:var(--phone-vw, 100vw) !important;
+        height:var(--phone-vh, 100vh) !important;
+        min-width:0 !important;
+        min-height:0 !important;
+        padding:0 !important;
+        margin:0 !important;
+        overflow:hidden !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        background:#020b13 !important;
+      }
+
+      .scene{
+        position:absolute !important;
+        left:50% !important;
+        top:50% !important;
+        width:var(--fit-w) !important;
+        height:var(--fit-h) !important;
+        aspect-ratio:1672 / 941 !important;
+        transform:translate(-50%,-50%) !important;
+        margin:0 !important;
+        max-width:none !important;
+        max-height:none !important;
+        z-index:5 !important;
+        box-shadow:0 0 34px rgba(0,0,0,.42);
+      }
+
+      .scene img,
+      .scene8State{
+        position:absolute !important;
+        inset:0 !important;
+        width:100% !important;
+        height:100% !important;
+        object-fit:fill !important;
+        object-position:center !important;
+      }
+
+      #scene5Canvas,
+      #reachCanvas,
+      #scene8Gesture{
+        position:absolute !important;
+        inset:0 !important;
+        width:100% !important;
+        height:100% !important;
       }
     }
-    @media (orientation: portrait) {
-      img {
-        width: 100vw;
-        height: auto;
-        max-height: 100vh;
-        object-fit: contain;
+
+  
+    /* ===== Gentle iPhone landscape zoom =====
+       1.08 = slightly wider/larger, while keeping the important content visible.
+       The whole scene (including hotspots/canvases) scales together.
+    */
+    @media (orientation:landscape){
+      .scene{
+        transform:translate(-50%,-50%) scale(1.08) !important;
+        transform-origin:center center !important;
       }
     }
+
   </style>
 </head>
+
 <body>
-  <div class="stage">
-    <img src="scene13.png" alt="Scene 13 - Locked Secret" />
+  <div id="rotatePhone" aria-hidden="true">
+    <div class="rotateCard">
+      <div class="rotateIcon">↻</div>
+      <div class="rotateTitle">TURN YOUR PHONE</div>
+      <div class="rotateText">Rotate to landscape to continue the adventure.</div>
+    </div>
   </div>
+  <main id="app">
+    <img id="sceneBackdrop" aria-hidden="true" alt="">
+
+    <section id="scene1" class="scene active">
+      <img src="./scene 1.png" alt="Our Little Adventure">
+      <button id="beginStory" class="hotspot" aria-label="Begin the story"></button>
+    </section>
+
+    <section id="scene2" class="scene">
+      <img src="./scene2.png" alt="Across the Waves">
+      <button id="scene2Continue" class="hotspot" aria-label="Sail forward"></button>
+    </section>
+
+    <section id="scene3" class="scene">
+      <img src="./scene3.png" alt="Boat sailing farther into the sea">
+    </section>
+
+    <section id="scene4" class="scene">
+      <img src="./scene4.png" alt="A bottle appears ahead of the boat">
+    </section>
+
+    <section id="scene5" class="scene">
+      <img src="./scene5.png" alt="Your Mission">
+      <canvas id="reachCanvas" width="1672" height="941"></canvas>
+      <button id="handDragStart" class="hotspot" aria-label="Drag from her hand to the bottle"></button>
+      <div id="missionHint">DRAG FROM HER HAND TO THE BOTTLE</div>
+    </section>
+
+
+    <section id="scene6" class="scene">
+      <img src="./scene6.png" alt="Mission Complete">
+      <button id="scene6Continue" class="hotspot" aria-label="Continue"></button>
+    </section>
+
+
+    <section id="scene7" class="scene">
+      <img src="./scene7.png" alt="A Secret Waiting to Be Uncovered">
+      <button id="scene7Continue" class="hotspot" aria-label="Continue"></button>
+    </section>
+
+<section id="scene8" class="scene">
+      <img id="scene8State1" class="scene8State active8" src="./scene8_1.png?v=8" alt="Grab the Rock">
+      <img id="scene8State2" class="scene8State" src="./scene8_2.png?v=8" alt="Lift It Up">
+      <img id="scene8State3" class="scene8State" src="./scene8_3.png?v=8" alt="Ready to Drop">
+
+      <canvas id="scene8Gesture" width="1672" height="941"></canvas>
+      <button id="scene8TapRock" type="button" aria-label="Tap the rock"></button>
+      <div id="scene8Hint">Tap the glowing rock</div>
+    </section>
+
+<section id="scene9" class="scene">
+      <img src="./scene9.png" alt="Adventure has been waiting for you">
+      <button id="scene9Continue" type="button" aria-label="Continue"></button>
+    </section>
+
+<section id="scene10" class="scene">
+      <img src="./scene10.png" alt="To get your surprise, you must complete three missions">
+      <button id="scene10Continue" type="button" aria-label="Continue"></button>
+    </section>
+
+<section id="scene11" class="scene">
+      <img src="./scene11.png?v=11" alt="The First Clue">
+      <button id="scene11Continue" type="button" aria-label="Follow the glow"></button>
+    </section>
+
+    <section id="scene12" class="scene">
+      <img src="./scene12.png?v=12" alt="The Hidden Chest">
+      <button id="scene12Continue" type="button" aria-label="Discover the chest"></button>
+    </section>
+
+    <section id="scene13" class="scene">
+      <img src="./scene13.png?v=13" alt="Locked Secret - Tap the lock">
+      <button id="scene13Lock" type="button" aria-label="Tap the lock"></button>
+    </section>
+
+    <div id="tapPulse" aria-hidden="true"></div>
+  </main>
+
+  <script>
+  (() => {
+    const W = 1672;
+    const H = 941;
+
+    const scenes = [...document.querySelectorAll(".scene")];
+    const sceneBackdrop = document.getElementById("sceneBackdrop");
+    const scene1 = document.getElementById("scene1");
+    const scene2 = document.getElementById("scene2");
+    const scene3 = document.getElementById("scene3");
+    const scene4 = document.getElementById("scene4");
+    const scene5 = document.getElementById("scene5");
+    const scene6 = document.getElementById("scene6");
+    const scene7 = document.getElementById("scene7");
+    const scene8 = document.getElementById("scene8");
+    const scene9 = document.getElementById("scene9");
+    const scene10 = document.getElementById("scene10");
+    const scene11 = document.getElementById("scene11");
+    const scene12 = document.getElementById("scene12");
+    const scene13 = document.getElementById("scene13");
+
+    const beginStory = document.getElementById("beginStory");
+    const scene2Continue = document.getElementById("scene2Continue");
+    const tapPulse = document.getElementById("tapPulse");
+
+    const reachCanvas = document.getElementById("reachCanvas");
+    const ctx = reachCanvas.getContext("2d");
+    const handDragStart = document.getElementById("handDragStart");
+    const missionHint = document.getElementById("missionHint");
+    const scene6Continue = document.getElementById("scene6Continue");
+    const scene7Continue = document.getElementById("scene7Continue");
+    const scene8State1 = document.getElementById("scene8State1");
+    const scene8State2 = document.getElementById("scene8State2");
+    const scene8State3 = document.getElementById("scene8State3");
+    const scene8Gesture = document.getElementById("scene8Gesture");
+    const scene8Ctx = scene8Gesture.getContext("2d");
+    const scene8TapRock = document.getElementById("scene8TapRock");
+    const scene8Hint = document.getElementById("scene8Hint");
+    const scene9Continue = document.getElementById("scene9Continue");
+    const scene10Continue = document.getElementById("scene10Continue");
+    const scene11Continue = document.getElementById("scene11Continue");
+    const scene12Continue = document.getElementById("scene12Continue");
+    const scene13Lock = document.getElementById("scene13Lock");
+
+    /*
+      Locked coordinates in the 1672 x 941 artwork.
+      Nothing in the PNG is moved.
+    */
+    const hand = { x: 914, y: 657 };
+    const bottle = { x: 1005, y: 757 };
+    const bottleRadius = 105;
+
+    let dragging = false;
+    let complete = false;
+    let current = { x: hand.x, y: hand.y };
+
+    function updateSceneBackdrop(scene){
+      if(!sceneBackdrop || !scene) return;
+      const img = scene.querySelector("img");
+      if(!img) return;
+
+      const src = img.currentSrc || img.getAttribute("src") || "";
+      if(!src) return;
+
+      sceneBackdrop.src = src;
+    }
+
+    function showScene(next){
+      scenes.forEach(s => s.classList.remove("active"));
+      next.classList.add("active");
+      updateSceneBackdrop(next);
+    }
+
+    function pulseAt(e){
+      if(typeof e.clientX !== "number") return;
+      tapPulse.style.left = e.clientX + "px";
+      tapPulse.style.top = e.clientY + "px";
+      tapPulse.classList.remove("play");
+      void tapPulse.offsetWidth;
+      tapPulse.classList.add("play");
+    }
+
+    function pointInArtwork(e){
+      const r = reachCanvas.getBoundingClientRect();
+      return {
+        x:(e.clientX-r.left) * W/r.width,
+        y:(e.clientY-r.top) * H/r.height
+      };
+    }
+
+    function clearLine(){
+      ctx.clearRect(0,0,W,H);
+    }
+
+    function drawLine(endX,endY,success=false){
+      clearLine();
+
+      ctx.save();
+      ctx.lineCap="round";
+      ctx.lineJoin="round";
+
+      /* soft glow */
+      ctx.shadowColor = success
+        ? "rgba(255,220,130,.98)"
+        : "rgba(232,183,83,.9)";
+      ctx.shadowBlur = success ? 28 : 17;
+
+      ctx.strokeStyle = success
+        ? "rgba(255,222,146,.98)"
+        : "rgba(232,183,83,.92)";
+
+      ctx.lineWidth = success ? 5 : 4;
+      ctx.setLineDash(success ? [] : [12,10]);
+
+      ctx.beginPath();
+      ctx.moveTo(hand.x,hand.y);
+
+      /*
+        Slight curve makes the reach feel more elegant
+        than a rigid straight line.
+      */
+      const mx=(hand.x+endX)/2;
+      const my=(hand.y+endY)/2 - 24;
+      ctx.quadraticCurveTo(mx,my,endX,endY);
+      ctx.stroke();
+
+      /* small glowing end point */
+      ctx.setLineDash([]);
+      ctx.fillStyle = success
+        ? "rgba(255,229,166,.98)"
+        : "rgba(239,196,101,.95)";
+      ctx.beginPath();
+      ctx.arc(endX,endY,success ? 10 : 7,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function startReach(e){
+      if(complete) return;
+
+      e.preventDefault();
+      dragging=true;
+      handDragStart.classList.add("dragging");
+
+      current = pointInArtwork(e);
+      drawLine(current.x,current.y);
+
+      try{
+        handDragStart.setPointerCapture(e.pointerId);
+      }catch(_){}
+    }
+
+    function moveReach(e){
+      if(!dragging || complete) return;
+
+      e.preventDefault();
+      current=pointInArtwork(e);
+      drawLine(current.x,current.y);
+
+      /*
+        Complete immediately when the drawn line reaches the bottle.
+      */
+      const d=Math.hypot(current.x-bottle.x,current.y-bottle.y);
+
+      if(d <= bottleRadius){
+        completeMission();
+      }
+    }
+
+    function endReach(e){
+      if(!dragging || complete) return;
+
+      e.preventDefault();
+      dragging=false;
+      handDragStart.classList.remove("dragging");
+
+      const p=pointInArtwork(e);
+      const d=Math.hypot(p.x-bottle.x,p.y-bottle.y);
+
+      if(d <= bottleRadius){
+        completeMission();
+      }else{
+        /*
+          Missed the bottle:
+          line disappears and user can try again.
+        */
+        clearLine();
+      }
+    }
+
+    function completeMission(){
+      if(complete) return;
+
+      complete=true;
+      dragging=false;
+      handDragStart.classList.remove("dragging");
+      handDragStart.style.pointerEvents="none";
+      missionHint.classList.add("done");
+
+      /*
+        Snap ONLY THE LINE to the bottle.
+        The bottle PNG stays 100% unchanged.
+      */
+      drawLine(bottle.x,bottle.y,true);
+
+      document.dispatchEvent(
+        new CustomEvent("bottleMissionComplete")
+      );
+
+      /* Show the locked MISSION COMPLETE scene after a short success beat */
+      setTimeout(() => {
+        showScene(scene6);
+      }, 700);
+    }
+
+    handDragStart.addEventListener("pointerdown",startReach);
+    handDragStart.addEventListener("pointermove",moveReach);
+    handDragStart.addEventListener("pointerup",endReach);
+    handDragStart.addEventListener("pointercancel",endReach);
+
+    /*
+      Existing story flow.
+      Scene 3 = 3 seconds.
+      Scene 4 = 3 seconds.
+    */
+    beginStory.addEventListener("pointerup",e=>{
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(()=>showScene(scene2),220);
+    });
+
+    scene2Continue.addEventListener("pointerup",e=>{
+      e.preventDefault();
+      pulseAt(e);
+
+      setTimeout(()=>{
+        showScene(scene3);
+
+        setTimeout(()=>{
+          showScene(scene4);
+
+          setTimeout(()=>{
+            showScene(scene5);
+          },3000);
+
+        },3000);
+
+      },260);
+    });
+
+    /* Scene 6 -> Scene 7 */
+    scene6Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene7), 260);
+    });
+
+    /* Scene 7 -> Scene 8 */
+    scene7Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => {
+        showScene(scene8);
+        resetScene8();
+      }, 260);
+    });
+
+
+    /* ===== Scene 8 interaction =====
+       1) Tap rock -> show grabbed state.
+       2) Drag upward -> draw gold line, then show lifted state.
+       3) Drag downward toward bottle -> draw gold line and complete.
+    */
+
+    let scene8Phase = 0;
+    let scene8Dragging = false;
+    let scene8PointerId = null;
+    let scene8Start = null;
+
+    const ART_W = 1672;
+    const ART_H = 941;
+
+    /* Coordinates in the locked artwork */
+    const grabbedRock = { x:1040, y:770 };   // Scene 8.2 rock
+    const liftedRock  = { x:930,  y:175 };   // Scene 8.3 raised rock
+    const bottleTarget = { x:700, y:835 };   // bottle in Scene 8.3
+
+    function setScene8State(n){
+      scene8State1.classList.toggle("active8", n === 1);
+      scene8State2.classList.toggle("active8", n === 2);
+      scene8State3.classList.toggle("active8", n === 3);
+    }
+
+    function resetScene8(){
+      scene8Phase = 0;
+      scene8Dragging = false;
+      scene8PointerId = null;
+      scene8Start = null;
+      setScene8State(1);
+      scene8TapRock.style.display = "block";
+      scene8Hint.textContent = "Tap the glowing rock";
+      scene8Ctx.clearRect(0,0,ART_W,ART_H);
+    }
+
+    ["./scene8_1.png?v=8","./scene8_2.png?v=8","./scene8_3.png?v=8"].forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+
+    function artPoint(clientX, clientY){
+      const r = scene8Gesture.getBoundingClientRect();
+      return {
+        x:(clientX-r.left) * ART_W/r.width,
+        y:(clientY-r.top) * ART_H/r.height
+      };
+    }
+
+    function clearScene8Line(){
+      scene8Ctx.clearRect(0,0,ART_W,ART_H);
+    }
+
+    function drawScene8Line(from, to){
+      clearScene8Line();
+
+      scene8Ctx.save();
+      scene8Ctx.lineCap = "round";
+      scene8Ctx.lineJoin = "round";
+      scene8Ctx.strokeStyle = "rgba(236,184,77,.96)";
+      scene8Ctx.lineWidth = 4;
+      scene8Ctx.setLineDash([13,10]);
+      scene8Ctx.shadowColor = "rgba(236,184,77,.95)";
+      scene8Ctx.shadowBlur = 16;
+
+      scene8Ctx.beginPath();
+      scene8Ctx.moveTo(from.x, from.y);
+      scene8Ctx.lineTo(to.x, to.y);
+      scene8Ctx.stroke();
+
+      scene8Ctx.setLineDash([]);
+      scene8Ctx.fillStyle = "rgba(255,218,130,.98)";
+      scene8Ctx.beginPath();
+      scene8Ctx.arc(to.x,to.y,8,0,Math.PI*2);
+      scene8Ctx.fill();
+      scene8Ctx.restore();
+    }
+
+    /* STEP 1: tap rock -> grabbed image */
+    scene8TapRock.addEventListener("pointerup", e => {
+      e.preventDefault();
+      if(scene8Phase !== 0) return;
+
+      scene8Phase = 1;
+      setScene8State(2);
+      scene8TapRock.style.display = "none";
+      scene8Hint.textContent = "Drag upward to lift the rock";
+    });
+
+    /*
+      STEP 2 and STEP 3 use gestures directly on the scene.
+    */
+    scene8.addEventListener("pointerdown", e => {
+      if(scene8Phase !== 1 && scene8Phase !== 2) return;
+
+      e.preventDefault();
+      const p = artPoint(e.clientX,e.clientY);
+
+      if(scene8Phase === 1){
+        /* Begin upward drag near the grabbed rock */
+        if(Math.hypot(p.x-grabbedRock.x,p.y-grabbedRock.y) > 240) return;
+      } else {
+        /* Begin downward drag near the raised rock */
+        if(Math.hypot(p.x-liftedRock.x,p.y-liftedRock.y) > 260) return;
+      }
+
+      scene8Dragging = true;
+      scene8PointerId = e.pointerId;
+      scene8Start = p;
+
+      try{ scene8.setPointerCapture(e.pointerId); }catch(_){}
+    });
+
+    scene8.addEventListener("pointermove", e => {
+      if(!scene8Dragging || !scene8Start) return;
+      e.preventDefault();
+
+      const p = artPoint(e.clientX,e.clientY);
+
+      if(scene8Phase === 1){
+        /* Gold line upward from grabbed rock */
+        drawScene8Line(grabbedRock,p);
+
+        if(p.y < scene8Start.y - 150){
+          scene8Phase = 2;
+          setScene8State(3);
+          clearScene8Line();
+          scene8Hint.textContent = "Now drag downward toward the bottle";
+          scene8Dragging = false;
+
+          try{ scene8.releasePointerCapture(e.pointerId); }catch(_){}
+        }
+      }
+      else if(scene8Phase === 2){
+        /* Gold line downward from lifted rock */
+        drawScene8Line(liftedRock,p);
+
+        const distanceToBottle = Math.hypot(
+          p.x-bottleTarget.x,
+          p.y-bottleTarget.y
+        );
+
+        if(distanceToBottle < 150){
+          scene8Phase = 3;
+          scene8Dragging = false;
+          drawScene8Line(liftedRock,bottleTarget);
+          scene8Hint.textContent = "Ready to break the bottle";
+
+          try{ scene8.releasePointerCapture(e.pointerId); }catch(_){}
+
+          document.dispatchEvent(
+            new CustomEvent("scene8MissionComplete")
+          );
+
+          setTimeout(() => {
+            showScene(scene9);
+          }, 550);
+
+          setTimeout(() => {
+            showScene(scene9);
+          }, 550);
+        }
+      }
+    });
+
+    scene8.addEventListener("pointerup", e => {
+      if(!scene8Dragging) return;
+      e.preventDefault();
+
+      /* If user releases too early, keep the same state and let them retry. */
+      clearScene8Line();
+      scene8Dragging = false;
+      scene8PointerId = null;
+      scene8Start = null;
+
+      if(scene8Phase === 1){
+        scene8Hint.textContent = "Drag upward to lift the rock";
+      }
+      else if(scene8Phase === 2){
+        scene8Hint.textContent = "Drag downward toward the bottle";
+      }
+    });
+
+    scene8.addEventListener("pointercancel", e => {
+      if(!scene8Dragging) return;
+      e.preventDefault();
+      clearScene8Line();
+      scene8Dragging = false;
+      scene8PointerId = null;
+      scene8Start = null;
+    });
+
+    /* Touch fallback for older iPad Safari */
+    let s8Touch = false;
+
+    scene8.addEventListener("touchstart", e => {
+      if(scene8Phase !== 1 && scene8Phase !== 2) return;
+      const t = e.changedTouches && e.changedTouches[0];
+      if(!t) return;
+
+      const p = artPoint(t.clientX,t.clientY);
+
+      if(scene8Phase === 1 && Math.hypot(p.x-grabbedRock.x,p.y-grabbedRock.y) > 240) return;
+      if(scene8Phase === 2 && Math.hypot(p.x-liftedRock.x,p.y-liftedRock.y) > 260) return;
+
+      e.preventDefault();
+      s8Touch = true;
+      scene8Dragging = true;
+      scene8Start = p;
+    }, {passive:false});
+
+    scene8.addEventListener("touchmove", e => {
+      if(!s8Touch || !scene8Dragging) return;
+      const t = e.changedTouches && e.changedTouches[0];
+      if(!t) return;
+      e.preventDefault();
+
+      const p = artPoint(t.clientX,t.clientY);
+
+      if(scene8Phase === 1){
+        drawScene8Line(grabbedRock,p);
+
+        if(p.y < scene8Start.y - 150){
+          scene8Phase = 2;
+          setScene8State(3);
+          clearScene8Line();
+          scene8Hint.textContent = "Now drag downward toward the bottle";
+          scene8Dragging = false;
+          s8Touch = false;
+        }
+      }
+      else if(scene8Phase === 2){
+        drawScene8Line(liftedRock,p);
+
+        if(Math.hypot(p.x-bottleTarget.x,p.y-bottleTarget.y) < 150){
+          scene8Phase = 3;
+          drawScene8Line(liftedRock,bottleTarget);
+          scene8Hint.textContent = "Ready to break the bottle";
+          scene8Dragging = false;
+          s8Touch = false;
+
+          document.dispatchEvent(
+            new CustomEvent("scene8MissionComplete")
+          );
+        }
+      }
+    }, {passive:false});
+
+    scene8.addEventListener("touchend", e => {
+      if(!s8Touch) return;
+      e.preventDefault();
+      clearScene8Line();
+      s8Touch = false;
+      scene8Dragging = false;
+      scene8Start = null;
+    }, {passive:false});
+
+
+    /* Scene 9 -> Scene 10 */
+    scene9Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene10), 260);
+    });
+
+    /* Scene 10 -> Scene 11 */
+    scene10Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene11), 260);
+    });
+
+    /* Scene 11 -> Scene 12: follow the glow */
+    scene11Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene12), 260);
+    });
+
+    /* Scene 12 -> Scene 13: tap the discovered chest */
+    scene12Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene13), 260);
+    });
+
+    /* Scene 13: lock is interactive and ready for the next lock mission. */
+    scene13Lock.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      document.dispatchEvent(new CustomEvent("lockMissionStart"));
+    });
+
+
+    const CARD_RATIO = 1672 / 941;
+
+    function fitCardToIPhone(){
+      /*
+        window.innerWidth/innerHeight describe Safari's actual webpage area.
+        We fit the entire 16:9 card inside it, maximizing height.
+      */
+      const vw = Math.max(1, window.innerWidth);
+      const vh = Math.max(1, window.innerHeight);
+
+      document.documentElement.style.setProperty("--phone-vw", vw + "px");
+      document.documentElement.style.setProperty("--phone-vh", vh + "px");
+
+      let w, h;
+
+      if((vw / vh) > CARD_RATIO){
+        // Extra-wide Safari landscape: fill height, leave side areas.
+        h = vh;
+        w = h * CARD_RATIO;
+      }else{
+        // Narrower viewport: fill width.
+        w = vw;
+        h = w / CARD_RATIO;
+      }
+
+      // 2 px breathing room so the gold frame is never clipped.
+      w = Math.max(1, w - 2);
+      h = Math.max(1, h - 2);
+
+      document.documentElement.style.setProperty("--fit-w", Math.floor(w) + "px");
+      document.documentElement.style.setProperty("--fit-h", Math.floor(h) + "px");
+    }
+
+    function refitCard(){
+      fitCardToIPhone();
+      requestAnimationFrame(fitCardToIPhone);
+      setTimeout(fitCardToIPhone, 80);
+      setTimeout(fitCardToIPhone, 250);
+      setTimeout(fitCardToIPhone, 600);
+    }
+
+    window.addEventListener("load", () => {
+      refitCard();
+      const firstActive = document.querySelector(".scene.active") || document.getElementById("scene1");
+      if(firstActive) updateSceneBackdrop(firstActive);
+    }, {once:true});
+
+    window.addEventListener("resize", refitCard, {passive:true});
+    window.addEventListener("orientationchange", refitCard, {passive:true});
+
+  })();
+  </script>
 </body>
 </html>
