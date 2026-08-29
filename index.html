@@ -380,6 +380,74 @@
       -webkit-tap-highlight-color:transparent;
     }
 
+
+    /* ===== Scene 14: The Key Thief — 4-step crab interaction ===== */
+    #scene14{
+      background:#020b13;
+      touch-action:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .scene14State{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:fill;
+      opacity:0;
+      transform:scale(1.003);
+      transition:opacity .42s ease, transform .42s ease;
+      pointer-events:none;
+      -webkit-user-drag:none;
+    }
+
+    .scene14State.active14{
+      opacity:1;
+      transform:scale(1);
+    }
+
+    #scene14Action{
+      position:absolute;
+      z-index:70;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    /* Tap targets are moved with each image-state so the visible crab/key is what is tapped. */
+    #scene14Action.phase0{ left:40%; top:57%; width:29%; height:31%; }
+    #scene14Action.phase1{ left:43%; top:60%; width:28%; height:30%; }
+    #scene14Action.phase2{ left:37%; top:72%; width:25%; height:17%; }
+    #scene14Action.phase3{ left:35%; top:87%; width:30%; height:10%; }
+
+    #scene14Spark{
+      position:absolute;
+      z-index:62;
+      width:88px;
+      height:88px;
+      border-radius:50%;
+      border:2px solid rgba(242,193,91,.85);
+      box-shadow:0 0 30px rgba(242,193,91,.7), inset 0 0 20px rgba(242,193,91,.28);
+      opacity:0;
+      pointer-events:none;
+      transform:translate(-50%,-50%) scale(.35);
+    }
+
+    #scene14Spark.play{ animation:scene14Spark .5s ease forwards; }
+
+    @keyframes scene14Spark{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
+      42%{opacity:1;transform:translate(-50%,-50%) scale(.95)}
+      100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
+    }
+
     /* =========================================================
        iPHONE BEST-FIT LAYOUT
        Full artwork visible, maximum height, soft side fill.
@@ -624,6 +692,15 @@
       <button id="scene13Lock" type="button" aria-label="Tap the lock"></button>
     </section>
 
+    <section id="scene14" class="scene">
+      <img id="scene14State1" class="scene14State active14" src="./scene14_1.png?v=14" alt="The Key Thief - tap the crab">
+      <img id="scene14State2" class="scene14State" src="./scene14_2.png?v=14" alt="Follow the crab">
+      <img id="scene14State3" class="scene14State" src="./scene14_3.png?v=14" alt="The key appears">
+      <img id="scene14State4" class="scene14State" src="./scene14_4.png?v=14" alt="You found the key">
+      <button id="scene14Action" class="phase0" type="button" aria-label="Tap the crab"></button>
+      <div id="scene14Spark" aria-hidden="true"></div>
+    </section>
+
     <div id="tapPulse" aria-hidden="true"></div>
   </main>
 
@@ -647,6 +724,7 @@
     const scene11 = document.getElementById("scene11");
     const scene12 = document.getElementById("scene12");
     const scene13 = document.getElementById("scene13");
+    const scene14 = document.getElementById("scene14");
 
     const beginStory = document.getElementById("beginStory");
     const scene2Continue = document.getElementById("scene2Continue");
@@ -670,6 +748,12 @@
     const scene11Continue = document.getElementById("scene11Continue");
     const scene12Continue = document.getElementById("scene12Continue");
     const scene13Lock = document.getElementById("scene13Lock");
+    const scene14State1 = document.getElementById("scene14State1");
+    const scene14State2 = document.getElementById("scene14State2");
+    const scene14State3 = document.getElementById("scene14State3");
+    const scene14State4 = document.getElementById("scene14State4");
+    const scene14Action = document.getElementById("scene14Action");
+    const scene14Spark = document.getElementById("scene14Spark");
 
     /*
       Locked coordinates in the 1672 x 941 artwork.
@@ -685,7 +769,7 @@
 
     function updateSceneBackdrop(scene){
       if(!sceneBackdrop || !scene) return;
-      const img = scene.querySelector("img");
+      const img = scene.querySelector(".scene14State.active14, .scene8State.active8, img");
       if(!img) return;
 
       const src = img.currentSrc || img.getAttribute("src") || "";
@@ -1182,11 +1266,97 @@
       setTimeout(() => showScene(scene13), 260);
     });
 
-    /* Scene 13: lock is interactive and ready for the next lock mission. */
+    /* Scene 13 -> Scene 14: tapping the lock reveals the key thief. */
     scene13Lock.addEventListener("pointerup", e => {
       e.preventDefault();
       pulseAt(e);
       document.dispatchEvent(new CustomEvent("lockMissionStart"));
+      setTimeout(() => {
+        resetScene14();
+        showScene(scene14);
+      }, 260);
+    });
+
+    /* ===== Scene 14: 4-step interaction =====
+       1) Tap the crab holding the key.
+       2) Tap it again as it scuttles away.
+       3) Tap the key after it falls to the sand.
+       4) Continue from the success frame.
+       The PNGs change as state images; nothing is cropped or duplicated.
+    */
+    let scene14Phase = 0;
+
+    function setScene14State(n){
+      scene14State1.classList.toggle("active14", n === 1);
+      scene14State2.classList.toggle("active14", n === 2);
+      scene14State3.classList.toggle("active14", n === 3);
+      scene14State4.classList.toggle("active14", n === 4);
+    }
+
+    function setScene14ActionPhase(phase){
+      scene14Action.classList.remove("phase0","phase1","phase2","phase3");
+      scene14Action.classList.add("phase" + phase);
+      if(phase === 0) scene14Action.setAttribute("aria-label","Tap the crab");
+      if(phase === 1) scene14Action.setAttribute("aria-label","Tap the crab again");
+      if(phase === 2) scene14Action.setAttribute("aria-label","Tap the key");
+      if(phase === 3) scene14Action.setAttribute("aria-label","Continue");
+    }
+
+    function resetScene14(){
+      scene14Phase = 0;
+      setScene14State(1);
+      setScene14ActionPhase(0);
+      scene14Action.style.pointerEvents = "auto";
+    }
+
+    function playScene14Spark(e){
+      if(!scene14Spark || typeof e.clientX !== "number") return;
+      const r = scene14.getBoundingClientRect();
+      scene14Spark.style.left = (e.clientX - r.left) + "px";
+      scene14Spark.style.top = (e.clientY - r.top) + "px";
+      scene14Spark.classList.remove("play");
+      void scene14Spark.offsetWidth;
+      scene14Spark.classList.add("play");
+    }
+
+    ["./scene14_1.png?v=14","./scene14_2.png?v=14","./scene14_3.png?v=14","./scene14_4.png?v=14"].forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+
+    scene14Action.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      playScene14Spark(e);
+
+      if(scene14Phase === 0){
+        scene14Phase = 1;
+        setScene14State(2);
+        setScene14ActionPhase(1);
+        updateSceneBackdrop(scene14);
+        return;
+      }
+
+      if(scene14Phase === 1){
+        scene14Phase = 2;
+        setScene14State(3);
+        setScene14ActionPhase(2);
+        updateSceneBackdrop(scene14);
+        return;
+      }
+
+      if(scene14Phase === 2){
+        scene14Phase = 3;
+        setScene14State(4);
+        setScene14ActionPhase(3);
+        updateSceneBackdrop(scene14);
+        document.dispatchEvent(new CustomEvent("scene14KeyFound"));
+        return;
+      }
+
+      /* Scene 14 is the current end of the story.
+         The event lets the next scene plug in cleanly when we add it. */
+      document.dispatchEvent(new CustomEvent("scene14Complete"));
     });
 
 
