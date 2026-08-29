@@ -738,6 +738,79 @@
       -webkit-tap-highlight-color:transparent;
     }
 
+
+    /* ===== Fix v16: clear lock beat + obvious Scene 15 reactions ===== */
+    #scene13FailGlow{
+      position:absolute;
+      left:64.7%;
+      top:63.7%;
+      width:13%;
+      aspect-ratio:1;
+      border-radius:50%;
+      z-index:95;
+      pointer-events:none;
+      opacity:0;
+      border:2px solid rgba(246,202,102,.9);
+      box-shadow:0 0 10px rgba(239,188,77,.85),0 0 34px rgba(239,188,77,.6),inset 0 0 24px rgba(239,188,77,.25);
+    }
+    #scene13FailGlow.play{
+      animation:scene13FailPulse .95s ease forwards;
+    }
+    @keyframes scene13FailPulse{
+      0%{opacity:0;transform:scale(.65)}
+      35%{opacity:1;transform:scale(1.02)}
+      60%{opacity:.9;transform:scale(.94)}
+      100%{opacity:0;transform:scale(1.3)}
+    }
+
+    #scene15ReactionFeedback{
+      position:absolute;
+      left:50%;
+      top:15%;
+      transform:translateX(-50%);
+      width:min(72%,900px);
+      z-index:125;
+      text-align:center;
+      pointer-events:none;
+      opacity:0;
+      transition:opacity .25s ease;
+      color:#f5dda1;
+      font-family:Georgia,"Times New Roman",serif;
+      text-shadow:0 3px 16px #000,0 0 24px rgba(0,0,0,.85);
+    }
+    #scene15ReactionFeedback.show{opacity:1;}
+    #scene15ReactionFeedback .reactionTitle{
+      font-size:clamp(26px,4vw,58px);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#e9b95d;
+      margin-bottom:.25em;
+    }
+    #scene15ReactionFeedback .reactionText{
+      font-size:clamp(16px,2vw,28px);
+      line-height:1.25;
+    }
+    #scene15Reaction.feedback-fruit{animation:reactionFruit 2.5s ease both;}
+    #scene15Reaction.feedback-pearl{animation:reactionPearl 2.7s ease both;}
+    #scene15Reaction.feedback-shell{animation:reactionShell 3.2s ease both;}
+    @keyframes reactionFruit{
+      0%{transform:translateX(0) scale(1);filter:none}
+      35%{transform:translateX(-1.2%) scale(1.01);filter:saturate(.92)}
+      55%{transform:translateX(1.1%) scale(1.005)}
+      75%{transform:translateX(-.6%) scale(1)}
+      100%{transform:translateX(0) scale(1)}
+    }
+    @keyframes reactionPearl{
+      0%{transform:scale(1);filter:brightness(1)}
+      45%{transform:scale(1.018);filter:brightness(1.12)}
+      100%{transform:scale(1);filter:brightness(1)}
+    }
+    @keyframes reactionShell{
+      0%{transform:scale(1);filter:brightness(1)}
+      55%{transform:scale(1.025);filter:brightness(1.18) saturate(1.08)}
+      100%{transform:scale(1);filter:brightness(1.06)}
+    }
+
     #scene16 img{ object-fit:fill; }
 
   </style>
@@ -824,6 +897,7 @@
     <section id="scene13" class="scene">
       <img src="./scene13.png?v=13" alt="Locked Secret - Tap the lock">
       <button id="scene13Lock" type="button" aria-label="Tap the lock"></button>
+      <div id="scene13FailGlow" aria-hidden="true"></div>
     </section>
 
     <section id="scene14" class="scene">
@@ -834,7 +908,7 @@
       <img id="scene14State4" class="scene14State" src="./scene13.png?v=13" alt="">
       <button id="scene14Action" class="phase0" type="button" aria-label=""></button>
       <div id="scene14Spark" aria-hidden="true"></div>
-      <video id="scene14Video" src="./scene14.mp4?v=15" muted playsinline preload="auto"></video>
+      <video id="scene14Video" src="./scene14.mp4?v=16" muted playsinline preload="auto"></video>
     </section>
 
     <section id="scene15" class="scene">
@@ -846,6 +920,10 @@
       <canvas id="scene15KeyCanvas" width="1672" height="941"></canvas>
       <button id="scene15KeyStart" type="button" aria-label="Drag the key to the lock"></button>
       <div id="scene15ChoiceHint">Choose something the little key keeper might like</div>
+      <div id="scene15ReactionFeedback" aria-live="polite">
+        <div class="reactionTitle"></div>
+        <div class="reactionText"></div>
+      </div>
       <div id="scene15Choices" aria-label="Choose a gift for the crab">
         <button class="scene15Choice" data-choice="pearl" type="button">Pearl</button>
         <button class="scene15Choice" data-choice="fruit" type="button">Fruit</button>
@@ -919,6 +997,10 @@
     const scene15Success = document.getElementById("scene15Success");
     const scene15Choices = document.getElementById("scene15Choices");
     const scene15ChoiceHint = document.getElementById("scene15ChoiceHint");
+    const scene15ReactionFeedback = document.getElementById("scene15ReactionFeedback");
+    const scene15ReactionTitle = scene15ReactionFeedback.querySelector(".reactionTitle");
+    const scene15ReactionText = scene15ReactionFeedback.querySelector(".reactionText");
+    const scene13FailGlow = document.getElementById("scene13FailGlow");
     const scene15KeyDragImage = document.getElementById("scene15KeyDragImage");
     const scene15KeyCanvas = document.getElementById("scene15KeyCanvas");
     const scene15KeyCtx = scene15KeyCanvas.getContext("2d");
@@ -1438,16 +1520,24 @@
       setTimeout(() => showScene(scene13), 260);
     });
 
-    /* Scene 13 -> Scene 14: tapping the lock reveals the key thief. */
-    scene13Lock.addEventListener("pointerup", e => {
-      e.preventDefault();
-      pulseAt(e);
-      document.dispatchEvent(new CustomEvent("lockMissionStart"));
+    /* Scene 13 -> Scene 14. The video NEVER starts by itself.
+       A real tap on the lock gives a short failed-lock glow first. */
+    let scene13LockBusy = false;
+    function beginScene14FromLock(e){
+      if(scene13LockBusy) return;
+      scene13LockBusy = true;
+      if(e){ e.preventDefault(); pulseAt(e); }
+      scene13FailGlow.classList.remove("play");
+      void scene13FailGlow.offsetWidth;
+      scene13FailGlow.classList.add("play");
       setTimeout(() => {
         resetScene14();
         showScene(scene14);
-      }, 260);
-    });
+        playScene14Video();
+        scene13LockBusy = false;
+      }, 980);
+    }
+    scene13Lock.addEventListener("click", beginScene14FromLock);
 
     /* ===== Scene 14: 4-step interaction =====
        1) Tap the crab holding the key.
@@ -1539,9 +1629,9 @@
        Scenes 1–13 remain exactly as before.
        ========================================================= */
     const scene15ReactionFiles = {
-      fruit: "./scene15_fruit.mp4?v=15",
-      pearl: "./scene15_pearl.mp4?v=15",
-      shell: "./scene15_shell.mp4?v=15"
+      fruit: "./scene15_fruit.mp4?v=16",
+      pearl: "./scene15_pearl.mp4?v=16",
+      shell: "./scene15_shell.mp4?v=16"
     };
 
     function hideScene15Layers(){
@@ -1557,6 +1647,9 @@
       scene15DragHint.style.display = "none";
       scene15Choices.style.display = "none";
       scene15ChoiceHint.style.display = "none";
+      scene15ReactionFeedback.classList.remove("show");
+      scene15ReactionTitle.textContent = "";
+      scene15ReactionText.textContent = "";
       scene15Intro.style.display = "block";
     }
 
@@ -1581,53 +1674,85 @@
       scene15ChoiceHint.style.display = "block";
     }
 
-    document.addEventListener("lockMissionStart", () => {
-      /* Scene 13 already came from a real user tap, so muted inline video
-         can start cleanly on iPhone/iPad. */
-      setTimeout(playScene14Video, 320);
-    });
-
     scene14Video.addEventListener("ended", () => {
       setTimeout(startScene15, 180);
     });
 
     scene15Intro.addEventListener("ended", showScene15Choices);
 
-    function playScene15Reaction(choice){
-      scene15Choices.style.display = "none";
-      scene15ChoiceHint.style.display = "none";
-      scene15Reaction.src = scene15ReactionFiles[choice];
-      scene15Reaction.dataset.choice = choice;
-      scene15Reaction.currentTime = 0;
-      scene15Reaction.style.display = "block";
-      const p = scene15Reaction.play();
-      if(p && typeof p.catch === "function") p.catch(()=>{});
-    }
+    const scene15ReactionCopy = {
+      fruit: { title:"Not this one…", text:"He is definitely not interested in the fruit.", ms:3100 },
+      pearl: { title:"Almost…", text:"The pearl gets his attention — but he still keeps the key.", ms:3300 },
+      shell: { title:"That got his attention.", text:"He wants the beautiful shell.", ms:3900 }
+    };
+    let scene15ReactionBusy = false;
+    let scene15ReactionFallback = null;
 
-    scene15Choices.querySelectorAll(".scene15Choice").forEach(btn => {
-      btn.addEventListener("pointerup", e => {
-        e.preventDefault();
-        pulseAt(e);
-        playScene15Reaction(btn.dataset.choice);
-      });
-    });
-
-    scene15Reaction.addEventListener("ended", () => {
+    function finishScene15Reaction(){
+      if(!scene15ReactionBusy) return;
+      scene15ReactionBusy = false;
+      if(scene15ReactionFallback){ clearTimeout(scene15ReactionFallback); scene15ReactionFallback = null; }
       const choice = scene15Reaction.dataset.choice;
+      scene15Reaction.pause();
       scene15Reaction.style.display = "none";
+      scene15Reaction.classList.remove("feedback-fruit","feedback-pearl","feedback-shell");
+      scene15ReactionFeedback.classList.remove("show");
 
       if(choice !== "shell"){
-        /* Wrong gifts: return to the frozen end frame and let her try again. */
+        /* Wrong gift: visibly return to the choice screen so she can retry. */
+        scene15Intro.style.display = "block";
         showScene15Choices();
         return;
       }
 
-      /* Correct shell: play the trade/key-drop success beat. */
+      scene15Intro.style.display = "none";
       scene15Success.style.display = "block";
       scene15Success.currentTime = 0;
       const p = scene15Success.play();
       if(p && typeof p.catch === "function") p.catch(()=>{});
+    }
+
+    function playScene15Reaction(choice, evt){
+      if(scene15ReactionBusy) return;
+      scene15ReactionBusy = true;
+      if(evt){ evt.preventDefault(); pulseAt(evt); }
+      scene15Choices.style.display = "none";
+      scene15ChoiceHint.style.display = "none";
+      const copy = scene15ReactionCopy[choice];
+      scene15ReactionTitle.textContent = copy.title;
+      scene15ReactionText.textContent = copy.text;
+      scene15ReactionFeedback.classList.add("show");
+
+      scene15Reaction.pause();
+      scene15Reaction.removeAttribute("src");
+      scene15Reaction.load();
+      scene15Reaction.src = scene15ReactionFiles[choice];
+      scene15Reaction.dataset.choice = choice;
+      scene15Reaction.muted = true;
+      scene15Reaction.playsInline = true;
+      scene15Reaction.style.display = "block";
+      scene15Reaction.classList.remove("feedback-fruit","feedback-pearl","feedback-shell");
+      void scene15Reaction.offsetWidth;
+      scene15Reaction.classList.add("feedback-"+choice);
+      scene15Reaction.load();
+
+      const tryPlay = () => {
+        scene15Reaction.currentTime = 0;
+        const p = scene15Reaction.play();
+        if(p && typeof p.catch === "function") p.catch(()=>{});
+      };
+      if(scene15Reaction.readyState >= 2) tryPlay();
+      else scene15Reaction.addEventListener("canplay", tryPlay, {once:true});
+
+      /* iOS/Safari fallback: even if 'ended' is missed, the mission continues. */
+      scene15ReactionFallback = setTimeout(finishScene15Reaction, copy.ms);
+    }
+
+    scene15Choices.querySelectorAll(".scene15Choice").forEach(btn => {
+      btn.addEventListener("click", e => playScene15Reaction(btn.dataset.choice, e));
     });
+
+    scene15Reaction.addEventListener("ended", finishScene15Reaction);
 
     function enterScene15KeyDrag(){
       scene15Intro.style.display = "none";
