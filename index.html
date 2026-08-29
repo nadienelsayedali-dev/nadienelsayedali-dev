@@ -813,6 +813,22 @@
 
     #scene16 img{ object-fit:fill; }
 
+  
+    /* ===== Rock Paper Scissors mission ===== */
+    #scene15Reveal, #scene15RpsChoice, #scene15PaperLose, #scene15ScissorsTie, #scene15RockWin{
+      position:absolute; inset:0; width:100%; height:100%; object-fit:fill; display:none; z-index:35;
+    }
+    #scene15RpsButtons{position:absolute; inset:0; z-index:50; display:none; pointer-events:none;}
+    .rpsChoice{position:absolute; bottom:4.5%; height:17%; background:transparent; border:0; border-radius:22px; pointer-events:auto; -webkit-tap-highlight-color:transparent;}
+    .rpsChoice.rock{left:10.5%; width:25.5%;}
+    .rpsChoice.paper{left:37.5%; width:25.5%;}
+    .rpsChoice.scissors{left:64.5%; width:25.5%;}
+    .rpsChoice:active{background:rgba(236,190,95,.10); box-shadow:0 0 28px rgba(236,190,95,.25) inset;}
+    #scene15RpsTapHint{position:absolute; left:50%; bottom:1.6%; transform:translateX(-50%); z-index:52; display:none; color:#f0d8a8; font:600 15px Georgia,serif; text-shadow:0 2px 8px #000; pointer-events:none;}
+    #scene15RevealTap{position:absolute; inset:0; z-index:48; display:none; background:transparent; border:0;}
+    .rpsResultPulse{animation:rpsResultPulse .5s ease-out both;}
+    @keyframes rpsResultPulse{from{filter:brightness(.75);transform:scale(.985)}to{filter:brightness(1);transform:scale(1)}}
+
   </style>
 </head>
 
@@ -912,6 +928,18 @@
     </section>
 
     <section id="scene15" class="scene">
+      <img id="scene15Reveal" src="./scene14_reveal.png?v=21" alt="Apparently someone got here first">
+      <button id="scene15RevealTap" type="button" aria-label="Continue to the crab challenge"></button>
+      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=21" alt="Rock Paper Scissors challenge">
+      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=21" alt="The crab wins and chases her">
+      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=21" alt="A tie - try again">
+      <img id="scene15RockWin" src="./scene15_rock_win.png?v=21" alt="You win - the crab gives up the key">
+      <div id="scene15RpsButtons" aria-label="Choose rock paper or scissors">
+        <button class="rpsChoice rock" data-rps="rock" type="button" aria-label="Rock"></button>
+        <button class="rpsChoice paper" data-rps="paper" type="button" aria-label="Paper"></button>
+        <button class="rpsChoice scissors" data-rps="scissors" type="button" aria-label="Scissors"></button>
+      </div>
+      <div id="scene15RpsTapHint">Tap ROCK, PAPER or SCISSORS</div>
       <img id="scene15BackdropSource" src="./scene15_keydrag.png?v=15" alt="">
       <video id="scene15Intro" src="./scene15_intro.mp4?v=15" muted playsinline preload="auto"></video>
       <video id="scene15Reaction" muted playsinline preload="auto"></video>
@@ -1625,32 +1653,34 @@
 
 
     /* =========================================================
-       Scene 14 + 15 hybrid video mission
-       Scenes 1–13 remain exactly as before.
+       Scene 14 + 15 Rock–Paper–Scissors mission
        ========================================================= */
-    const scene15ReactionFiles = {
-      fruit: "./scene15_fruit.mp4?v=16",
-      pearl: "./scene15_pearl.mp4?v=16",
-      shell: "./scene15_shell.mp4?v=16"
-    };
+    const scene15Reveal = document.getElementById("scene15Reveal");
+    const scene15RevealTap = document.getElementById("scene15RevealTap");
+    const scene15RpsChoice = document.getElementById("scene15RpsChoice");
+    const scene15PaperLose = document.getElementById("scene15PaperLose");
+    const scene15ScissorsTie = document.getElementById("scene15ScissorsTie");
+    const scene15RockWin = document.getElementById("scene15RockWin");
+    const scene15RpsButtons = document.getElementById("scene15RpsButtons");
+    const scene15RpsTapHint = document.getElementById("scene15RpsTapHint");
+    let rpsTimer = null;
+    let rpsBusy = false;
 
-    function hideScene15Layers(){
-      scene15Reaction.pause();
-      scene15Success.pause();
-      scene15ChestOpen.pause();
-      scene15Reaction.style.display = "none";
-      scene15Success.style.display = "none";
-      scene15ChestOpen.style.display = "none";
-      scene15KeyDragImage.style.display = "none";
-      scene15KeyCanvas.style.display = "none";
-      scene15KeyStart.style.display = "none";
-      scene15DragHint.style.display = "none";
-      scene15Choices.style.display = "none";
-      scene15ChoiceHint.style.display = "none";
+    function hideAllRpsLayers(){
+      if(rpsTimer){ clearTimeout(rpsTimer); rpsTimer=null; }
+      [scene15Reveal,scene15RpsChoice,scene15PaperLose,scene15ScissorsTie,scene15RockWin].forEach(el=>{
+        el.style.display="none"; el.classList.remove("rpsResultPulse");
+      });
+      scene15RevealTap.style.display="none";
+      scene15RpsButtons.style.display="none";
+      scene15RpsTapHint.style.display="none";
+      /* old gift/video layers stay disabled */
+      scene15Intro.pause(); scene15Reaction.pause(); scene15Success.pause();
+      scene15Intro.style.display="none"; scene15Reaction.style.display="none"; scene15Success.style.display="none";
+      scene15Choices.style.display="none"; scene15ChoiceHint.style.display="none";
       scene15ReactionFeedback.classList.remove("show");
-      scene15ReactionTitle.textContent = "";
-      scene15ReactionText.textContent = "";
-      scene15Intro.style.display = "block";
+      scene15KeyDragImage.style.display="none"; scene15KeyCanvas.style.display="none"; scene15KeyStart.style.display="none"; scene15DragHint.style.display="none";
+      scene15ChestOpen.pause(); scene15ChestOpen.style.display="none";
     }
 
     function playScene14Video(){
@@ -1660,111 +1690,61 @@
       if(p && typeof p.catch === "function") p.catch(()=>{});
     }
 
+    function showRpsChoice(){
+      rpsBusy=false;
+      hideAllRpsLayers();
+      scene15RpsChoice.style.display="block";
+      scene15RpsButtons.style.display="block";
+      scene15RpsTapHint.style.display="block";
+      updateSceneBackdrop(scene15);
+    }
+
     function startScene15(){
-      hideScene15Layers();
+      hideAllRpsLayers();
       showScene(scene15);
-      scene15Intro.currentTime = 0;
-      const p = scene15Intro.play();
-      if(p && typeof p.catch === "function") p.catch(()=>{});
+      scene15Reveal.style.display="block";
+      scene15RevealTap.style.display="block";
+      updateSceneBackdrop(scene15);
+      /* Let her read the reveal, then continue automatically if she does not tap. */
+      rpsTimer=setTimeout(showRpsChoice, 3200);
     }
 
-    function showScene15Choices(){
-      scene15Intro.pause();
-      scene15Choices.style.display = "grid";
-      scene15ChoiceHint.style.display = "block";
+    scene14Video.addEventListener("ended", ()=>setTimeout(startScene15,180));
+    scene15RevealTap.addEventListener("click", e=>{ e.preventDefault(); showRpsChoice(); });
+
+    function showRpsResult(which){
+      if(rpsBusy) return;
+      rpsBusy=true;
+      hideAllRpsLayers();
+      let el, ms;
+      if(which==="paper"){ el=scene15PaperLose; ms=5200; }
+      else if(which==="scissors"){ el=scene15ScissorsTie; ms=3800; }
+      else { el=scene15RockWin; ms=4400; }
+      el.style.display="block";
+      void el.offsetWidth;
+      el.classList.add("rpsResultPulse");
+      updateSceneBackdrop(scene15);
+      rpsTimer=setTimeout(()=>{
+        if(which==="rock") enterScene15KeyDrag();
+        else showRpsChoice();
+      },ms);
     }
 
-    scene14Video.addEventListener("ended", () => {
-      setTimeout(startScene15, 180);
+    scene15RpsButtons.querySelectorAll(".rpsChoice").forEach(btn=>{
+      btn.addEventListener("click", e=>{ e.preventDefault(); e.stopPropagation(); pulseAt(e); showRpsResult(btn.dataset.rps); });
     });
-
-    scene15Intro.addEventListener("ended", showScene15Choices);
-
-    const scene15ReactionCopy = {
-      fruit: { title:"Not this one…", text:"He is definitely not interested in the fruit.", ms:3100 },
-      pearl: { title:"Almost…", text:"The pearl gets his attention — but he still keeps the key.", ms:3300 },
-      shell: { title:"That got his attention.", text:"He wants the beautiful shell.", ms:3900 }
-    };
-    let scene15ReactionBusy = false;
-    let scene15ReactionFallback = null;
-
-    function finishScene15Reaction(){
-      if(!scene15ReactionBusy) return;
-      scene15ReactionBusy = false;
-      if(scene15ReactionFallback){ clearTimeout(scene15ReactionFallback); scene15ReactionFallback = null; }
-      const choice = scene15Reaction.dataset.choice;
-      scene15Reaction.pause();
-      scene15Reaction.style.display = "none";
-      scene15Reaction.classList.remove("feedback-fruit","feedback-pearl","feedback-shell");
-      scene15ReactionFeedback.classList.remove("show");
-
-      if(choice !== "shell"){
-        /* Wrong gift: visibly return to the choice screen so she can retry. */
-        scene15Intro.style.display = "block";
-        showScene15Choices();
-        return;
-      }
-
-      scene15Intro.style.display = "none";
-      scene15Success.style.display = "block";
-      scene15Success.currentTime = 0;
-      const p = scene15Success.play();
-      if(p && typeof p.catch === "function") p.catch(()=>{});
-    }
-
-    function playScene15Reaction(choice, evt){
-      if(scene15ReactionBusy) return;
-      scene15ReactionBusy = true;
-      if(evt){ evt.preventDefault(); pulseAt(evt); }
-      scene15Choices.style.display = "none";
-      scene15ChoiceHint.style.display = "none";
-      const copy = scene15ReactionCopy[choice];
-      scene15ReactionTitle.textContent = copy.title;
-      scene15ReactionText.textContent = copy.text;
-      scene15ReactionFeedback.classList.add("show");
-
-      scene15Reaction.pause();
-      scene15Reaction.removeAttribute("src");
-      scene15Reaction.load();
-      scene15Reaction.src = scene15ReactionFiles[choice];
-      scene15Reaction.dataset.choice = choice;
-      scene15Reaction.muted = true;
-      scene15Reaction.playsInline = true;
-      scene15Reaction.style.display = "block";
-      scene15Reaction.classList.remove("feedback-fruit","feedback-pearl","feedback-shell");
-      void scene15Reaction.offsetWidth;
-      scene15Reaction.classList.add("feedback-"+choice);
-      scene15Reaction.load();
-
-      const tryPlay = () => {
-        scene15Reaction.currentTime = 0;
-        const p = scene15Reaction.play();
-        if(p && typeof p.catch === "function") p.catch(()=>{});
-      };
-      if(scene15Reaction.readyState >= 2) tryPlay();
-      else scene15Reaction.addEventListener("canplay", tryPlay, {once:true});
-
-      /* iOS/Safari fallback: even if 'ended' is missed, the mission continues. */
-      scene15ReactionFallback = setTimeout(finishScene15Reaction, copy.ms);
-    }
-
-    scene15Choices.querySelectorAll(".scene15Choice").forEach(btn => {
-      btn.addEventListener("click", e => playScene15Reaction(btn.dataset.choice, e));
-    });
-
-    scene15Reaction.addEventListener("ended", finishScene15Reaction);
 
     function enterScene15KeyDrag(){
-      scene15Intro.style.display = "none";
-      scene15Success.style.display = "none";
-      scene15KeyDragImage.style.display = "block";
-      scene15KeyCanvas.style.display = "block";
-      scene15KeyStart.style.display = "block";
-      scene15DragHint.style.display = "block";
+      rpsBusy=false;
+      hideAllRpsLayers();
+      scene15KeyDragImage.style.display="block";
+      scene15KeyCanvas.style.display="block";
+      scene15KeyStart.style.display="block";
+      scene15KeyStart.style.pointerEvents="auto";
+      scene15DragHint.style.display="block";
       clearScene15KeyLine();
+      updateSceneBackdrop(scene15);
     }
-
-    scene15Success.addEventListener("ended", enterScene15KeyDrag);
 
     const scene15Key = { x: 760, y: 790 };
     const scene15LockTarget = { x: 1250, y: 570 };
@@ -1772,94 +1752,26 @@
     let scene15Dragging = false;
 
     function scene15Point(e){
-      const r = scene15KeyCanvas.getBoundingClientRect();
-      return {
-        x:(e.clientX-r.left) * W/r.width,
-        y:(e.clientY-r.top) * H/r.height
-      };
+      const r=scene15KeyCanvas.getBoundingClientRect();
+      return {x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height};
     }
-
-    function clearScene15KeyLine(){
-      scene15KeyCtx.clearRect(0,0,W,H);
+    function clearScene15KeyLine(){ scene15KeyCtx.clearRect(0,0,W,H); }
+    function drawScene15KeyLine(p,success=false){
+      clearScene15KeyLine(); scene15KeyCtx.save(); scene15KeyCtx.lineCap="round"; scene15KeyCtx.lineJoin="round";
+      scene15KeyCtx.shadowColor=success?"rgba(255,225,155,.98)":"rgba(232,183,83,.92)"; scene15KeyCtx.shadowBlur=success?28:18;
+      scene15KeyCtx.strokeStyle=success?"rgba(255,230,166,.98)":"rgba(235,191,96,.95)"; scene15KeyCtx.lineWidth=success?5:4; scene15KeyCtx.setLineDash(success?[]:[12,10]);
+      scene15KeyCtx.beginPath(); scene15KeyCtx.moveTo(scene15Key.x,scene15Key.y); const mx=(scene15Key.x+p.x)/2,my=(scene15Key.y+p.y)/2-18; scene15KeyCtx.quadraticCurveTo(mx,my,p.x,p.y); scene15KeyCtx.stroke();
+      scene15KeyCtx.setLineDash([]); scene15KeyCtx.fillStyle="rgba(255,226,156,.98)"; scene15KeyCtx.beginPath(); scene15KeyCtx.arc(p.x,p.y,success?10:7,0,Math.PI*2); scene15KeyCtx.fill(); scene15KeyCtx.restore();
     }
-
-    function drawScene15KeyLine(p, success=false){
-      clearScene15KeyLine();
-      scene15KeyCtx.save();
-      scene15KeyCtx.lineCap="round";
-      scene15KeyCtx.lineJoin="round";
-      scene15KeyCtx.shadowColor = success ? "rgba(255,225,155,.98)" : "rgba(232,183,83,.92)";
-      scene15KeyCtx.shadowBlur = success ? 28 : 18;
-      scene15KeyCtx.strokeStyle = success ? "rgba(255,230,166,.98)" : "rgba(235,191,96,.95)";
-      scene15KeyCtx.lineWidth = success ? 5 : 4;
-      scene15KeyCtx.setLineDash(success ? [] : [12,10]);
-      scene15KeyCtx.beginPath();
-      scene15KeyCtx.moveTo(scene15Key.x, scene15Key.y);
-      const mx=(scene15Key.x+p.x)/2;
-      const my=(scene15Key.y+p.y)/2-18;
-      scene15KeyCtx.quadraticCurveTo(mx,my,p.x,p.y);
-      scene15KeyCtx.stroke();
-      scene15KeyCtx.setLineDash([]);
-      scene15KeyCtx.fillStyle="rgba(255,226,156,.98)";
-      scene15KeyCtx.beginPath();
-      scene15KeyCtx.arc(p.x,p.y,success?10:7,0,Math.PI*2);
-      scene15KeyCtx.fill();
-      scene15KeyCtx.restore();
-    }
-
     function finishScene15KeyDrag(){
-      scene15Dragging = false;
-      scene15KeyStart.style.pointerEvents = "none";
-      scene15DragHint.style.display = "none";
-      drawScene15KeyLine(scene15LockTarget,true);
-      setTimeout(() => {
-        scene15KeyDragImage.style.display = "none";
-        scene15KeyCanvas.style.display = "none";
-        scene15KeyStart.style.display = "none";
-        scene15ChestOpen.style.display = "block";
-        scene15ChestOpen.currentTime = 0;
-        const p = scene15ChestOpen.play();
-        if(p && typeof p.catch === "function") p.catch(()=>{});
-      }, 520);
+      scene15Dragging=false; scene15KeyStart.style.pointerEvents="none"; scene15DragHint.style.display="none"; drawScene15KeyLine(scene15LockTarget,true);
+      setTimeout(()=>{ scene15KeyDragImage.style.display="none"; scene15KeyCanvas.style.display="none"; scene15KeyStart.style.display="none"; scene15ChestOpen.style.display="block"; scene15ChestOpen.currentTime=0; const p=scene15ChestOpen.play(); if(p&&typeof p.catch==="function")p.catch(()=>{}); },520);
     }
-
-    function scene15DragStart(e){
-      e.preventDefault();
-      scene15Dragging = true;
-      try{ scene15KeyStart.setPointerCapture(e.pointerId); }catch(_){}
-      drawScene15KeyLine(scene15Point(e));
-    }
-
-    function scene15DragMove(e){
-      if(!scene15Dragging) return;
-      e.preventDefault();
-      const p = scene15Point(e);
-      drawScene15KeyLine(p);
-      if(Math.hypot(p.x-scene15LockTarget.x,p.y-scene15LockTarget.y) <= scene15LockRadius){
-        finishScene15KeyDrag();
-      }
-    }
-
-    function scene15DragEnd(e){
-      if(!scene15Dragging) return;
-      e.preventDefault();
-      scene15Dragging = false;
-      const p = scene15Point(e);
-      if(Math.hypot(p.x-scene15LockTarget.x,p.y-scene15LockTarget.y) <= scene15LockRadius){
-        finishScene15KeyDrag();
-      }else{
-        clearScene15KeyLine();
-      }
-    }
-
-    scene15KeyStart.addEventListener("pointerdown", scene15DragStart);
-    scene15KeyStart.addEventListener("pointermove", scene15DragMove);
-    scene15KeyStart.addEventListener("pointerup", scene15DragEnd);
-    scene15KeyStart.addEventListener("pointercancel", scene15DragEnd);
-
-    scene15ChestOpen.addEventListener("ended", () => {
-      showScene(scene16);
-    });
+    function scene15DragStart(e){ e.preventDefault(); scene15Dragging=true; try{scene15KeyStart.setPointerCapture(e.pointerId)}catch(_){} drawScene15KeyLine(scene15Point(e)); }
+    function scene15DragMove(e){ if(!scene15Dragging)return; e.preventDefault(); const p=scene15Point(e); drawScene15KeyLine(p); if(Math.hypot(p.x-scene15LockTarget.x,p.y-scene15LockTarget.y)<=scene15LockRadius)finishScene15KeyDrag(); }
+    function scene15DragEnd(e){ if(!scene15Dragging)return; e.preventDefault(); scene15Dragging=false; const p=scene15Point(e); if(Math.hypot(p.x-scene15LockTarget.x,p.y-scene15LockTarget.y)<=scene15LockRadius)finishScene15KeyDrag(); else clearScene15KeyLine(); }
+    scene15KeyStart.addEventListener("pointerdown",scene15DragStart); scene15KeyStart.addEventListener("pointermove",scene15DragMove); scene15KeyStart.addEventListener("pointerup",scene15DragEnd); scene15KeyStart.addEventListener("pointercancel",scene15DragEnd);
+    scene15ChestOpen.addEventListener("ended",()=>showScene(scene16));
 
     const CARD_RATIO = 1672 / 941;
 
