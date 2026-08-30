@@ -924,27 +924,27 @@
       <img id="scene14State4" class="scene14State" src="./scene13.png?v=13" alt="">
       <button id="scene14Action" class="phase0" type="button" aria-label=""></button>
       <div id="scene14Spark" aria-hidden="true"></div>
-      <video id="scene14Video" src="./scene14.mp4?v=16" muted playsinline preload="auto"></video>
+      <video id="scene14Video" src="./scene14.mp4?v=22" poster="./scene13.png?v=13" muted playsinline preload="auto"></video>
     </section>
 
     <section id="scene15" class="scene">
-      <img id="scene15Reveal" src="./scene14_reveal.png?v=21" alt="Apparently someone got here first">
+      <img id="scene15Reveal" src="./scene14_reveal.png?v=22" alt="Apparently someone got here first">
       <button id="scene15RevealTap" type="button" aria-label="Continue to the crab challenge"></button>
-      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=21" alt="Rock Paper Scissors challenge">
-      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=21" alt="The crab wins and chases her">
-      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=21" alt="A tie - try again">
-      <img id="scene15RockWin" src="./scene15_rock_win.png?v=21" alt="You win - the crab gives up the key">
+      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=22" alt="Rock Paper Scissors challenge">
+      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=22" alt="The crab wins and chases her">
+      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=22" alt="A tie - try again">
+      <img id="scene15RockWin" src="./scene15_rock_win.png?v=22" alt="You win - the crab gives up the key">
       <div id="scene15RpsButtons" aria-label="Choose rock paper or scissors">
         <button class="rpsChoice rock" data-rps="rock" type="button" aria-label="Rock"></button>
         <button class="rpsChoice paper" data-rps="paper" type="button" aria-label="Paper"></button>
         <button class="rpsChoice scissors" data-rps="scissors" type="button" aria-label="Scissors"></button>
       </div>
       <div id="scene15RpsTapHint">Tap ROCK, PAPER or SCISSORS</div>
-      <img id="scene15BackdropSource" src="./scene15_keydrag.png?v=15" alt="">
-      <video id="scene15Intro" src="./scene15_intro.mp4?v=15" muted playsinline preload="auto"></video>
+      <img id="scene15BackdropSource" src="./scene15_keydrag.png?v=22" alt="">
+      <video id="scene15Intro" src="./scene15_intro.mp4?v=22" muted playsinline preload="auto"></video>
       <video id="scene15Reaction" muted playsinline preload="auto"></video>
-      <video id="scene15Success" src="./scene15_success.mp4?v=15" muted playsinline preload="auto"></video>
-      <img id="scene15KeyDragImage" src="./scene15_keydrag.png?v=15" alt="Drag the key to the lock">
+      <video id="scene15Success" src="./scene15_success.mp4?v=22" muted playsinline preload="auto"></video>
+      <img id="scene15KeyDragImage" src="./scene15_keydrag.png?v=22" alt="Drag the key to the lock">
       <canvas id="scene15KeyCanvas" width="1672" height="941"></canvas>
       <button id="scene15KeyStart" type="button" aria-label="Drag the key to the lock"></button>
       <div id="scene15ChoiceHint">Choose something the little key keeper might like</div>
@@ -958,7 +958,7 @@
         <button class="scene15Choice" data-choice="shell" type="button">Beautiful Shell</button>
       </div>
       <div id="scene15DragHint">DRAG THE KEY TO THE LOCK</div>
-      <video id="scene15ChestOpen" src="./scene15_chest_open.mp4?v=15" muted playsinline preload="auto"></video>
+      <video id="scene15ChestOpen" src="./scene15_chest_open.mp4?v=22" muted playsinline preload="auto"></video>
     </section>
 
     <section id="scene16" class="scene">
@@ -1548,8 +1548,10 @@
       setTimeout(() => showScene(scene13), 260);
     });
 
-    /* Scene 13 -> Scene 14. The video NEVER starts by itself.
-       A real tap on the lock gives a short failed-lock glow first. */
+    /* Scene 13 -> Scene 14.
+       The tap on the lock is the user gesture that starts the clip.
+       We switch immediately so iPhone/iPad Safari cannot block playback.
+       The video has scene13.png as its poster, so there is never a black flash while loading. */
     let scene13LockBusy = false;
     function beginScene14FromLock(e){
       if(scene13LockBusy) return;
@@ -1558,12 +1560,21 @@
       scene13FailGlow.classList.remove("play");
       void scene13FailGlow.offsetWidth;
       scene13FailGlow.classList.add("play");
-      setTimeout(() => {
-        resetScene14();
-        showScene(scene14);
-        playScene14Video();
+
+      resetScene14();
+      scene14Video.style.display = "block";
+      scene14Video.currentTime = 0;
+      showScene(scene14);
+
+      const p = scene14Video.play();
+      if(p && typeof p.then === "function") {
+        p.then(()=>{ scene13LockBusy = false; }).catch(()=>{
+          scene13LockBusy = false;
+          showScene14Fallback();
+        });
+      } else {
         scene13LockBusy = false;
-      }, 980);
+      }
     }
     scene13Lock.addEventListener("click", beginScene14FromLock);
 
@@ -1683,11 +1694,33 @@
       scene15ChestOpen.pause(); scene15ChestOpen.style.display="none";
     }
 
+    let scene14FallbackTimer = null;
+    function clearScene14FallbackTimer(){
+      if(scene14FallbackTimer){ clearTimeout(scene14FallbackTimer); scene14FallbackTimer=null; }
+    }
+
+    function showScene14Fallback(){
+      clearScene14FallbackTimer();
+      scene14Video.pause();
+      scene14Video.style.display = "none";
+      showScene(scene15);
+      hideAllRpsLayers();
+      scene15Reveal.style.display = "block";
+      scene15RevealTap.style.display = "block";
+      updateSceneBackdrop(scene15);
+      rpsTimer=setTimeout(showRpsChoice, 3400);
+    }
+
     function playScene14Video(){
+      clearScene14FallbackTimer();
       scene14Video.currentTime = 0;
       scene14Video.style.display = "block";
       const p = scene14Video.play();
-      if(p && typeof p.catch === "function") p.catch(()=>{});
+      if(p && typeof p.catch === "function") p.catch(showScene14Fallback);
+      /* If the browser cannot load the MP4, never leave the user on black. */
+      scene14FallbackTimer=setTimeout(()=>{
+        if(scene14Video.readyState < 2 || scene14Video.error) showScene14Fallback();
+      },1800);
     }
 
     function showRpsChoice(){
@@ -1709,7 +1742,9 @@
       rpsTimer=setTimeout(showRpsChoice, 3200);
     }
 
-    scene14Video.addEventListener("ended", ()=>setTimeout(startScene15,180));
+    scene14Video.addEventListener("playing", clearScene14FallbackTimer);
+    scene14Video.addEventListener("ended", ()=>{ clearScene14FallbackTimer(); setTimeout(startScene15,180); });
+    scene14Video.addEventListener("error", showScene14Fallback);
     scene15RevealTap.addEventListener("click", e=>{ e.preventDefault(); showRpsChoice(); });
 
     function showRpsResult(which){
