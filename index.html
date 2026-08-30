@@ -557,9 +557,9 @@
     .rpsChoice.paper{left:36.8%;width:26.5%;}
     .rpsChoice.scissors{left:64.0%;width:26.5%;}
     .rpsChoice:active{background:rgba(241,193,95,.10);box-shadow:0 0 30px rgba(241,193,95,.25) inset;}
-    #scene15KeyCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:60;pointer-events:none;}
+    #scene15KeyCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:64;pointer-events:none;}
     #scene15KeyStart{
-      position:absolute;left:54%;top:79%;width:19%;height:17%;display:none;z-index:65;
+      position:absolute;left:57.5%;top:81.5%;width:16%;height:15%;display:none;z-index:65;
       border:0;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;
     }
     #scene15DragHint{
@@ -657,25 +657,25 @@
     </section>
 
     <section id="scene14Dialogue" class="scene">
-      <img src="./scene14_dialogue.png?v=31" alt="You can talk? I know a secret about this chest">
+      <img src="./scene14_dialogue.png?v=32" alt="You can talk? I know a secret about this chest">
       <button id="scene14DialogueContinue" type="button" aria-label="Continue the conversation"></button>
     </section>
 
     <section id="scene14Instruction" class="scene">
-      <img src="./scene14_instruction.png?v=31" alt="To discover what is inside, you must open the chest">
+      <img src="./scene14_instruction.png?v=32" alt="To discover what is inside, you must open the chest">
       <button id="scene14InstructionContinue" type="button" aria-label="Continue"></button>
     </section>
 
     <section id="scene14How" class="scene">
-      <img src="./scene14_how.png?v=31" alt="How?">
+      <img src="./scene14_how.png?v=32" alt="How?">
       <button id="scene14HowContinue" type="button" aria-label="Start the challenge"></button>
     </section>
 
     <section id="scene15" class="scene">
-      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=31" alt="Rock Paper Scissors challenge">
-      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=31" alt="Paper loses. The crab chases her.">
-      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=31" alt="Scissors versus scissors. A tie.">
-      <img id="scene15RockWin" src="./scene15_rock_win.png?v=31" alt="Rock wins. The crab gives up the key.">
+      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=32" alt="Rock Paper Scissors challenge">
+      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=32" alt="Paper loses. The crab chases her.">
+      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=32" alt="Scissors versus scissors. A tie.">
+      <img id="scene15RockWin" src="./scene15_rock_win.png?v=32" alt="Rock wins. The crab gives up the key.">
 
       <div id="scene15RpsButtons" aria-label="Choose rock paper or scissors">
         <button class="rpsChoice rock" data-rps="rock" type="button" aria-label="Rock"></button>
@@ -689,12 +689,12 @@
     </section>
 
     <section id="scene15Portal" class="scene">
-      <img src="./scene15_portal.png?v=31" alt="What's happening?">
+      <img src="./scene15_portal.png?v=32" alt="What's happening?">
       <button id="scene15PortalContinue" type="button" aria-label="Continue to the next world"></button>
     </section>
 
     <section id="scene16" class="scene">
-      <img src="./scene16_alchemy.png?v=31" alt="The Alchemy Room">
+      <img src="./scene16_alchemy.png?v=32" alt="The Alchemy Room">
     </section>
 
     <div id="tapPulse" aria-hidden="true"></div>
@@ -1348,35 +1348,55 @@
       });
     });
 
-    /* ===== After winning: drag the key directly from the win scene to the lock ===== */
-    const scene15Key = {x:1040,y:846};
-    const scene15Lock = {x:924,y:680};
-    const scene15LockRadius = 138;
+    /* ===== After winning: deliberate drag from the key to the lock ===== */
+    const scene15Key = {x:1080,y:850};
+    const scene15Lock = {x:925,y:680};
+    const scene15LockRadius = 58;
+    const scene15MinDragMs = 550;
+    const scene15MinTravel = 115;
     let scene15Dragging = false;
+    let scene15DragStartedAt = 0;
+    let scene15DragStartPoint = null;
+    let scene15LastPoint = null;
+    let scene15Unlocking = false;
+
     function clearKeyLine(){ scene15KeyCtx.clearRect(0,0,W,H); }
-    function keyPoint(e){
+    function keyPointFromClient(clientX,clientY){
       const r=scene15KeyCanvas.getBoundingClientRect();
-      return {x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height};
+      return {x:(clientX-r.left)*W/r.width,y:(clientY-r.top)*H/r.height};
     }
-    function drawKeyLine(p){
+    function keyPoint(e){ return keyPointFromClient(e.clientX,e.clientY); }
+
+    function drawKeyLine(p,success=false){
       clearKeyLine();
       scene15KeyCtx.save();
-      scene15KeyCtx.strokeStyle="#f3c55d";
+      scene15KeyCtx.strokeStyle=success ? "#ffe8a0" : "#f3c55d";
       scene15KeyCtx.shadowColor="#f3c55d";
-      scene15KeyCtx.shadowBlur=18;
-      scene15KeyCtx.lineWidth=8;
+      scene15KeyCtx.shadowBlur=success ? 32 : 22;
+      scene15KeyCtx.lineWidth=success ? 10 : 7;
       scene15KeyCtx.lineCap="round";
-      scene15KeyCtx.setLineDash([18,12]);
+      scene15KeyCtx.lineJoin="round";
+      scene15KeyCtx.setLineDash(success ? [] : [20,13]);
       scene15KeyCtx.beginPath();
       scene15KeyCtx.moveTo(scene15Key.x,scene15Key.y);
-      scene15KeyCtx.lineTo(p.x,p.y);
+      const cx=(scene15Key.x+p.x)/2;
+      const cy=Math.min(scene15Key.y,p.y)-45;
+      scene15KeyCtx.quadraticCurveTo(cx,cy,p.x,p.y);
+      scene15KeyCtx.stroke();
+
+      scene15KeyCtx.setLineDash([]);
+      scene15KeyCtx.beginPath();
+      scene15KeyCtx.arc(p.x,p.y,success?24:15,0,Math.PI*2);
+      scene15KeyCtx.strokeStyle=success ? "#fff4c7" : "#f3c55d";
+      scene15KeyCtx.lineWidth=success ? 7 : 4;
       scene15KeyCtx.stroke();
       scene15KeyCtx.restore();
     }
+
     function enterKeyDrag(){
       rpsBusy=false;
+      scene15Unlocking=false;
       hideRpsLayers();
-      /* Keep the WIN scene visible; the key is already lying on the sand. */
       scene15RockWin.style.display="block";
       scene15KeyCanvas.style.display="block";
       scene15KeyStart.style.display="block";
@@ -1384,29 +1404,86 @@
       clearKeyLine();
       updateSceneBackdrop(scene15);
     }
-    function finishKeyDrag(){
+
+    function startKeyDragAt(clientX,clientY){
+      if(scene15Unlocking) return;
+      scene15Dragging=true;
+      scene15DragStartedAt=performance.now();
+      scene15DragStartPoint=keyPointFromClient(clientX,clientY);
+      scene15LastPoint=scene15DragStartPoint;
+      drawKeyLine(scene15LastPoint);
+    }
+
+    function moveKeyDragAt(clientX,clientY){
+      if(!scene15Dragging || scene15Unlocking) return;
+      const p=keyPointFromClient(clientX,clientY);
+      scene15LastPoint=p;
+      drawKeyLine(p);
+      const elapsed=performance.now()-scene15DragStartedAt;
+      const travelled=Math.hypot(p.x-scene15Key.x,p.y-scene15Key.y);
+      const atLock=Math.hypot(p.x-scene15Lock.x,p.y-scene15Lock.y)<=scene15LockRadius;
+      if(atLock && elapsed>=scene15MinDragMs && travelled>=scene15MinTravel){
+        finishKeyDrag(p);
+      }
+    }
+
+    function finishKeyDrag(p){
+      if(scene15Unlocking) return;
+      scene15Unlocking=true;
       scene15Dragging=false;
       scene15KeyStart.style.display="none";
       scene15DragHint.style.display="none";
-      clearKeyLine();
-      scene15KeyCanvas.style.display="none";
-      /* No Continue state and no delay: successful drag goes straight to the portal scene. */
-      showScene(scene15Portal);
+      drawKeyLine({x:scene15Lock.x,y:scene15Lock.y},true);
+      /* Keep the successful line visible briefly, then go straight to the portal scene. */
+      setTimeout(()=>{
+        scene15KeyCanvas.style.display="none";
+        clearKeyLine();
+        showScene(scene15Portal);
+      },420);
     }
+
+    function cancelKeyDrag(){
+      if(!scene15Dragging || scene15Unlocking) return;
+      scene15Dragging=false;
+      clearKeyLine();
+    }
+
     scene15KeyStart.addEventListener("pointerdown", e => {
-      e.preventDefault(); scene15Dragging=true;
+      e.preventDefault(); e.stopPropagation();
       try{ scene15KeyStart.setPointerCapture(e.pointerId); }catch(_){ }
-      drawKeyLine(keyPoint(e));
+      startKeyDragAt(e.clientX,e.clientY);
     });
-    scene15KeyStart.addEventListener("pointermove", e => {
+    window.addEventListener("pointermove", e => {
       if(!scene15Dragging) return;
       e.preventDefault();
-      const p=keyPoint(e); drawKeyLine(p);
-      if(Math.hypot(p.x-scene15Lock.x,p.y-scene15Lock.y) <= scene15LockRadius){ finishKeyDrag(); }
-    });
-    function cancelKeyDrag(){ if(!scene15Dragging) return; scene15Dragging=false; clearKeyLine(); }
-    scene15KeyStart.addEventListener("pointerup", cancelKeyDrag);
-    scene15KeyStart.addEventListener("pointercancel", cancelKeyDrag);
+      moveKeyDragAt(e.clientX,e.clientY);
+    }, {passive:false});
+    window.addEventListener("pointerup", e => {
+      if(!scene15Dragging) return;
+      e.preventDefault();
+      /* Releasing before the lock simply resets the line and lets her retry. */
+      cancelKeyDrag();
+    }, {passive:false});
+    window.addEventListener("pointercancel", cancelKeyDrag);
+
+    /* iOS touch fallback: keeps the line following the finger even if pointer capture is inconsistent. */
+    scene15KeyStart.addEventListener("touchstart", e => {
+      if(scene15Dragging || scene15Unlocking) return;
+      const t=e.changedTouches[0]; if(!t) return;
+      e.preventDefault();
+      startKeyDragAt(t.clientX,t.clientY);
+    }, {passive:false});
+    window.addEventListener("touchmove", e => {
+      if(!scene15Dragging) return;
+      const t=e.changedTouches[0]; if(!t) return;
+      e.preventDefault();
+      moveKeyDragAt(t.clientX,t.clientY);
+    }, {passive:false});
+    window.addEventListener("touchend", e => {
+      if(!scene15Dragging) return;
+      e.preventDefault();
+      cancelKeyDrag();
+    }, {passive:false});
 
     /* The chest-light scene is locked; tap anywhere when ready to enter the chemistry world. */
     scene15PortalContinue.addEventListener("pointerup", e => {
