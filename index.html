@@ -68,7 +68,7 @@
       pointer-events:auto;
     }
 
-    /* v38 safety: invisible scenes must NEVER steal taps or drags.
+    /* v39 safety: invisible scenes must NEVER steal taps or drags.
        This is especially important for the mirror puzzle on iPhone/iPad Safari. */
     .scene:not(.active),
     .scene:not(.active) *{
@@ -902,12 +902,12 @@
 
 
     <section id="scene21" class="scene">
-      <img src="./scene21_intro.png?v=38" alt="Where did you bring me now?">
+      <img src="./scene21.png?v=38" alt="Where did you bring me now?">
       <button id="scene21Continue" type="button" aria-label="Look at the mirrors"></button>
     </section>
 
     <section id="scene22" class="scene">
-      <img src="./scene22_choice.png?v=38" alt="Only one reflection tells the truth">
+      <img src="./scene22.png?v=38" alt="Only one reflection tells the truth">
       <div id="scene22MirrorButtons" aria-label="Choose the true reflection">
         <button class="mirrorChoice m1" data-mirror="1" type="button" aria-label="First mirror"></button>
         <button class="mirrorChoice m2" data-mirror="2" type="button" aria-label="Second mirror"></button>
@@ -917,12 +917,12 @@
     </section>
 
     <section id="scene23" class="scene">
-      <img src="./scene23_wrong_choice.png?v=38" alt="That's not right. Try again.">
+      <img src="./scene23.png?v=38" alt="That's not right. Try again.">
       <button id="scene23Retry" type="button" aria-label="Try the mirror challenge again"></button>
     </section>
 
     <section id="scene24" class="scene">
-      <img src="./scene24_puzzle.png?v=38" alt="The mirror broke. Put the pieces back in the right place.">
+      <img src="./scene24.png?v=38" alt="The mirror broke. Put the pieces back in the right place.">
       <div id="scene24PuzzleLayer" aria-label="Drag the six mirror pieces into the mirror">
         <div class="puzzleTarget" data-target="1"></div>
         <div class="puzzleTarget" data-target="2"></div>
@@ -942,12 +942,12 @@
     </section>
 
     <section id="scene25" class="scene">
-      <img src="./scene25_symbol.png?v=38" alt="Two of three symbols found">
+      <img src="./scene25.png?v=38" alt="Two of three symbols found">
       <button id="scene25Continue" type="button" aria-label="Continue"></button>
     </section>
 
     <section id="scene26" class="scene">
-      <img src="./scene26_portal.png?v=38" alt="The mirror becomes a portal">
+      <img src="./scene26.png?v=38" alt="The mirror becomes a portal">
       <button id="scene26PortalTouch" type="button" aria-label="Touch the portal"></button>
     </section>
 
@@ -989,7 +989,7 @@
     const scene23 = document.getElementById("scene23");
     const scene24 = document.getElementById("scene24");
 
-    /* v38: initialize inactive scenes as inert before any mission starts. */
+    /* v39: initialize inactive scenes as inert before any mission starts. */
     scenes.forEach(s => {
       const active = s.classList.contains("active");
       s.setAttribute("aria-hidden", active ? "false" : "true");
