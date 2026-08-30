@@ -9,7 +9,7 @@
   <meta http-equiv="Expires" content="0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Our Little Adventure · v36</title>
+  <title>Our Little Adventure · v37</title>
 
   <style>
     :root{
@@ -694,6 +694,32 @@
       100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
     }
 
+  
+    /* ===== v37 mirror puzzle: pieces are real independent images, never scene-sized ===== */
+    #scene24 #scene24PuzzleLayer .puzzlePiece{
+      position:absolute !important;
+      inset:auto !important;
+      max-width:none !important;
+      max-height:none !important;
+      height:auto !important;
+      object-fit:contain !important;
+      object-position:center !important;
+      pointer-events:auto !important;
+      touch-action:none !important;
+      user-select:none !important;
+      -webkit-user-drag:none !important;
+      filter:drop-shadow(0 0 10px rgba(232,183,83,.78));
+      transition:left .18s ease, top .18s ease, width .18s ease, filter .18s ease;
+    }
+    #scene24 #scene24PuzzleLayer .puzzlePiece.dragging{
+      transition:none !important;
+      filter:drop-shadow(0 0 22px rgba(245,209,130,1));
+    }
+    #scene24 .puzzleTarget{
+      border:1px dashed rgba(232,183,83,.35) !important;
+      background:rgba(232,183,83,.035) !important;
+    }
+
   </style>
 </head>
 
@@ -746,9 +772,9 @@
     </section>
 
 <section id="scene8" class="scene">
-      <img id="scene8State1" class="scene8State active8" src="./scene8_1.png?v=36" alt="Grab the Rock">
-      <img id="scene8State2" class="scene8State" src="./scene8_2.png?v=36" alt="Lift It Up">
-      <img id="scene8State3" class="scene8State" src="./scene8_3.png?v=36" alt="Ready to Drop">
+      <img id="scene8State1" class="scene8State active8" src="./scene8_1.png?v=37" alt="Grab the Rock">
+      <img id="scene8State2" class="scene8State" src="./scene8_2.png?v=37" alt="Lift It Up">
+      <img id="scene8State3" class="scene8State" src="./scene8_3.png?v=37" alt="Ready to Drop">
 
       <canvas id="scene8Gesture" width="1672" height="941"></canvas>
       <button id="scene8TapRock" type="button" aria-label="Tap the rock"></button>
@@ -766,40 +792,40 @@
     </section>
 
 <section id="scene11" class="scene">
-      <img src="./scene11.png?v=36" alt="The First Clue">
+      <img src="./scene11.png?v=37" alt="The First Clue">
       <button id="scene11Continue" type="button" aria-label="Follow the glow"></button>
     </section>
 
     <section id="scene12" class="scene">
-      <img src="./scene12.png?v=36" alt="The Hidden Chest">
+      <img src="./scene12.png?v=37" alt="The Hidden Chest">
       <button id="scene12Continue" type="button" aria-label="Discover the chest"></button>
     </section>
 
     <section id="scene13" class="scene">
-      <img src="./scene13.png?v=36" alt="Locked Secret - Tap the lock">
+      <img src="./scene13.png?v=37" alt="Locked Secret - Tap the lock">
       <button id="scene13Lock" type="button" aria-label="Tap the lock"></button>
     </section>
 
     <section id="scene14Dialogue" class="scene">
-      <img src="./scene14_dialogue.png?v=36" alt="You can talk? I know a secret about this chest">
+      <img src="./scene14_dialogue.png?v=37" alt="You can talk? I know a secret about this chest">
       <button id="scene14DialogueContinue" type="button" aria-label="Continue the conversation"></button>
     </section>
 
     <section id="scene14Instruction" class="scene">
-      <img src="./scene14_instruction.png?v=36" alt="To discover what is inside, you must open the chest">
+      <img src="./scene14_instruction.png?v=37" alt="To discover what is inside, you must open the chest">
       <button id="scene14InstructionContinue" type="button" aria-label="Continue"></button>
     </section>
 
     <section id="scene14How" class="scene">
-      <img src="./scene14_how.png?v=36" alt="How?">
+      <img src="./scene14_how.png?v=37" alt="How?">
       <button id="scene14HowContinue" type="button" aria-label="Start the challenge"></button>
     </section>
 
     <section id="scene15" class="scene">
-      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=36" alt="Rock Paper Scissors challenge">
-      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=36" alt="Paper loses. The crab chases her.">
-      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=36" alt="Scissors versus scissors. A tie.">
-      <img id="scene15RockWin" src="./scene15_rock_win.png?v=36" alt="Rock wins. The crab gives up the key.">
+      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=37" alt="Rock Paper Scissors challenge">
+      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=37" alt="Paper loses. The crab chases her.">
+      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=37" alt="Scissors versus scissors. A tie.">
+      <img id="scene15RockWin" src="./scene15_rock_win.png?v=37" alt="Rock wins. The crab gives up the key.">
 
       <div id="scene15RpsButtons" aria-label="Choose rock paper or scissors">
         <button class="rpsChoice rock" data-rps="rock" type="button" aria-label="Rock"></button>
@@ -813,22 +839,22 @@
     </section>
 
     <section id="scene15Portal" class="scene">
-      <img src="./scene15_portal.png?v=36" alt="What's happening?">
+      <img src="./scene15_portal.png?v=37" alt="What's happening?">
       <button id="scene15PortalContinue" type="button" aria-label="Continue to the next world"></button>
     </section>
 
     <section id="scene16" class="scene">
-      <img src="./scene16_alchemy.png?v=36" alt="Where am I? The golden dawn alchemy world">
+      <img src="./scene16_alchemy.png?v=37" alt="Where am I? The golden dawn alchemy world">
       <button id="scene16Continue" type="button" aria-label="Explore the alchemy room"></button>
     </section>
 
     <section id="scene17" class="scene">
-      <img src="./scene17_formula.png?v=36" alt="The First Formula clue">
+      <img src="./scene17_formula.png?v=37" alt="The First Formula clue">
       <button id="scene17Continue" type="button" aria-label="Begin the formula challenge"></button>
     </section>
 
     <section id="scene18" class="scene">
-      <img src="./scene18_ingredients.png?v=36" alt="Choose the three ingredients in the correct order">
+      <img src="./scene18_ingredients.png?v=37" alt="Choose the three ingredients in the correct order">
       <div id="scene18IngredientButtons" aria-label="Alchemy ingredient choices">
         <button class="alchemyIngredient stardust" data-ingredient="stardust" type="button" aria-label="Stardust"></button>
         <button class="alchemyIngredient moonwater" data-ingredient="moonwater" type="button" aria-label="Moonwater"></button>
@@ -845,24 +871,24 @@
     </section>
 
     <section id="scene19" class="scene">
-      <img src="./scene19_formula_awakens.png?v=36" alt="The Formula Awakens. What is that?">
+      <img src="./scene19_formula_awakens.png?v=37" alt="The Formula Awakens. What is that?">
       <button id="scene19Continue" type="button" aria-label="Continue"></button>
     </section>
 
     <section id="scene20" class="scene">
-      <img src="./scene20_symbol.png?v=36" alt="One symbol found. One of three collected.">
+      <img src="./scene20_symbol.png?v=37" alt="One symbol found. One of three collected.">
       <button id="scene20Continue" type="button" aria-label="Continue to the next world"></button>
     </section>
 
 
 
     <section id="scene21" class="scene">
-      <img src="./scene21_intro.png?v=36" alt="Where did you bring me now?">
+      <img src="./scene21_intro.png?v=37" alt="Where did you bring me now?">
       <button id="scene21Continue" type="button" aria-label="Look at the mirrors"></button>
     </section>
 
     <section id="scene22" class="scene">
-      <img src="./scene22_choice.png?v=36" alt="Only one reflection tells the truth">
+      <img src="./scene22_choice.png?v=37" alt="Only one reflection tells the truth">
       <div id="scene22MirrorButtons" aria-label="Choose the true reflection">
         <button class="mirrorChoice m1" data-mirror="1" type="button" aria-label="First mirror"></button>
         <button class="mirrorChoice m2" data-mirror="2" type="button" aria-label="Second mirror"></button>
@@ -872,12 +898,12 @@
     </section>
 
     <section id="scene23" class="scene">
-      <img src="./scene23_wrong_choice.png?v=36" alt="That's not right. Try again.">
+      <img src="./scene23_wrong_choice.png?v=37" alt="That's not right. Try again.">
       <button id="scene23Retry" type="button" aria-label="Try the mirror challenge again"></button>
     </section>
 
     <section id="scene24" class="scene">
-      <img src="./scene24_puzzle.png?v=36" alt="The mirror broke. Put the pieces back in the right place.">
+      <img src="./scene24_puzzle.png?v=37" alt="The mirror broke. Put the pieces back in the right place.">
       <div id="scene24PuzzleLayer" aria-label="Drag the six mirror pieces into the mirror">
         <div class="puzzleTarget" data-target="1"></div>
         <div class="puzzleTarget" data-target="2"></div>
@@ -885,31 +911,24 @@
         <div class="puzzleTarget" data-target="4"></div>
         <div class="puzzleTarget" data-target="5"></div>
         <div class="puzzleTarget" data-target="6"></div>
-        <div class="puzzleCover" data-cover="1"></div>
-        <div class="puzzleCover" data-cover="2"></div>
-        <div class="puzzleCover" data-cover="3"></div>
-        <div class="puzzleCover" data-cover="4"></div>
-        <div class="puzzleCover" data-cover="5"></div>
-        <div class="puzzleCover" data-cover="6"></div>
-        <button class="puzzleOrigin" data-piece="1" type="button" aria-label="Mirror piece 1"></button>
-        <button class="puzzleOrigin" data-piece="2" type="button" aria-label="Mirror piece 2"></button>
-        <button class="puzzleOrigin" data-piece="3" type="button" aria-label="Mirror piece 3"></button>
-        <button class="puzzleOrigin" data-piece="4" type="button" aria-label="Mirror piece 4"></button>
-        <button class="puzzleOrigin" data-piece="5" type="button" aria-label="Mirror piece 5"></button>
-        <button class="puzzleOrigin" data-piece="6" type="button" aria-label="Mirror piece 6"></button>
-        <img id="puzzleGhost" src="" alt="" aria-hidden="true">
+        <img class="puzzlePiece" data-piece="1" src="./puzzle_piece_1.png?v=37" alt="Mirror piece 1" draggable="false">
+        <img class="puzzlePiece" data-piece="2" src="./puzzle_piece_2.png?v=37" alt="Mirror piece 2" draggable="false">
+        <img class="puzzlePiece" data-piece="3" src="./puzzle_piece_3.png?v=37" alt="Mirror piece 3" draggable="false">
+        <img class="puzzlePiece" data-piece="4" src="./puzzle_piece_4.png?v=37" alt="Mirror piece 4" draggable="false">
+        <img class="puzzlePiece" data-piece="5" src="./puzzle_piece_5.png?v=37" alt="Mirror piece 5" draggable="false">
+        <img class="puzzlePiece" data-piece="6" src="./puzzle_piece_6.png?v=37" alt="Mirror piece 6" draggable="false">
         <div id="scene24PuzzleStatus">Drag each mirror piece into its matching place.</div>
         <div id="scene24WrongPulse" aria-hidden="true"></div>
       </div>
     </section>
 
     <section id="scene25" class="scene">
-      <img src="./scene25_symbol.png?v=36" alt="Two of three symbols found">
+      <img src="./scene25_symbol.png?v=37" alt="Two of three symbols found">
       <button id="scene25Continue" type="button" aria-label="Continue"></button>
     </section>
 
     <section id="scene26" class="scene">
-      <img src="./scene26_portal.png?v=36" alt="The mirror becomes a portal">
+      <img src="./scene26_portal.png?v=37" alt="The mirror becomes a portal">
       <button id="scene26PortalTouch" type="button" aria-label="Touch the portal"></button>
     </section>
 
@@ -1002,10 +1021,8 @@
     const scene21Continue = document.getElementById("scene21Continue");
     const mirrorChoices = [...document.querySelectorAll(".mirrorChoice")];
     const scene23Retry = document.getElementById("scene23Retry");
-    const puzzleOrigins = [...document.querySelectorAll(".puzzleOrigin")];
+    const puzzlePieces = [...document.querySelectorAll(".puzzlePiece")];
     const puzzleTargets = [...document.querySelectorAll(".puzzleTarget")];
-    const puzzleCovers = [...document.querySelectorAll(".puzzleCover")];
-    const puzzleGhost = document.getElementById("puzzleGhost");
     const scene24PuzzleStatus = document.getElementById("scene24PuzzleStatus");
     const scene24WrongPulse = document.getElementById("scene24WrongPulse");
     const scene25Continue = document.getElementById("scene25Continue");
@@ -1272,7 +1289,7 @@
       scene8Ctx.clearRect(0,0,ART_W,ART_H);
     }
 
-    ["./scene8_1.png?v=36","./scene8_2.png?v=36","./scene8_3.png?v=36"].forEach(src => {
+    ["./scene8_1.png?v=37","./scene8_2.png?v=37","./scene8_3.png?v=37"].forEach(src => {
       const img = new Image();
       img.src = src;
     });
@@ -1838,39 +1855,45 @@
     });
 
     const puzzleConfig = [
-      {id:1, x:29.6,y:8.5,w:14.1,h:26.6, poly:"13% 18%,83% 2%,98% 42%,74% 88%,15% 92%,2% 48%", tx:47.0,ty:20.0,tw:10.5,th:18.0},
-      {id:2, x:64.6,y:7.4,w:20.6,h:28.2, poly:"29% 4%,90% 21%,98% 61%,74% 93%,16% 83%,1% 40%", tx:57.0,ty:20.0,tw:11.5,th:18.0},
-      {id:3, x:33.2,y:33.5,w:16.8,h:27.6, poly:"9% 8%,89% 25%,93% 73%,52% 92%,7% 69%,2% 31%", tx:46.5,ty:41.0,tw:10.0,th:17.0},
-      {id:4, x:71.2,y:31.9,w:16.1,h:26.0, poly:"17% 6%,92% 18%,96% 63%,67% 92%,13% 80%,2% 39%", tx:58.0,ty:41.0,tw:10.0,th:17.0},
-      {id:5, x:38.3,y:56.9,w:20.3,h:28.2, poly:"28% 4%,94% 23%,97% 64%,66% 95%,13% 83%,2% 45%", tx:47.0,ty:60.0,tw:11.0,th:18.0},
-      {id:6, x:62.8,y:55.8,w:21.2,h:28.2, poly:"18% 4%,93% 21%,99% 62%,69% 94%,10% 83%,1% 43%", tx:58.0,ty:60.0,tw:11.5,th:18.0}
+      {id:1, x:29.6,y:8.5,w:14.1,h:26.6, tx:47.0,ty:20.0,tw:10.5,th:18.0},
+      {id:2, x:64.6,y:7.4,w:20.6,h:28.2, tx:57.0,ty:20.0,tw:11.5,th:18.0},
+      {id:3, x:33.2,y:33.5,w:16.8,h:27.6, tx:46.5,ty:41.0,tw:10.0,th:17.0},
+      {id:4, x:71.2,y:31.9,w:16.1,h:26.0, tx:58.0,ty:41.0,tw:10.0,th:17.0},
+      {id:5, x:38.3,y:56.9,w:20.3,h:28.2, tx:47.0,ty:60.0,tw:11.0,th:18.0},
+      {id:6, x:62.8,y:55.8,w:21.2,h:28.2, tx:58.0,ty:60.0,tw:11.5,th:18.0}
     ];
     const placedPuzzlePieces = new Set();
     let puzzleDrag = null;
 
+    function cfgFor(id){ return puzzleConfig.find(c => c.id === id); }
+
+    function positionPieceAtOrigin(piece,c){
+      piece.style.setProperty("left", (c.x+c.w/2)+"%", "important");
+      piece.style.setProperty("top", (c.y+c.h/2)+"%", "important");
+      piece.style.setProperty("width", c.w+"%", "important");
+      piece.style.setProperty("height", "auto", "important");
+      piece.style.setProperty("transform", "translate(-50%,-50%)", "important");
+      piece.style.setProperty("z-index", "110", "important");
+      piece.style.opacity="1";
+      piece.style.pointerEvents="auto";
+      piece.dataset.placed="0";
+    }
+
     function setPuzzleElementGeometry(){
       puzzleConfig.forEach(c => {
-        const origin = puzzleOrigins.find(el => Number(el.dataset.piece) === c.id);
-        const cover = puzzleCovers.find(el => Number(el.dataset.cover) === c.id);
         const target = puzzleTargets.find(el => Number(el.dataset.target) === c.id);
-        [origin,cover].forEach(el => {
-          el.style.left=c.x+"%"; el.style.top=c.y+"%"; el.style.width=c.w+"%"; el.style.height=c.h+"%";
-        });
-        cover.style.setProperty("--poly",c.poly);
         target.style.left=c.tx+"%"; target.style.top=c.ty+"%"; target.style.width=c.tw+"%"; target.style.height=c.th+"%";
+        const piece = puzzlePieces.find(el => Number(el.dataset.piece) === c.id);
+        positionPieceAtOrigin(piece,c);
       });
     }
 
     function resetMirrorPuzzle(){
       placedPuzzlePieces.clear();
-      scene24.querySelectorAll(".fixedPuzzlePiece").forEach(el => el.remove());
-      puzzleOrigins.forEach(el => { el.style.pointerEvents="auto"; el.classList.remove("dragging"); });
-      puzzleCovers.forEach(el => el.style.display="none");
       puzzleTargets.forEach(el => el.classList.remove("lit"));
-      puzzleGhost.style.display="none";
+      puzzlePieces.forEach(piece => positionPieceAtOrigin(piece,cfgFor(Number(piece.dataset.piece))));
       scene24PuzzleStatus.textContent="Drag each mirror piece into its matching place.";
       puzzleDrag=null;
-      setPuzzleElementGeometry();
     }
 
     function framePercentFromPointer(clientX,clientY){
@@ -1878,31 +1901,25 @@
       return {x:(clientX-r.left)/r.width*100,y:(clientY-r.top)/r.height*100};
     }
 
-    function beginPuzzleDrag(el,e){
-      const id=Number(el.dataset.piece);
+    function beginPuzzleDrag(piece,e){
+      const id=Number(piece.dataset.piece);
       if(placedPuzzlePieces.has(id)) return;
-      const c=puzzleConfig[id-1];
+      e.preventDefault(); e.stopPropagation();
+      const c=cfgFor(id);
       const p=framePercentFromPointer(e.clientX,e.clientY);
-      puzzleDrag={id,el,c,x:p.x,y:p.y,startX:p.x,startY:p.y,moved:false};
-      el.classList.add("dragging");
-      const cover=puzzleCovers.find(v=>Number(v.dataset.cover)===id);
-      cover.style.display="block";
-      puzzleGhost.src=`./puzzle_piece_${id}.png?v=36`;
-      puzzleGhost.style.width=c.w+"%";
-      puzzleGhost.style.height=c.h+"%";
-      puzzleGhost.style.objectFit="fill";
-      puzzleGhost.style.left=p.x+"%"; puzzleGhost.style.top=p.y+"%";
-      puzzleGhost.style.display="block";
-      try{el.setPointerCapture(e.pointerId);}catch(_){ }
+      puzzleDrag={id,piece,c,startX:p.x,startY:p.y,moved:false};
+      piece.classList.add("dragging");
+      piece.style.setProperty("z-index","140","important");
+      try{ piece.setPointerCapture(e.pointerId); }catch(_){ }
     }
 
     function movePuzzleDrag(e){
       if(!puzzleDrag) return;
       e.preventDefault();
       const p=framePercentFromPointer(e.clientX,e.clientY);
-      if(Math.hypot(p.x-puzzleDrag.startX,p.y-puzzleDrag.startY)>1.2) puzzleDrag.moved=true;
-      puzzleDrag.x=p.x; puzzleDrag.y=p.y;
-      puzzleGhost.style.left=p.x+"%"; puzzleGhost.style.top=p.y+"%";
+      if(Math.hypot(p.x-puzzleDrag.startX,p.y-puzzleDrag.startY)>0.9) puzzleDrag.moved=true;
+      puzzleDrag.piece.style.setProperty("left",p.x+"%","important");
+      puzzleDrag.piece.style.setProperty("top",p.y+"%","important");
     }
 
     function wrongPuzzleDrop(p){
@@ -1913,38 +1930,29 @@
     function endPuzzleDrag(e){
       if(!puzzleDrag) return;
       e.preventDefault();
-      const {id,el,c,moved}=puzzleDrag;
+      const {id,piece,c,moved}=puzzleDrag;
       const p=framePercentFromPointer(e.clientX,e.clientY);
-      const inside = moved && p.x >= c.tx && p.x <= c.tx+c.tw && p.y >= c.ty && p.y <= c.ty+c.th;
-      const cover=puzzleCovers.find(v=>Number(v.dataset.cover)===id);
+      const margin=3.5;
+      const inside = moved && p.x >= c.tx-margin && p.x <= c.tx+c.tw+margin && p.y >= c.ty-margin && p.y <= c.ty+c.th+margin;
       const target=puzzleTargets.find(v=>Number(v.dataset.target)===id);
-      el.classList.remove("dragging");
+      piece.classList.remove("dragging");
       if(inside){
         placedPuzzlePieces.add(id);
-        el.style.pointerEvents="none";
         target.classList.add("lit");
-        puzzleGhost.style.left=(c.tx+c.tw/2)+"%";
-        puzzleGhost.style.top=(c.ty+c.th/2)+"%";
-        puzzleGhost.style.width=c.tw+"%";
-        puzzleGhost.style.height=c.th+"%";
-        puzzleGhost.style.objectFit="fill";
-        puzzleGhost.style.display="block";
-        // freeze a copy of the successfully placed shard in the target
-        const fixed=puzzleGhost.cloneNode(true);
-        fixed.removeAttribute("id");
-        fixed.className="fixedPuzzlePiece";
-        fixed.style.position="absolute"; fixed.style.zIndex="101"; fixed.style.pointerEvents="none";
-        fixed.style.width=c.tw+"%"; fixed.style.height=c.th+"%"; fixed.style.objectFit="fill";
-        scene24.querySelector("#scene24PuzzleLayer").appendChild(fixed);
-        puzzleGhost.style.display="none";
+        piece.style.setProperty("left",(c.tx+c.tw/2)+"%","important");
+        piece.style.setProperty("top",(c.ty+c.th/2)+"%","important");
+        piece.style.setProperty("width",c.tw+"%","important");
+        piece.style.setProperty("height","auto","important");
+        piece.style.setProperty("z-index","112","important");
+        piece.style.pointerEvents="none";
+        piece.dataset.placed="1";
         scene24PuzzleStatus.textContent=`${placedPuzzlePieces.size} / 6 pieces placed`;
         if(placedPuzzlePieces.size===6){
           scene24PuzzleStatus.textContent="The mirror is complete.";
-          setTimeout(()=>showScene(scene25),650);
+          setTimeout(()=>showScene(scene25),750);
         }
       }else{
-        cover.style.display="none";
-        puzzleGhost.style.display="none";
+        positionPieceAtOrigin(piece,c);
         wrongPuzzleDrop(p);
         scene24PuzzleStatus.textContent="That piece does not fit there. Try again.";
         setTimeout(()=>{ if(placedPuzzlePieces.size<6) scene24PuzzleStatus.textContent="Drag each mirror piece into its matching place."; },900);
@@ -1953,15 +1961,16 @@
     }
 
     setPuzzleElementGeometry();
-    puzzleOrigins.forEach(el => {
-      el.addEventListener("pointerdown", e => { e.preventDefault(); e.stopPropagation(); beginPuzzleDrag(el,e); });
+    puzzlePieces.forEach(piece => {
+      piece.addEventListener("pointerdown", e => beginPuzzleDrag(piece,e), {passive:false});
     });
     window.addEventListener("pointermove", movePuzzleDrag, {passive:false});
     window.addEventListener("pointerup", endPuzzleDrag, {passive:false});
     window.addEventListener("pointercancel", () => {
       if(!puzzleDrag) return;
-      const cover=puzzleCovers.find(v=>Number(v.dataset.cover)===puzzleDrag.id);
-      cover.style.display="none"; puzzleGhost.style.display="none"; puzzleDrag.el.classList.remove("dragging"); puzzleDrag=null;
+      positionPieceAtOrigin(puzzleDrag.piece,puzzleDrag.c);
+      puzzleDrag.piece.classList.remove("dragging");
+      puzzleDrag=null;
     });
 
     scene25Continue.addEventListener("pointerup", e => {
