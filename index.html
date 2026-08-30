@@ -1,263 +1,2012 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#020b13" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#020b13">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Our Little Adventure</title>
+
   <style>
-    :root{ --bg:#020b13; --gold:#f2cb77; --ratio:1672/941; }
-    *{ box-sizing:border-box; }
-    html,body{ margin:0; width:100%; height:100%; overflow:hidden; background:var(--bg); font-family: Georgia, 'Times New Roman', serif; }
-    body{ position:fixed; inset:0; touch-action:none; -webkit-user-select:none; user-select:none; }
-    #app{ position:fixed; inset:0; display:grid; place-items:center; background:var(--bg); }
-    #frame{ position:relative; width:min(100vw, calc(100vh * 1672 / 941)); height:min(100vh, calc(100vw * 941 / 1672)); aspect-ratio:var(--ratio); overflow:hidden; background:var(--bg); }
-    #sceneImg{ position:absolute; inset:0; width:100%; height:100%; object-fit:fill; display:block; -webkit-user-drag:none; user-select:none; }
-    #overlay{ position:absolute; inset:0; }
-    .taplayer, .hotspot{ position:absolute; background:transparent; border:0; outline:0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-    .taplayer{ inset:0; }
-    .hotspot.showDebug{ outline:2px dashed rgba(255,255,255,.35); }
-    .badge{ position:absolute; left:50%; transform:translateX(-50%); bottom:2.8%; z-index:20; padding:.55rem 1rem; color:#f4d68d; border:1px solid rgba(232,183,83,.45); border-radius:999px; background:rgba(5,12,24,.62); backdrop-filter:blur(4px); font-size:clamp(12px,1.35vw,20px); letter-spacing:.03em; text-shadow:0 1px 4px rgba(0,0,0,.6); box-shadow:0 10px 18px rgba(0,0,0,.18); display:none; }
-    #lockHint{ bottom:2.6%; }
-    #keyCover{ position:absolute; left:39%; top:85.5%; width:23%; height:9%; border-radius:999px; background:rgba(2,8,18,.72); filter:blur(2px); display:none; }
-    #targetRing{ position:absolute; left:65.8%; top:52.6%; width:8%; height:14%; border-radius:50%; border:2px solid rgba(242,203,119,.86); box-shadow:0 0 22px rgba(242,203,119,.8), inset 0 0 14px rgba(242,203,119,.32); display:none; }
-    #dragSvg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; display:none; }
-    #dragLine{ stroke:rgba(246,211,134,.95); stroke-width:5; stroke-linecap:round; filter:drop-shadow(0 0 8px rgba(246,211,134,.95)); }
-    #keySprite{ position:absolute; width:14%; height:auto; transform:translate(-50%,-50%); display:none; z-index:25; cursor:grab; touch-action:none; filter:drop-shadow(0 0 12px rgba(255,210,120,.7)); }
-    #keySprite.dragging{ cursor:grabbing; }
-    #flash{ position:absolute; inset:0; background:radial-gradient(circle at center, rgba(255,240,180,.35), rgba(255,220,140,.0) 55%); opacity:0; pointer-events:none; transition:opacity .35s ease; }
-    #flash.on{ opacity:1; }
-    .spark{ position:absolute; width:22px; height:22px; border-radius:50%; background:radial-gradient(circle, rgba(255,235,180,.95), rgba(255,210,120,.5) 45%, rgba(255,210,120,0) 70%); pointer-events:none; opacity:0; }
-    @keyframes pulse { from { transform:translate(-50%,-50%) scale(.5); opacity:0; } 40%{ opacity:1; } to { transform:translate(-50%,-50%) scale(1.7); opacity:0; } }
-    .pulse{ animation:pulse .7s ease-out forwards; }
+    :root{
+      --bg:#020b13;
+      --ratio:1672/941;
+      --gold:#e8b753;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html,body{
+      width:100%;
+      height:100%;
+      min-height:100dvh;
+      overflow:hidden;
+      background:var(--bg);
+    }
+
+    body{
+      position:fixed;
+      inset:0;
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-touch-callout:none;
+      touch-action:none;
+      overscroll-behavior:none;
+    }
+
+    #app{
+      position:fixed;
+      inset:0;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      background:var(--bg);
+    }
+
+    .scene{
+      position:absolute;
+      width:min(100vw,calc(100dvh * 1672 / 941));
+      height:min(100dvh,calc(100vw * 941 / 1672));
+      aspect-ratio:var(--ratio);
+      overflow:hidden;
+      opacity:0;
+      pointer-events:none;
+      background:var(--bg);
+      transition:opacity .62s ease;
+    }
+
+    .scene.active{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .scene img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:fill;
+      pointer-events:none;
+      -webkit-user-drag:none;
+    }
+
+    .hotspot{
+      position:absolute;
+      z-index:30;
+      border:0;
+      outline:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      touch-action:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    /* Scene 1 */
+    #beginStory{
+      left:63.2%;
+      top:75%;
+      width:21.5%;
+      height:10.5%;
+    }
+
+    /* Scene 2 */
+    #scene2Continue{
+      left:61%;
+      top:79%;
+      width:30%;
+      height:11%;
+    }
+
+    /* Scene 5 line-drag layer */
+    #reachCanvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:20;
+      pointer-events:none;
+    }
+
+    /*
+      Invisible start area around her reaching hand.
+      The bottle itself never moves.
+    */
+    #handDragStart{
+      left:47%;
+      top:61%;
+      width:13%;
+      height:17%;
+      z-index:40;
+      cursor:grab;
+    }
+
+    #handDragStart.dragging{
+      cursor:grabbing;
+    }
+
+    /* Success scene: CONTINUE button */
+    #scene6Continue{
+      left:67.5%;
+      top:72.5%;
+      width:21.5%;
+      height:11%;
+      z-index:40;
+    }
+
+    /* Scene 7: CONTINUE button */
+    #scene7Continue{
+      left:67%;
+      top:73%;
+      width:22%;
+      height:11%;
+      z-index:40;
+    }
+
+    #missionHint{
+      position:absolute;
+      left:50%;
+      bottom:2.7%;
+      transform:translateX(-50%);
+      z-index:35;
+      padding:.42rem .9rem;
+      border:1px solid rgba(232,183,83,.4);
+      border-radius:999px;
+      background:rgba(2,11,19,.42);
+      color:#efd18c;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(12px,1.25vw,21px);
+      letter-spacing:.045em;
+      text-shadow:0 2px 8px #000;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .3s ease;
+      backdrop-filter:blur(3px);
+    }
+
+    #scene5.active #missionHint{
+      opacity:.94;
+    }
+
+    #missionHint.done{
+      opacity:0 !important;
+    }
+
+    #tapPulse{
+      position:fixed;
+      z-index:80;
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      border:2px solid rgba(232,183,83,.96);
+      box-shadow:0 0 28px rgba(232,183,83,.82);
+      opacity:0;
+      transform:translate(-50%,-50%) scale(.55);
+      pointer-events:none;
+    }
+
+    #tapPulse.play{
+      animation:tapPulse .45s ease forwards;
+    }
+
+    @keyframes tapPulse{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
+      45%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+      100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
+    }
+  
+    /* ===== Scene 8: Grab -> Lift -> Drop ===== */
+    #scene8{
+      background:#020b13;
+      touch-action:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .scene8State{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:fill;
+      opacity:0;
+      transform:scale(1.003);
+      transition:opacity .38s ease, transform .38s ease;
+      pointer-events:none;
+      -webkit-user-drag:none;
+    }
+
+    .scene8State.active8{
+      opacity:1;
+      transform:scale(1);
+    }
+
+    #scene8Gesture{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:55;
+      pointer-events:none;
+    }
+
+    #scene8TapRock{
+      position:absolute;
+      left:68%;
+      top:65%;
+      width:28%;
+      height:31%;
+      z-index:65;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    #scene8Hint{
+      position:absolute;
+      left:50%;
+      bottom:2.7%;
+      transform:translateX(-50%);
+      z-index:70;
+      padding:.43rem .95rem;
+      border:1px solid rgba(232,183,83,.42);
+      border-radius:999px;
+      background:rgba(2,11,19,.46);
+      color:#efd18b;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(12px,1.2vw,20px);
+      letter-spacing:.04em;
+      text-shadow:0 2px 8px #000;
+      backdrop-filter:blur(3px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .25s ease;
+      white-space:nowrap;
+    }
+
+    #scene8.active #scene8Hint{
+      opacity:.95;
+    }
+
+  
+    /* ===== Scene 9: broken-bottle reveal ===== */
+    #scene9Continue{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:40;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+  
+    /* ===== Scene 10: message letter ===== */
+    #scene10Continue{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:40;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+  
+    /* ===== Scene 11: The First Clue ===== */
+    #scene11Continue{
+      position:absolute;
+      left:59%;
+      top:80%;
+      width:29%;
+      height:10%;
+      z-index:45;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+  
+    /* ===== Scene 12: hidden chest discovery ===== */
+    #scene12Continue{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:45;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    /* ===== Scene 13: locked secret ===== */
+    #scene13Lock{
+      position:absolute;
+      left:56%;
+      top:61%;
+      width:18%;
+      height:25%;
+      z-index:50;
+      border:0;
+      padding:0;
+      margin:0;
+      background:transparent;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    /* =========================================================
+       iPHONE BEST-FIT LAYOUT
+       Full artwork visible, maximum height, soft side fill.
+       ========================================================= */
+
+    #rotatePhone{
+      display:none;
+      position:fixed;
+      inset:0;
+      z-index:10000;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+      background:#020b13;
+      color:#efc978;
+      text-align:center;
+      font-family:Georgia,"Times New Roman",serif;
+    }
+
+    .rotateCard{
+      max-width:420px;
+      padding:26px 24px;
+      border:1px solid rgba(239,201,120,.38);
+      border-radius:22px;
+      background:rgba(7,20,32,.84);
+      box-shadow:0 0 35px rgba(0,0,0,.35);
+    }
+
+    .rotateIcon{
+      font-size:52px;
+      line-height:1;
+      margin-bottom:12px;
+    }
+
+    .rotateTitle{
+      font-size:24px;
+      letter-spacing:.08em;
+      margin-bottom:8px;
+    }
+
+    .rotateText{
+      color:#f5e4ba;
+      font-size:16px;
+      line-height:1.45;
+    }
+
+    #sceneBackdrop{
+      position:absolute;
+      z-index:0;
+      inset:-8%;
+      width:116%;
+      height:116%;
+      object-fit:cover;
+      object-position:center;
+      filter:blur(28px) brightness(.34) saturate(1.08);
+      transform:scale(1.06);
+      opacity:1;
+      pointer-events:none;
+      transition:opacity .35s ease;
+    }
+
+    #app::after{
+      content:"";
+      position:absolute;
+      z-index:1;
+      inset:0;
+      pointer-events:none;
+      background:rgba(2,11,19,.12);
+    }
+
+    @media (orientation:portrait){
+      #rotatePhone{display:flex !important;}
+      #app{visibility:hidden !important;}
+    }
+
+    @media (orientation:landscape){
+      html,body{
+        width:100% !important;
+        height:100% !important;
+        min-height:0 !important;
+        margin:0 !important;
+        padding:0 !important;
+        overflow:hidden !important;
+        background:#020b13 !important;
+      }
+
+      body{
+        position:fixed !important;
+        inset:0 !important;
+      }
+
+      #rotatePhone{display:none !important;}
+
+      #app{
+        visibility:visible !important;
+        position:fixed !important;
+        left:0 !important;
+        top:0 !important;
+        width:var(--phone-vw, 100vw) !important;
+        height:var(--phone-vh, 100vh) !important;
+        min-width:0 !important;
+        min-height:0 !important;
+        padding:0 !important;
+        margin:0 !important;
+        overflow:hidden !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        background:#020b13 !important;
+      }
+
+      .scene{
+        position:absolute !important;
+        left:50% !important;
+        top:50% !important;
+        width:var(--fit-w) !important;
+        height:var(--fit-h) !important;
+        aspect-ratio:1672 / 941 !important;
+        transform:translate(-50%,-50%) !important;
+        margin:0 !important;
+        max-width:none !important;
+        max-height:none !important;
+        z-index:5 !important;
+        box-shadow:0 0 34px rgba(0,0,0,.42);
+      }
+
+      .scene img,
+      .scene8State{
+        position:absolute !important;
+        inset:0 !important;
+        width:100% !important;
+        height:100% !important;
+        object-fit:fill !important;
+        object-position:center !important;
+      }
+
+      #scene5Canvas,
+      #reachCanvas,
+      #scene8Gesture{
+        position:absolute !important;
+        inset:0 !important;
+        width:100% !important;
+        height:100% !important;
+      }
+    }
+
+  
+    /* ===== Gentle iPhone landscape zoom =====
+       1.08 = slightly wider/larger, while keeping the important content visible.
+       The whole scene (including hotspots/canvases) scales together.
+    */
+    @media (orientation:landscape){
+      .scene{
+        transform:translate(-50%,-50%) scale(1.08) !important;
+        transform-origin:center center !important;
+      }
+    }
+
+  
+
+    /* ===== Locked crab conversation + Rock/Paper/Scissors mission ===== */
+    #scene14DialogueContinue,#scene14InstructionContinue,#scene14HowContinue,#scene15PortalContinue{
+      position:absolute;inset:0;width:100%;height:100%;z-index:55;
+      border:0;background:transparent;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+    }
+    #scene15RpsChoice,#scene15PaperLose,#scene15ScissorsTie,#scene15RockWin{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:fill;
+      display:none;z-index:30;pointer-events:none;
+    }
+    #scene15RpsButtons{position:absolute; inset:0; z-index:55; display:none; pointer-events:none;}
+    .rpsChoice{
+      position:absolute; bottom:4.1%; height:18%; border:0; background:transparent;
+      border-radius:22px; pointer-events:auto; touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .rpsChoice.rock{left:9.5%;width:26.5%;}
+    .rpsChoice.paper{left:36.8%;width:26.5%;}
+    .rpsChoice.scissors{left:64.0%;width:26.5%;}
+    .rpsChoice:active{background:rgba(241,193,95,.10);box-shadow:0 0 30px rgba(241,193,95,.25) inset;}
+    #scene15KeyCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:64;pointer-events:none;}
+    #scene15KeyStart{
+      position:absolute;left:57.5%;top:81.5%;width:16%;height:15%;display:none;z-index:65;
+      border:0;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;
+    }
+    #scene15DragHint{
+      position:absolute;left:50%;bottom:2.7%;transform:translateX(-50%);display:none;z-index:70;
+      padding:.48rem 1.2rem;border:1px solid rgba(239,201,120,.55);border-radius:999px;
+      background:rgba(2,11,19,.68);color:#efd18b;font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(14px,1.45vw,23px);letter-spacing:.06em;text-shadow:0 2px 8px #000;pointer-events:none;
+    }
+    #scene16 img{object-fit:fill;}
+
+  
+
+    /* === Alchemy mission (Scenes 16–20) === */
+    #scene16Continue,#scene17Continue,#scene19Continue{
+      position:absolute; inset:0; width:100%; height:100%; z-index:72;
+      border:0; background:transparent; padding:0; margin:0;
+      appearance:none; -webkit-appearance:none; touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+    #scene18IngredientButtons{position:absolute;inset:0;z-index:76;}
+    .alchemyIngredient{
+      position:absolute;border:0;background:transparent;padding:0;margin:0;
+      appearance:none;-webkit-appearance:none;touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;border-radius:18px;
+    }
+    .alchemyIngredient:active{background:rgba(239,198,105,.10);}
+    .alchemyIngredient.stardust{left:1.5%;top:57%;width:17%;height:34%;}
+    .alchemyIngredient.moonwater{left:17.5%;top:57%;width:17%;height:34%;}
+    .alchemyIngredient.pearl{left:31.5%;top:57%;width:15%;height:34%;}
+    .alchemyIngredient.golden{left:64%;top:48%;width:15%;height:31%;}
+    .alchemyIngredient.blue{left:78%;top:49%;width:20%;height:34%;}
+    #alchemySlots{position:absolute;inset:0;z-index:77;pointer-events:none;}
+    .alchemySlotMark{
+      position:absolute;top:78.4%;width:4.8%;height:6.8%;
+      display:grid;place-items:center;border-radius:999px;
+      color:#ffe4a1;font-family:Georgia,serif;font-weight:700;
+      font-size:clamp(18px,2.4vw,34px);text-shadow:0 0 13px #f1b947,0 0 24px #f1b947;
+      opacity:0;transform:scale(.75);transition:opacity .22s ease,transform .22s ease;
+    }
+    .alchemySlotMark.on{opacity:1;transform:scale(1);}
+    #alchemySlot1{left:41.1%;} #alchemySlot2{left:50.7%;} #alchemySlot3{left:60.3%;}
+    #alchemyStatus{
+      position:absolute;left:50%;bottom:5.2%;transform:translateX(-50%);
+      z-index:80;padding:.55em 1.1em;border:1px solid rgba(230,184,92,.72);
+      border-radius:999px;background:rgba(6,11,20,.78);color:#f5d797;
+      font:600 clamp(14px,1.7vw,24px)/1.1 Georgia,serif;letter-spacing:.02em;
+      opacity:0;pointer-events:none;transition:opacity .2s ease;white-space:nowrap;
+      box-shadow:0 0 18px rgba(219,166,64,.18);
+    }
+    #alchemyStatus.show{opacity:1;}
+    #scene18.wrongFlash{animation:alchemyWrong .42s ease 1;}
+    @keyframes alchemyWrong{0%,100%{filter:none}45%{filter:brightness(.82) sepia(.15)}}
+
+
+
+    /* ===== Mirror World: second mission ===== */
+    #scene20Continue,#scene21Continue,#scene23Retry,#scene25Continue,#scene26PortalTouch{
+      position:absolute; inset:0; width:100%; height:100%; z-index:80;
+      border:0; padding:0; margin:0; background:transparent;
+      appearance:none; -webkit-appearance:none; cursor:pointer;
+      touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+    }
+
+    #scene22MirrorButtons{position:absolute;inset:0;z-index:85;}
+    .mirrorChoice{
+      position:absolute; top:14%; height:63%; border:0; background:transparent;
+      appearance:none; -webkit-appearance:none; touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent; cursor:pointer;
+    }
+    .mirrorChoice.m1{left:24%;width:17%;}
+    .mirrorChoice.m2{left:41%;width:17%;}
+    .mirrorChoice.m3{left:58%;width:18%;}
+    .mirrorChoice.m4{left:76%;width:17%;}
+
+    #scene24PuzzleLayer{position:absolute;inset:0;z-index:95;touch-action:none;}
+    .puzzleOrigin{
+      position:absolute; border:0; background:transparent; padding:0; margin:0;
+      appearance:none; -webkit-appearance:none; touch-action:none; cursor:grab;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .puzzleOrigin.dragging{cursor:grabbing;}
+    .puzzleCover{
+      position:absolute; display:none; z-index:96; background:rgba(3,12,29,.94);
+      border:1px solid rgba(232,183,83,.75); clip-path:polygon(var(--poly));
+      pointer-events:none; box-shadow:0 0 16px rgba(232,183,83,.18) inset;
+    }
+    #puzzleGhost{
+      position:absolute; display:none; z-index:110; pointer-events:none;
+      transform:translate(-50%,-50%); transform-origin:center center;
+      filter:drop-shadow(0 0 14px rgba(232,183,83,.85));
+    }
+    .puzzleTarget{
+      position:absolute; z-index:94; border:1px dashed rgba(232,183,83,.28);
+      background:rgba(232,183,83,.025); border-radius:16px; pointer-events:none;
+      transition:.25s ease;
+    }
+    .puzzleTarget.lit{
+      border-color:rgba(245,209,130,.92); background:rgba(232,183,83,.10);
+      box-shadow:0 0 24px rgba(232,183,83,.5);
+    }
+    #scene24PuzzleStatus{
+      position:absolute; left:50%; bottom:2.5%; transform:translateX(-50%);
+      z-index:120; padding:.42rem .95rem; border:1px solid rgba(232,183,83,.42);
+      border-radius:999px; background:rgba(2,11,19,.62); color:#efd18b;
+      font-family:Georgia,"Times New Roman",serif; font-size:clamp(12px,1.15vw,19px);
+      letter-spacing:.035em; text-shadow:0 2px 8px #000; backdrop-filter:blur(3px);
+      white-space:nowrap; pointer-events:none;
+    }
+    #scene24WrongPulse{
+      position:absolute; width:90px; height:90px; border-radius:50%;
+      border:3px solid rgba(255,92,118,.92); box-shadow:0 0 30px rgba(255,70,100,.65);
+      transform:translate(-50%,-50%) scale(.35); opacity:0; z-index:130; pointer-events:none;
+    }
+    #scene24WrongPulse.play{animation:mirrorWrongPulse .55s ease forwards;}
+    @keyframes mirrorWrongPulse{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
+      40%{opacity:1;transform:translate(-50%,-50%) scale(.9)}
+      100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
+    }
+
   </style>
 </head>
+
 <body>
-<div id="app">
-  <div id="frame">
-    <img id="sceneImg" src="scene01.png" alt="story scene" />
-    <div id="overlay"></div>
-    <svg id="dragSvg" viewBox="0 0 100 100" preserveAspectRatio="none"><line id="dragLine" x1="0" y1="0" x2="0" y2="0"/></svg>
-    <div id="keyCover"></div>
-    <div id="targetRing"></div>
-    <img id="keySprite" src="key.png" alt="key" draggable="false" />
-    <div id="lockHint" class="badge">Drag the key to the lock</div>
-    <div id="flash"></div>
+  <div id="rotatePhone" aria-hidden="true">
+    <div class="rotateCard">
+      <div class="rotateIcon">↻</div>
+      <div class="rotateTitle">TURN YOUR PHONE</div>
+      <div class="rotateText">Rotate to landscape to continue the adventure.</div>
+    </div>
   </div>
-</div>
-<script>
-(() => {
-  const img = document.getElementById('sceneImg');
-  const overlay = document.getElementById('overlay');
-  const frame = document.getElementById('frame');
-  const keySprite = document.getElementById('keySprite');
-  const dragSvg = document.getElementById('dragSvg');
-  const dragLine = document.getElementById('dragLine');
-  const keyCover = document.getElementById('keyCover');
-  const targetRing = document.getElementById('targetRing');
-  const lockHint = document.getElementById('lockHint');
-  const flash = document.getElementById('flash');
+  <main id="app">
+    <img id="sceneBackdrop" aria-hidden="true" alt="">
 
-  const assets = {
-    scene01:'scene01.png', scene02:'scene02.png', scene03:'scene03.png', scene04:'scene04.png', scene05:'scene05.png', scene06:'scene06.png', scene07:'scene07.png',
-    scene08_1:'scene08_1.png', scene08_2:'scene08_2.png', scene08_3:'scene08_3.png', scene09:'scene09.png', scene10:'scene10.png', scene11:'scene11.png', scene12:'scene12.png', scene13:'scene13.png',
-    scene14_dialogue:'scene14_dialogue.png', scene14_instruction:'scene14_instruction.png', scene14_how:'scene14_how.png',
-    scene15_rps_choice:'scene15_rps_choice.png', scene15_paper_lose:'scene15_paper_lose.png', scene15_scissors_tie:'scene15_scissors_tie.png', scene15_rock_win:'scene15_rock_win.png', scene15_keydrag:'scene15_keydrag.png', scene15_portal:'scene15_portal.png',
-    scene16_alchemy:'scene16_alchemy.png', scene17_formula:'scene17_formula.png', scene18_ingredients:'scene18_ingredients.png', scene19_formula_awakens:'scene19_formula_awakens.png', scene20_symbol:'scene20_symbol.png',
-    scene21_intro:'scene21_intro.png', scene22_choice:'scene22_choice.png', scene23_wrong_choice:'scene23_wrong_choice.png', scene24_puzzle:'scene24_puzzle.png', scene25_symbol:'scene25_symbol.png', scene26_portal:'scene26_portal.png'
-  };
+    <section id="scene1" class="scene active">
+      <img src="./scene 1.png" alt="Our Little Adventure">
+      <button id="beginStory" class="hotspot" aria-label="Begin the story"></button>
+    </section>
 
-  Object.values(assets).forEach(src => { const i = new Image(); i.src = src; });
-  new Image().src = 'key.png';
+    <section id="scene2" class="scene">
+      <img src="./scene2.png" alt="Across the Waves">
+      <button id="scene2Continue" class="hotspot" aria-label="Sail forward"></button>
+    </section>
 
-  const tapNext = {
-    scene01:'scene02', scene02:'scene03', scene03:'scene04', scene04:'scene05', scene05:'scene06', scene06:'scene07', scene07:'scene08_1',
-    scene08_1:'scene08_2', scene08_2:'scene08_3', scene08_3:'scene09', scene09:'scene10', scene10:'scene11', scene11:'scene12', scene12:'scene13',
-    scene13:'scene14_dialogue', scene14_dialogue:'scene14_instruction', scene14_instruction:'scene14_how', scene14_how:'scene15_rps_choice',
-    scene15_paper_lose:'scene15_rps_choice', scene15_scissors_tie:'scene15_rps_choice', scene15_rock_win:'scene15_keydrag', scene15_portal:'scene16_alchemy',
-    scene16_alchemy:'scene17_formula', scene17_formula:'scene18_ingredients', scene18_ingredients:'scene19_formula_awakens', scene19_formula_awakens:'scene20_symbol', scene20_symbol:'scene21_intro',
-    scene21_intro:'scene22_choice', scene23_wrong_choice:'scene22_choice', scene25_symbol:'scene26_portal'
-  };
+    <section id="scene3" class="scene">
+      <img src="./scene3.png" alt="Boat sailing farther into the sea">
+    </section>
 
-  let current = 'scene01';
-  let dragState = null;
-  let puzzleDone = 0;
-  let puzzleTouched = new Set();
+    <section id="scene4" class="scene">
+      <img src="./scene4.png" alt="A bottle appears ahead of the boat">
+    </section>
 
-  function pct(v){ return `${v}%`; }
-  function clearOverlay(){
-    overlay.innerHTML = '';
-    overlay.onclick = null;
-    keySprite.style.display = 'none';
-    keySprite.onpointerdown = null;
-    keySprite.ontouchstart = null;
-    keySprite.classList.remove('dragging');
-    dragSvg.style.display = 'none';
-    keyCover.style.display = 'none';
-    targetRing.style.display = 'none';
-    lockHint.style.display = 'none';
-    flash.classList.remove('on');
-    dragState = null;
-    puzzleDone = 0;
-    puzzleTouched = new Set();
-  }
+    <section id="scene5" class="scene">
+      <img src="./scene5.png" alt="Your Mission">
+      <canvas id="reachCanvas" width="1672" height="941"></canvas>
+      <button id="handDragStart" class="hotspot" aria-label="Drag from her hand to the bottle"></button>
+      <div id="missionHint">DRAG FROM HER HAND TO THE BOTTLE</div>
+    </section>
 
-  function makeHotspot(x,y,w,h,onTap,extraClass=''){
-    const btn = document.createElement('button');
-    btn.className = `hotspot ${extraClass}`.trim();
-    btn.style.left = pct(x); btn.style.top = pct(y); btn.style.width = pct(w); btn.style.height = pct(h);
-    btn.addEventListener('click', (e) => { e.stopPropagation(); onTap(); });
-    overlay.appendChild(btn);
-    return btn;
-  }
 
-  function addFullTap(nextId){
-    const btn = document.createElement('button');
-    btn.className = 'taplayer';
-    btn.addEventListener('click', () => show(nextId));
-    overlay.appendChild(btn);
-  }
+    <section id="scene6" class="scene">
+      <img src="./scene6.png" alt="Mission Complete">
+      <button id="scene6Continue" class="hotspot" aria-label="Continue"></button>
+    </section>
 
-  function sparkle(x,y){
-    const s = document.createElement('div');
-    s.className = 'spark pulse';
-    s.style.left = pct(x); s.style.top = pct(y);
-    frame.appendChild(s);
-    setTimeout(() => s.remove(), 700);
-  }
 
-  function show(id){
-    current = id;
-    clearOverlay();
-    img.src = assets[id];
+    <section id="scene7" class="scene">
+      <img src="./scene7.png" alt="A Secret Waiting to Be Uncovered">
+      <button id="scene7Continue" class="hotspot" aria-label="Continue"></button>
+    </section>
 
-    if (id === 'scene15_rps_choice') return setupRPS();
-    if (id === 'scene15_keydrag') return setupKeyDrag();
-    if (id === 'scene22_choice') return setupMirrorChoice();
-    if (id === 'scene24_puzzle') return setupPuzzle();
-    if (id === 'scene26_portal') return; // end scene, no forced next
+<section id="scene8" class="scene">
+      <img id="scene8State1" class="scene8State active8" src="./scene8_1.png?v=8" alt="Grab the Rock">
+      <img id="scene8State2" class="scene8State" src="./scene8_2.png?v=8" alt="Lift It Up">
+      <img id="scene8State3" class="scene8State" src="./scene8_3.png?v=8" alt="Ready to Drop">
 
-    const next = tapNext[id];
-    if (next) addFullTap(next);
-  }
+      <canvas id="scene8Gesture" width="1672" height="941"></canvas>
+      <button id="scene8TapRock" type="button" aria-label="Tap the rock"></button>
+      <div id="scene8Hint">Tap the glowing rock</div>
+    </section>
 
-  function setupRPS(){
-    makeHotspot(7, 80.5, 26, 15, () => show('scene15_rock_win'));     // Rock wins against crab scissors
-    makeHotspot(36, 80.5, 27, 15, () => show('scene15_paper_lose'));  // Paper loses to crab scissors
-    makeHotspot(64, 80.5, 29, 15, () => show('scene15_scissors_tie')); // Scissors ties
-  }
+<section id="scene9" class="scene">
+      <img src="./scene9.png" alt="Adventure has been waiting for you">
+      <button id="scene9Continue" type="button" aria-label="Continue"></button>
+    </section>
 
-  function setupMirrorChoice(){
-    makeHotspot(24, 15, 17, 61, () => show('scene23_wrong_choice'));
-    makeHotspot(41.5, 15, 16.5, 61, () => show('scene23_wrong_choice'));
-    makeHotspot(58.5, 13.5, 17, 63, () => show('scene24_puzzle'));
-    makeHotspot(76.5, 15, 16.5, 61, () => show('scene23_wrong_choice'));
-  }
+<section id="scene10" class="scene">
+      <img src="./scene10.png" alt="To get your surprise, you must complete three missions">
+      <button id="scene10Continue" type="button" aria-label="Continue"></button>
+    </section>
 
-  function setupPuzzle(){
-    const pieces = [
-      [29.5,17.5,15,21],
-      [61,15.5,18,24],
-      [34.2,39.5,13.5,19],
-      [66.8,38.5,12.5,18.5],
-      [40.5,60,15.5,23],
-      [57.5,59.5,18.5,23.5]
+<section id="scene11" class="scene">
+      <img src="./scene11.png?v=11" alt="The First Clue">
+      <button id="scene11Continue" type="button" aria-label="Follow the glow"></button>
+    </section>
+
+    <section id="scene12" class="scene">
+      <img src="./scene12.png?v=12" alt="The Hidden Chest">
+      <button id="scene12Continue" type="button" aria-label="Discover the chest"></button>
+    </section>
+
+    <section id="scene13" class="scene">
+      <img src="./scene13.png?v=13" alt="Locked Secret - Tap the lock">
+      <button id="scene13Lock" type="button" aria-label="Tap the lock"></button>
+    </section>
+
+    <section id="scene14Dialogue" class="scene">
+      <img src="./scene14_dialogue.png?v=33" alt="You can talk? I know a secret about this chest">
+      <button id="scene14DialogueContinue" type="button" aria-label="Continue the conversation"></button>
+    </section>
+
+    <section id="scene14Instruction" class="scene">
+      <img src="./scene14_instruction.png?v=33" alt="To discover what is inside, you must open the chest">
+      <button id="scene14InstructionContinue" type="button" aria-label="Continue"></button>
+    </section>
+
+    <section id="scene14How" class="scene">
+      <img src="./scene14_how.png?v=33" alt="How?">
+      <button id="scene14HowContinue" type="button" aria-label="Start the challenge"></button>
+    </section>
+
+    <section id="scene15" class="scene">
+      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=33" alt="Rock Paper Scissors challenge">
+      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=33" alt="Paper loses. The crab chases her.">
+      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=33" alt="Scissors versus scissors. A tie.">
+      <img id="scene15RockWin" src="./scene15_rock_win.png?v=33" alt="Rock wins. The crab gives up the key.">
+
+      <div id="scene15RpsButtons" aria-label="Choose rock paper or scissors">
+        <button class="rpsChoice rock" data-rps="rock" type="button" aria-label="Rock"></button>
+        <button class="rpsChoice paper" data-rps="paper" type="button" aria-label="Paper"></button>
+        <button class="rpsChoice scissors" data-rps="scissors" type="button" aria-label="Scissors"></button>
+      </div>
+
+      <canvas id="scene15KeyCanvas" width="1672" height="941"></canvas>
+      <button id="scene15KeyStart" type="button" aria-label="Drag the key to the chest lock"></button>
+      <div id="scene15DragHint">DRAG THE KEY TO THE LOCK</div>
+    </section>
+
+    <section id="scene15Portal" class="scene">
+      <img src="./scene15_portal.png?v=33" alt="What's happening?">
+      <button id="scene15PortalContinue" type="button" aria-label="Continue to the next world"></button>
+    </section>
+
+    <section id="scene16" class="scene">
+      <img src="./scene16_alchemy.png?v=33" alt="Where am I? The golden dawn alchemy world">
+      <button id="scene16Continue" type="button" aria-label="Explore the alchemy room"></button>
+    </section>
+
+    <section id="scene17" class="scene">
+      <img src="./scene17_formula.png?v=33" alt="The First Formula clue">
+      <button id="scene17Continue" type="button" aria-label="Begin the formula challenge"></button>
+    </section>
+
+    <section id="scene18" class="scene">
+      <img src="./scene18_ingredients.png?v=33" alt="Choose the three ingredients in the correct order">
+      <div id="scene18IngredientButtons" aria-label="Alchemy ingredient choices">
+        <button class="alchemyIngredient stardust" data-ingredient="stardust" type="button" aria-label="Stardust"></button>
+        <button class="alchemyIngredient moonwater" data-ingredient="moonwater" type="button" aria-label="Moonwater"></button>
+        <button class="alchemyIngredient pearl" data-ingredient="pearl" type="button" aria-label="Pearl Essence"></button>
+        <button class="alchemyIngredient golden" data-ingredient="golden" type="button" aria-label="Golden Powder"></button>
+        <button class="alchemyIngredient blue" data-ingredient="blue" type="button" aria-label="Blue Crystal"></button>
+      </div>
+      <div id="alchemySlots" aria-hidden="true">
+        <div id="alchemySlot1" class="alchemySlotMark">✓</div>
+        <div id="alchemySlot2" class="alchemySlotMark">✓</div>
+        <div id="alchemySlot3" class="alchemySlotMark">✓</div>
+      </div>
+      <div id="alchemyStatus" aria-live="polite"></div>
+    </section>
+
+    <section id="scene19" class="scene">
+      <img src="./scene19_formula_awakens.png?v=33" alt="The Formula Awakens. What is that?">
+      <button id="scene19Continue" type="button" aria-label="Continue"></button>
+    </section>
+
+    <section id="scene20" class="scene">
+      <img src="./scene20_symbol.png?v=33" alt="One symbol found. One of three collected.">
+      <button id="scene20Continue" type="button" aria-label="Continue to the next world"></button>
+    </section>
+
+
+
+    <section id="scene21" class="scene">
+      <img src="./scene21_intro.png?v=34" alt="Where did you bring me now?">
+      <button id="scene21Continue" type="button" aria-label="Look at the mirrors"></button>
+    </section>
+
+    <section id="scene22" class="scene">
+      <img src="./scene22_choice.png?v=34" alt="Only one reflection tells the truth">
+      <div id="scene22MirrorButtons" aria-label="Choose the true reflection">
+        <button class="mirrorChoice m1" data-mirror="1" type="button" aria-label="First mirror"></button>
+        <button class="mirrorChoice m2" data-mirror="2" type="button" aria-label="Second mirror"></button>
+        <button class="mirrorChoice m3" data-mirror="3" type="button" aria-label="Third mirror"></button>
+        <button class="mirrorChoice m4" data-mirror="4" type="button" aria-label="Fourth mirror"></button>
+      </div>
+    </section>
+
+    <section id="scene23" class="scene">
+      <img src="./scene23_wrong_choice.png?v=34" alt="That's not right. Try again.">
+      <button id="scene23Retry" type="button" aria-label="Try the mirror challenge again"></button>
+    </section>
+
+    <section id="scene24" class="scene">
+      <img src="./scene24_puzzle.png?v=34" alt="The mirror broke. Put the pieces back in the right place.">
+      <div id="scene24PuzzleLayer" aria-label="Drag the six mirror pieces into the mirror">
+        <div class="puzzleTarget" data-target="1"></div>
+        <div class="puzzleTarget" data-target="2"></div>
+        <div class="puzzleTarget" data-target="3"></div>
+        <div class="puzzleTarget" data-target="4"></div>
+        <div class="puzzleTarget" data-target="5"></div>
+        <div class="puzzleTarget" data-target="6"></div>
+        <div class="puzzleCover" data-cover="1"></div>
+        <div class="puzzleCover" data-cover="2"></div>
+        <div class="puzzleCover" data-cover="3"></div>
+        <div class="puzzleCover" data-cover="4"></div>
+        <div class="puzzleCover" data-cover="5"></div>
+        <div class="puzzleCover" data-cover="6"></div>
+        <button class="puzzleOrigin" data-piece="1" type="button" aria-label="Mirror piece 1"></button>
+        <button class="puzzleOrigin" data-piece="2" type="button" aria-label="Mirror piece 2"></button>
+        <button class="puzzleOrigin" data-piece="3" type="button" aria-label="Mirror piece 3"></button>
+        <button class="puzzleOrigin" data-piece="4" type="button" aria-label="Mirror piece 4"></button>
+        <button class="puzzleOrigin" data-piece="5" type="button" aria-label="Mirror piece 5"></button>
+        <button class="puzzleOrigin" data-piece="6" type="button" aria-label="Mirror piece 6"></button>
+        <img id="puzzleGhost" src="" alt="" aria-hidden="true">
+        <div id="scene24PuzzleStatus">Drag each mirror piece into its matching place.</div>
+        <div id="scene24WrongPulse" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section id="scene25" class="scene">
+      <img src="./scene25_symbol.png?v=34" alt="Two of three symbols found">
+      <button id="scene25Continue" type="button" aria-label="Continue"></button>
+    </section>
+
+    <section id="scene26" class="scene">
+      <img src="./scene26_portal.png?v=34" alt="The mirror becomes a portal">
+      <button id="scene26PortalTouch" type="button" aria-label="Touch the portal"></button>
+    </section>
+
+    <div id="tapPulse" aria-hidden="true"></div>
+  </main>
+
+  <script>
+  (() => {
+    const W = 1672;
+    const H = 941;
+
+    const scenes = [...document.querySelectorAll(".scene")];
+    const sceneBackdrop = document.getElementById("sceneBackdrop");
+    const scene1 = document.getElementById("scene1");
+    const scene2 = document.getElementById("scene2");
+    const scene3 = document.getElementById("scene3");
+    const scene4 = document.getElementById("scene4");
+    const scene5 = document.getElementById("scene5");
+    const scene6 = document.getElementById("scene6");
+    const scene7 = document.getElementById("scene7");
+    const scene8 = document.getElementById("scene8");
+    const scene9 = document.getElementById("scene9");
+    const scene10 = document.getElementById("scene10");
+    const scene11 = document.getElementById("scene11");
+    const scene12 = document.getElementById("scene12");
+    const scene13 = document.getElementById("scene13");
+    const scene14Dialogue = document.getElementById("scene14Dialogue");
+    const scene14Instruction = document.getElementById("scene14Instruction");
+    const scene14How = document.getElementById("scene14How");
+    const scene15 = document.getElementById("scene15");
+    const scene15Portal = document.getElementById("scene15Portal");
+    const scene16 = document.getElementById("scene16");
+    const scene17 = document.getElementById("scene17");
+    const scene18 = document.getElementById("scene18");
+    const scene19 = document.getElementById("scene19");
+    const scene20 = document.getElementById("scene20");
+    const scene21 = document.getElementById("scene21");
+    const scene22 = document.getElementById("scene22");
+    const scene23 = document.getElementById("scene23");
+    const scene24 = document.getElementById("scene24");
+    const scene25 = document.getElementById("scene25");
+    const scene26 = document.getElementById("scene26");
+
+    const beginStory = document.getElementById("beginStory");
+    const scene2Continue = document.getElementById("scene2Continue");
+    const tapPulse = document.getElementById("tapPulse");
+
+    const reachCanvas = document.getElementById("reachCanvas");
+    const ctx = reachCanvas.getContext("2d");
+    const handDragStart = document.getElementById("handDragStart");
+    const missionHint = document.getElementById("missionHint");
+    const scene6Continue = document.getElementById("scene6Continue");
+    const scene7Continue = document.getElementById("scene7Continue");
+    const scene8State1 = document.getElementById("scene8State1");
+    const scene8State2 = document.getElementById("scene8State2");
+    const scene8State3 = document.getElementById("scene8State3");
+    const scene8Gesture = document.getElementById("scene8Gesture");
+    const scene8Ctx = scene8Gesture.getContext("2d");
+    const scene8TapRock = document.getElementById("scene8TapRock");
+    const scene8Hint = document.getElementById("scene8Hint");
+    const scene9Continue = document.getElementById("scene9Continue");
+    const scene10Continue = document.getElementById("scene10Continue");
+    const scene11Continue = document.getElementById("scene11Continue");
+    const scene12Continue = document.getElementById("scene12Continue");
+    const scene13Lock = document.getElementById("scene13Lock");
+    const scene14DialogueContinue = document.getElementById("scene14DialogueContinue");
+    const scene14InstructionContinue = document.getElementById("scene14InstructionContinue");
+    const scene14HowContinue = document.getElementById("scene14HowContinue");
+    const scene15RpsChoice = document.getElementById("scene15RpsChoice");
+    const scene15PaperLose = document.getElementById("scene15PaperLose");
+    const scene15ScissorsTie = document.getElementById("scene15ScissorsTie");
+    const scene15RockWin = document.getElementById("scene15RockWin");
+    const scene15RpsButtons = document.getElementById("scene15RpsButtons");
+    const scene15KeyCanvas = document.getElementById("scene15KeyCanvas");
+    const scene16Continue = document.getElementById("scene16Continue");
+    const scene17Continue = document.getElementById("scene17Continue");
+    const scene19Continue = document.getElementById("scene19Continue");
+    const alchemyIngredientButtons = [...document.querySelectorAll(".alchemyIngredient")];
+    const alchemyStatus = document.getElementById("alchemyStatus");
+    const alchemySlots = [
+      document.getElementById("alchemySlot1"),
+      document.getElementById("alchemySlot2"),
+      document.getElementById("alchemySlot3")
     ];
-    pieces.forEach((p, idx) => {
-      const [x,y,w,h] = p;
-      const btn = makeHotspot(x,y,w,h, () => {
-        if (puzzleTouched.has(idx)) return;
-        puzzleTouched.add(idx);
-        btn.style.pointerEvents = 'none';
-        btn.style.boxShadow = 'inset 0 0 0 2px rgba(0,0,0,0), 0 0 26px rgba(242,203,119,.9)';
-        btn.style.borderRadius = '14px';
-        sparkle(x + w/2, y + h/2);
-        puzzleDone += 1;
-        if (puzzleDone >= pieces.length){
-          flash.classList.add('on');
-          setTimeout(() => show('scene25_symbol'), 450);
+    const scene15KeyCtx = scene15KeyCanvas.getContext("2d");
+    const scene15KeyStart = document.getElementById("scene15KeyStart");
+    const scene15DragHint = document.getElementById("scene15DragHint");
+    const scene15PortalContinue = document.getElementById("scene15PortalContinue");
+    const scene20Continue = document.getElementById("scene20Continue");
+    const scene21Continue = document.getElementById("scene21Continue");
+    const mirrorChoices = [...document.querySelectorAll(".mirrorChoice")];
+    const scene23Retry = document.getElementById("scene23Retry");
+    const puzzleOrigins = [...document.querySelectorAll(".puzzleOrigin")];
+    const puzzleTargets = [...document.querySelectorAll(".puzzleTarget")];
+    const puzzleCovers = [...document.querySelectorAll(".puzzleCover")];
+    const puzzleGhost = document.getElementById("puzzleGhost");
+    const scene24PuzzleStatus = document.getElementById("scene24PuzzleStatus");
+    const scene24WrongPulse = document.getElementById("scene24WrongPulse");
+    const scene25Continue = document.getElementById("scene25Continue");
+    const scene26PortalTouch = document.getElementById("scene26PortalTouch");
+
+    /*
+      Locked coordinates in the 1672 x 941 artwork.
+      Nothing in the PNG is moved.
+    */
+    const hand = { x: 914, y: 657 };
+    const bottle = { x: 1005, y: 757 };
+    const bottleRadius = 105;
+
+    let dragging = false;
+    let complete = false;
+    let current = { x: hand.x, y: hand.y };
+
+    function updateSceneBackdrop(scene){
+      if(!sceneBackdrop || !scene) return;
+      const img = scene.querySelector("img");
+      if(!img) return;
+
+      const src = img.currentSrc || img.getAttribute("src") || "";
+      if(!src) return;
+
+      sceneBackdrop.src = src;
+    }
+
+    function showScene(next){
+      scenes.forEach(s => s.classList.remove("active"));
+      next.classList.add("active");
+      updateSceneBackdrop(next);
+    }
+
+    function pulseAt(e){
+      if(typeof e.clientX !== "number") return;
+      tapPulse.style.left = e.clientX + "px";
+      tapPulse.style.top = e.clientY + "px";
+      tapPulse.classList.remove("play");
+      void tapPulse.offsetWidth;
+      tapPulse.classList.add("play");
+    }
+
+    function pointInArtwork(e){
+      const r = reachCanvas.getBoundingClientRect();
+      return {
+        x:(e.clientX-r.left) * W/r.width,
+        y:(e.clientY-r.top) * H/r.height
+      };
+    }
+
+    function clearLine(){
+      ctx.clearRect(0,0,W,H);
+    }
+
+    function drawLine(endX,endY,success=false){
+      clearLine();
+
+      ctx.save();
+      ctx.lineCap="round";
+      ctx.lineJoin="round";
+
+      /* soft glow */
+      ctx.shadowColor = success
+        ? "rgba(255,220,130,.98)"
+        : "rgba(232,183,83,.9)";
+      ctx.shadowBlur = success ? 28 : 17;
+
+      ctx.strokeStyle = success
+        ? "rgba(255,222,146,.98)"
+        : "rgba(232,183,83,.92)";
+
+      ctx.lineWidth = success ? 5 : 4;
+      ctx.setLineDash(success ? [] : [12,10]);
+
+      ctx.beginPath();
+      ctx.moveTo(hand.x,hand.y);
+
+      /*
+        Slight curve makes the reach feel more elegant
+        than a rigid straight line.
+      */
+      const mx=(hand.x+endX)/2;
+      const my=(hand.y+endY)/2 - 24;
+      ctx.quadraticCurveTo(mx,my,endX,endY);
+      ctx.stroke();
+
+      /* small glowing end point */
+      ctx.setLineDash([]);
+      ctx.fillStyle = success
+        ? "rgba(255,229,166,.98)"
+        : "rgba(239,196,101,.95)";
+      ctx.beginPath();
+      ctx.arc(endX,endY,success ? 10 : 7,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function startReach(e){
+      if(complete) return;
+
+      e.preventDefault();
+      dragging=true;
+      handDragStart.classList.add("dragging");
+
+      current = pointInArtwork(e);
+      drawLine(current.x,current.y);
+
+      try{
+        handDragStart.setPointerCapture(e.pointerId);
+      }catch(_){}
+    }
+
+    function moveReach(e){
+      if(!dragging || complete) return;
+
+      e.preventDefault();
+      current=pointInArtwork(e);
+      drawLine(current.x,current.y);
+
+      /*
+        Complete immediately when the drawn line reaches the bottle.
+      */
+      const d=Math.hypot(current.x-bottle.x,current.y-bottle.y);
+
+      if(d <= bottleRadius){
+        completeMission();
+      }
+    }
+
+    function endReach(e){
+      if(!dragging || complete) return;
+
+      e.preventDefault();
+      dragging=false;
+      handDragStart.classList.remove("dragging");
+
+      const p=pointInArtwork(e);
+      const d=Math.hypot(p.x-bottle.x,p.y-bottle.y);
+
+      if(d <= bottleRadius){
+        completeMission();
+      }else{
+        /*
+          Missed the bottle:
+          line disappears and user can try again.
+        */
+        clearLine();
+      }
+    }
+
+    function completeMission(){
+      if(complete) return;
+
+      complete=true;
+      dragging=false;
+      handDragStart.classList.remove("dragging");
+      handDragStart.style.pointerEvents="none";
+      missionHint.classList.add("done");
+
+      /*
+        Snap ONLY THE LINE to the bottle.
+        The bottle PNG stays 100% unchanged.
+      */
+      drawLine(bottle.x,bottle.y,true);
+
+      document.dispatchEvent(
+        new CustomEvent("bottleMissionComplete")
+      );
+
+      /* Show the locked MISSION COMPLETE scene after a short success beat */
+      setTimeout(() => {
+        showScene(scene6);
+      }, 700);
+    }
+
+    handDragStart.addEventListener("pointerdown",startReach);
+    handDragStart.addEventListener("pointermove",moveReach);
+    handDragStart.addEventListener("pointerup",endReach);
+    handDragStart.addEventListener("pointercancel",endReach);
+
+    /*
+      Existing story flow.
+      Scene 3 = 3 seconds.
+      Scene 4 = 3 seconds.
+    */
+    beginStory.addEventListener("pointerup",e=>{
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(()=>showScene(scene2),220);
+    });
+
+    scene2Continue.addEventListener("pointerup",e=>{
+      e.preventDefault();
+      pulseAt(e);
+
+      setTimeout(()=>{
+        showScene(scene3);
+
+        setTimeout(()=>{
+          showScene(scene4);
+
+          setTimeout(()=>{
+            showScene(scene5);
+          },3000);
+
+        },3000);
+
+      },260);
+    });
+
+    /* Scene 6 -> Scene 7 */
+    scene6Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene7), 260);
+    });
+
+    /* Scene 7 -> Scene 8 */
+    scene7Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => {
+        showScene(scene8);
+        resetScene8();
+      }, 260);
+    });
+
+
+    /* ===== Scene 8 interaction =====
+       1) Tap rock -> show grabbed state.
+       2) Drag upward -> draw gold line, then show lifted state.
+       3) Drag downward toward bottle -> draw gold line and complete.
+    */
+
+    let scene8Phase = 0;
+    let scene8Dragging = false;
+    let scene8PointerId = null;
+    let scene8Start = null;
+
+    const ART_W = 1672;
+    const ART_H = 941;
+
+    /* Coordinates in the locked artwork */
+    const grabbedRock = { x:1040, y:770 };   // Scene 8.2 rock
+    const liftedRock  = { x:930,  y:175 };   // Scene 8.3 raised rock
+    const bottleTarget = { x:700, y:835 };   // bottle in Scene 8.3
+
+    function setScene8State(n){
+      scene8State1.classList.toggle("active8", n === 1);
+      scene8State2.classList.toggle("active8", n === 2);
+      scene8State3.classList.toggle("active8", n === 3);
+    }
+
+    function resetScene8(){
+      scene8Phase = 0;
+      scene8Dragging = false;
+      scene8PointerId = null;
+      scene8Start = null;
+      setScene8State(1);
+      scene8TapRock.style.display = "block";
+      scene8Hint.textContent = "Tap the glowing rock";
+      scene8Ctx.clearRect(0,0,ART_W,ART_H);
+    }
+
+    ["./scene8_1.png?v=8","./scene8_2.png?v=8","./scene8_3.png?v=8"].forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+
+    function artPoint(clientX, clientY){
+      const r = scene8Gesture.getBoundingClientRect();
+      return {
+        x:(clientX-r.left) * ART_W/r.width,
+        y:(clientY-r.top) * ART_H/r.height
+      };
+    }
+
+    function clearScene8Line(){
+      scene8Ctx.clearRect(0,0,ART_W,ART_H);
+    }
+
+    function drawScene8Line(from, to){
+      clearScene8Line();
+
+      scene8Ctx.save();
+      scene8Ctx.lineCap = "round";
+      scene8Ctx.lineJoin = "round";
+      scene8Ctx.strokeStyle = "rgba(236,184,77,.96)";
+      scene8Ctx.lineWidth = 4;
+      scene8Ctx.setLineDash([13,10]);
+      scene8Ctx.shadowColor = "rgba(236,184,77,.95)";
+      scene8Ctx.shadowBlur = 16;
+
+      scene8Ctx.beginPath();
+      scene8Ctx.moveTo(from.x, from.y);
+      scene8Ctx.lineTo(to.x, to.y);
+      scene8Ctx.stroke();
+
+      scene8Ctx.setLineDash([]);
+      scene8Ctx.fillStyle = "rgba(255,218,130,.98)";
+      scene8Ctx.beginPath();
+      scene8Ctx.arc(to.x,to.y,8,0,Math.PI*2);
+      scene8Ctx.fill();
+      scene8Ctx.restore();
+    }
+
+    /* STEP 1: tap rock -> grabbed image */
+    scene8TapRock.addEventListener("pointerup", e => {
+      e.preventDefault();
+      if(scene8Phase !== 0) return;
+
+      scene8Phase = 1;
+      setScene8State(2);
+      scene8TapRock.style.display = "none";
+      scene8Hint.textContent = "Drag upward to lift the rock";
+    });
+
+    /*
+      STEP 2 and STEP 3 use gestures directly on the scene.
+    */
+    scene8.addEventListener("pointerdown", e => {
+      if(scene8Phase !== 1 && scene8Phase !== 2) return;
+
+      e.preventDefault();
+      const p = artPoint(e.clientX,e.clientY);
+
+      if(scene8Phase === 1){
+        /* Begin upward drag near the grabbed rock */
+        if(Math.hypot(p.x-grabbedRock.x,p.y-grabbedRock.y) > 240) return;
+      } else {
+        /* Begin downward drag near the raised rock */
+        if(Math.hypot(p.x-liftedRock.x,p.y-liftedRock.y) > 260) return;
+      }
+
+      scene8Dragging = true;
+      scene8PointerId = e.pointerId;
+      scene8Start = p;
+
+      try{ scene8.setPointerCapture(e.pointerId); }catch(_){}
+    });
+
+    scene8.addEventListener("pointermove", e => {
+      if(!scene8Dragging || !scene8Start) return;
+      e.preventDefault();
+
+      const p = artPoint(e.clientX,e.clientY);
+
+      if(scene8Phase === 1){
+        /* Gold line upward from grabbed rock */
+        drawScene8Line(grabbedRock,p);
+
+        if(p.y < scene8Start.y - 150){
+          scene8Phase = 2;
+          setScene8State(3);
+          clearScene8Line();
+          scene8Hint.textContent = "Now drag downward toward the bottle";
+          scene8Dragging = false;
+
+          try{ scene8.releasePointerCapture(e.pointerId); }catch(_){}
+        }
+      }
+      else if(scene8Phase === 2){
+        /* Gold line downward from lifted rock */
+        drawScene8Line(liftedRock,p);
+
+        const distanceToBottle = Math.hypot(
+          p.x-bottleTarget.x,
+          p.y-bottleTarget.y
+        );
+
+        if(distanceToBottle < 150){
+          scene8Phase = 3;
+          scene8Dragging = false;
+          drawScene8Line(liftedRock,bottleTarget);
+          scene8Hint.textContent = "Ready to break the bottle";
+
+          try{ scene8.releasePointerCapture(e.pointerId); }catch(_){}
+
+          document.dispatchEvent(
+            new CustomEvent("scene8MissionComplete")
+          );
+
+          setTimeout(() => {
+            showScene(scene9);
+          }, 550);
+
+          setTimeout(() => {
+            showScene(scene9);
+          }, 550);
+        }
+      }
+    });
+
+    scene8.addEventListener("pointerup", e => {
+      if(!scene8Dragging) return;
+      e.preventDefault();
+
+      /* If user releases too early, keep the same state and let them retry. */
+      clearScene8Line();
+      scene8Dragging = false;
+      scene8PointerId = null;
+      scene8Start = null;
+
+      if(scene8Phase === 1){
+        scene8Hint.textContent = "Drag upward to lift the rock";
+      }
+      else if(scene8Phase === 2){
+        scene8Hint.textContent = "Drag downward toward the bottle";
+      }
+    });
+
+    scene8.addEventListener("pointercancel", e => {
+      if(!scene8Dragging) return;
+      e.preventDefault();
+      clearScene8Line();
+      scene8Dragging = false;
+      scene8PointerId = null;
+      scene8Start = null;
+    });
+
+    /* Touch fallback for older iPad Safari */
+    let s8Touch = false;
+
+    scene8.addEventListener("touchstart", e => {
+      if(scene8Phase !== 1 && scene8Phase !== 2) return;
+      const t = e.changedTouches && e.changedTouches[0];
+      if(!t) return;
+
+      const p = artPoint(t.clientX,t.clientY);
+
+      if(scene8Phase === 1 && Math.hypot(p.x-grabbedRock.x,p.y-grabbedRock.y) > 240) return;
+      if(scene8Phase === 2 && Math.hypot(p.x-liftedRock.x,p.y-liftedRock.y) > 260) return;
+
+      e.preventDefault();
+      s8Touch = true;
+      scene8Dragging = true;
+      scene8Start = p;
+    }, {passive:false});
+
+    scene8.addEventListener("touchmove", e => {
+      if(!s8Touch || !scene8Dragging) return;
+      const t = e.changedTouches && e.changedTouches[0];
+      if(!t) return;
+      e.preventDefault();
+
+      const p = artPoint(t.clientX,t.clientY);
+
+      if(scene8Phase === 1){
+        drawScene8Line(grabbedRock,p);
+
+        if(p.y < scene8Start.y - 150){
+          scene8Phase = 2;
+          setScene8State(3);
+          clearScene8Line();
+          scene8Hint.textContent = "Now drag downward toward the bottle";
+          scene8Dragging = false;
+          s8Touch = false;
+        }
+      }
+      else if(scene8Phase === 2){
+        drawScene8Line(liftedRock,p);
+
+        if(Math.hypot(p.x-bottleTarget.x,p.y-bottleTarget.y) < 150){
+          scene8Phase = 3;
+          drawScene8Line(liftedRock,bottleTarget);
+          scene8Hint.textContent = "Ready to break the bottle";
+          scene8Dragging = false;
+          s8Touch = false;
+
+          document.dispatchEvent(
+            new CustomEvent("scene8MissionComplete")
+          );
+        }
+      }
+    }, {passive:false});
+
+    scene8.addEventListener("touchend", e => {
+      if(!s8Touch) return;
+      e.preventDefault();
+      clearScene8Line();
+      s8Touch = false;
+      scene8Dragging = false;
+      scene8Start = null;
+    }, {passive:false});
+
+
+    /* Scene 9 -> Scene 10 */
+    scene9Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene10), 260);
+    });
+
+    /* Scene 10 -> Scene 11 */
+    scene10Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene11), 260);
+    });
+
+    /* Scene 11 -> Scene 12: follow the glow */
+    scene11Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene12), 260);
+    });
+
+    /* Scene 12 -> Scene 13: tap the discovered chest */
+    scene12Continue.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene13), 260);
+    });
+
+    /* Scene 13 -> locked crab conversation -> challenge */
+    scene13Lock.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene14Dialogue), 220);
+    });
+
+    scene14DialogueContinue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene14Instruction), 220);
+    });
+
+    scene14InstructionContinue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene14How), 220);
+    });
+
+    scene14HowContinue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(startRpsMission, 220);
+    });
+
+    /* ===== Scene 15: Rock / Paper / Scissors ===== */
+    let rpsTimer = null;
+    let rpsBusy = false;
+    function clearRpsTimer(){ if(rpsTimer){ clearTimeout(rpsTimer); rpsTimer=null; } }
+    function hideRpsLayers(){
+      clearRpsTimer();
+      [scene15RpsChoice,scene15PaperLose,scene15ScissorsTie,scene15RockWin].forEach(el=>el.style.display="none");
+      scene15RpsButtons.style.display="none";
+      scene15KeyCanvas.style.display="none";
+      scene15KeyStart.style.display="none";
+      scene15DragHint.style.display="none";
+    }
+    function startRpsMission(){
+      showScene(scene15);
+      showRpsChoice();
+    }
+    function showRpsChoice(){
+      rpsBusy=false;
+      hideRpsLayers();
+      scene15RpsChoice.style.display="block";
+      scene15RpsButtons.style.display="block";
+      updateSceneBackdrop(scene15);
+    }
+    function showRpsResult(which){
+      if(rpsBusy) return;
+      rpsBusy=true;
+      hideRpsLayers();
+      let el, ms;
+      if(which === "paper"){
+        /* Crab always uses scissors: PAPER loses -> funny chase scene. */
+        el = scene15PaperLose; ms = 5200;
+      } else if(which === "scissors"){
+        /* Scissors vs crab's scissors -> tie. */
+        el = scene15ScissorsTie; ms = 3900;
+      } else {
+        /* ROCK beats crab's scissors -> win. */
+        el = scene15RockWin; ms = 3600;
+      }
+      el.style.display="block";
+      updateSceneBackdrop(scene15);
+      rpsTimer=setTimeout(() => {
+        if(which === "rock") enterKeyDrag();
+        else showRpsChoice();
+      }, ms);
+    }
+    scene15RpsButtons.querySelectorAll(".rpsChoice").forEach(btn => {
+      btn.addEventListener("pointerup", e => {
+        e.preventDefault(); e.stopPropagation(); pulseAt(e);
+        showRpsResult(btn.dataset.rps);
+      });
+    });
+
+    /* ===== After winning: deliberate drag from the key to the lock ===== */
+    const scene15Key = {x:1080,y:850};
+    const scene15Lock = {x:925,y:680};
+    const scene15LockRadius = 58;
+    const scene15MinDragMs = 550;
+    const scene15MinTravel = 115;
+    let scene15Dragging = false;
+    let scene15DragStartedAt = 0;
+    let scene15DragStartPoint = null;
+    let scene15LastPoint = null;
+    let scene15Unlocking = false;
+
+    function clearKeyLine(){ scene15KeyCtx.clearRect(0,0,W,H); }
+    function keyPointFromClient(clientX,clientY){
+      const r=scene15KeyCanvas.getBoundingClientRect();
+      return {x:(clientX-r.left)*W/r.width,y:(clientY-r.top)*H/r.height};
+    }
+    function keyPoint(e){ return keyPointFromClient(e.clientX,e.clientY); }
+
+    function drawKeyLine(p,success=false){
+      clearKeyLine();
+      scene15KeyCtx.save();
+      scene15KeyCtx.strokeStyle=success ? "#ffe8a0" : "#f3c55d";
+      scene15KeyCtx.shadowColor="#f3c55d";
+      scene15KeyCtx.shadowBlur=success ? 32 : 22;
+      scene15KeyCtx.lineWidth=success ? 10 : 7;
+      scene15KeyCtx.lineCap="round";
+      scene15KeyCtx.lineJoin="round";
+      scene15KeyCtx.setLineDash(success ? [] : [20,13]);
+      scene15KeyCtx.beginPath();
+      scene15KeyCtx.moveTo(scene15Key.x,scene15Key.y);
+      const cx=(scene15Key.x+p.x)/2;
+      const cy=Math.min(scene15Key.y,p.y)-45;
+      scene15KeyCtx.quadraticCurveTo(cx,cy,p.x,p.y);
+      scene15KeyCtx.stroke();
+
+      scene15KeyCtx.setLineDash([]);
+      scene15KeyCtx.beginPath();
+      scene15KeyCtx.arc(p.x,p.y,success?24:15,0,Math.PI*2);
+      scene15KeyCtx.strokeStyle=success ? "#fff4c7" : "#f3c55d";
+      scene15KeyCtx.lineWidth=success ? 7 : 4;
+      scene15KeyCtx.stroke();
+      scene15KeyCtx.restore();
+    }
+
+    function enterKeyDrag(){
+      rpsBusy=false;
+      scene15Unlocking=false;
+      hideRpsLayers();
+      scene15RockWin.style.display="block";
+      scene15KeyCanvas.style.display="block";
+      scene15KeyStart.style.display="block";
+      scene15DragHint.style.display="block";
+      clearKeyLine();
+      updateSceneBackdrop(scene15);
+    }
+
+    function startKeyDragAt(clientX,clientY){
+      if(scene15Unlocking) return;
+      scene15Dragging=true;
+      scene15DragStartedAt=performance.now();
+      scene15DragStartPoint=keyPointFromClient(clientX,clientY);
+      scene15LastPoint=scene15DragStartPoint;
+      drawKeyLine(scene15LastPoint);
+    }
+
+    function moveKeyDragAt(clientX,clientY){
+      if(!scene15Dragging || scene15Unlocking) return;
+      const p=keyPointFromClient(clientX,clientY);
+      scene15LastPoint=p;
+      drawKeyLine(p);
+      const elapsed=performance.now()-scene15DragStartedAt;
+      const travelled=Math.hypot(p.x-scene15Key.x,p.y-scene15Key.y);
+      const atLock=Math.hypot(p.x-scene15Lock.x,p.y-scene15Lock.y)<=scene15LockRadius;
+      if(atLock && elapsed>=scene15MinDragMs && travelled>=scene15MinTravel){
+        finishKeyDrag(p);
+      }
+    }
+
+    function finishKeyDrag(p){
+      if(scene15Unlocking) return;
+      scene15Unlocking=true;
+      scene15Dragging=false;
+      scene15KeyStart.style.display="none";
+      scene15DragHint.style.display="none";
+      drawKeyLine({x:scene15Lock.x,y:scene15Lock.y},true);
+      /* Keep the successful line visible briefly, then go straight to the portal scene. */
+      setTimeout(()=>{
+        scene15KeyCanvas.style.display="none";
+        clearKeyLine();
+        showScene(scene15Portal);
+      },420);
+    }
+
+    function cancelKeyDrag(){
+      if(!scene15Dragging || scene15Unlocking) return;
+      scene15Dragging=false;
+      clearKeyLine();
+    }
+
+    scene15KeyStart.addEventListener("pointerdown", e => {
+      e.preventDefault(); e.stopPropagation();
+      try{ scene15KeyStart.setPointerCapture(e.pointerId); }catch(_){ }
+      startKeyDragAt(e.clientX,e.clientY);
+    });
+    window.addEventListener("pointermove", e => {
+      if(!scene15Dragging) return;
+      e.preventDefault();
+      moveKeyDragAt(e.clientX,e.clientY);
+    }, {passive:false});
+    window.addEventListener("pointerup", e => {
+      if(!scene15Dragging) return;
+      e.preventDefault();
+      /* Releasing before the lock simply resets the line and lets her retry. */
+      cancelKeyDrag();
+    }, {passive:false});
+    window.addEventListener("pointercancel", cancelKeyDrag);
+
+    /* iOS touch fallback: keeps the line following the finger even if pointer capture is inconsistent. */
+    scene15KeyStart.addEventListener("touchstart", e => {
+      if(scene15Dragging || scene15Unlocking) return;
+      const t=e.changedTouches[0]; if(!t) return;
+      e.preventDefault();
+      startKeyDragAt(t.clientX,t.clientY);
+    }, {passive:false});
+    window.addEventListener("touchmove", e => {
+      if(!scene15Dragging) return;
+      const t=e.changedTouches[0]; if(!t) return;
+      e.preventDefault();
+      moveKeyDragAt(t.clientX,t.clientY);
+    }, {passive:false});
+    window.addEventListener("touchend", e => {
+      if(!scene15Dragging) return;
+      e.preventDefault();
+      cancelKeyDrag();
+    }, {passive:false});
+
+    /* The chest-light scene is locked; tap anywhere when ready to enter the chemistry world. */
+    scene15PortalContinue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene16), 260);
+    });
+
+    /* Alchemy World: arrival -> clue -> ordered ingredient mission -> symbol. */
+    scene16Continue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene17), 240);
+    });
+
+    scene17Continue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      resetAlchemyMission();
+      setTimeout(() => showScene(scene18), 240);
+    });
+
+    const alchemyCorrectOrder = ["stardust","pearl","golden"];
+    let alchemyStep = 0;
+    let alchemyLocked = false;
+    let alchemyStatusTimer = null;
+
+    function setAlchemyStatus(message){
+      if(alchemyStatusTimer) clearTimeout(alchemyStatusTimer);
+      alchemyStatus.textContent = message;
+      alchemyStatus.classList.add("show");
+      alchemyStatusTimer = setTimeout(() => alchemyStatus.classList.remove("show"), 1050);
+    }
+
+    function resetAlchemyMission(){
+      alchemyStep = 0;
+      alchemyLocked = false;
+      alchemySlots.forEach(s => s.classList.remove("on"));
+      alchemyStatus.classList.remove("show");
+      scene18.classList.remove("wrongFlash");
+    }
+
+    function chooseAlchemyIngredient(name, e){
+      if(alchemyLocked) return;
+      if(e){ e.preventDefault(); e.stopPropagation(); pulseAt(e); }
+
+      const expected = alchemyCorrectOrder[alchemyStep];
+      if(name !== expected){
+        alchemyLocked = true;
+        scene18.classList.remove("wrongFlash");
+        void scene18.offsetWidth;
+        scene18.classList.add("wrongFlash");
+        setAlchemyStatus("The formula resets… try the order again.");
+        setTimeout(() => {
+          alchemySlots.forEach(s => s.classList.remove("on"));
+          alchemyStep = 0;
+          alchemyLocked = false;
+        }, 820);
+        return;
+      }
+
+      alchemySlots[alchemyStep].classList.add("on");
+      alchemyStep += 1;
+
+      if(alchemyStep === alchemyCorrectOrder.length){
+        alchemyLocked = true;
+        setAlchemyStatus("The formula is complete.");
+        setTimeout(() => showScene(scene19), 850);
+      }
+    }
+
+    alchemyIngredientButtons.forEach(btn => {
+      btn.addEventListener("pointerup", e => chooseAlchemyIngredient(btn.dataset.ingredient, e));
+    });
+
+    scene19Continue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene20), 260);
+    });
+
+    /* Mirror World: second mission. Scenes 1–20 above are unchanged. */
+    scene20Continue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene21), 260);
+    });
+
+    scene21Continue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene22), 240);
+    });
+
+    mirrorChoices.forEach(btn => {
+      btn.addEventListener("pointerup", e => {
+        e.preventDefault(); e.stopPropagation(); pulseAt(e);
+        const choice = Number(btn.dataset.mirror);
+        if(choice === 3){
+          setTimeout(() => { resetMirrorPuzzle(); showScene(scene24); }, 300);
+        }else{
+          setTimeout(() => showScene(scene23), 300);
         }
       });
     });
-  }
 
-  function setupKeyDrag(){
-    keyCover.style.display = 'block';
-    targetRing.style.display = 'block';
-    lockHint.style.display = 'block';
-    dragSvg.style.display = 'block';
-    const start = {x:49.5, y:84.0};
-    const target = {x:69.7, y:59.5};
-    let keyPos = {...start};
+    scene23Retry.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene22), 220);
+    });
 
-    function renderLine(){
-      dragLine.setAttribute('x1', start.x); dragLine.setAttribute('y1', start.y);
-      dragLine.setAttribute('x2', keyPos.x); dragLine.setAttribute('y2', keyPos.y);
-    }
-    function placeKey(){
-      keySprite.style.left = pct(keyPos.x);
-      keySprite.style.top = pct(keyPos.y);
-    }
-    keySprite.style.display = 'block';
-    placeKey(); renderLine();
+    const puzzleConfig = [
+      {id:1, x:29.6,y:8.5,w:14.1,h:26.6, poly:"13% 18%,83% 2%,98% 42%,74% 88%,15% 92%,2% 48%", tx:47.0,ty:20.0,tw:10.5,th:18.0},
+      {id:2, x:64.6,y:7.4,w:20.6,h:28.2, poly:"29% 4%,90% 21%,98% 61%,74% 93%,16% 83%,1% 40%", tx:57.0,ty:20.0,tw:11.5,th:18.0},
+      {id:3, x:33.2,y:33.5,w:16.8,h:27.6, poly:"9% 8%,89% 25%,93% 73%,52% 92%,7% 69%,2% 31%", tx:46.5,ty:41.0,tw:10.0,th:17.0},
+      {id:4, x:71.2,y:31.9,w:16.1,h:26.0, poly:"17% 6%,92% 18%,96% 63%,67% 92%,13% 80%,2% 39%", tx:58.0,ty:41.0,tw:10.0,th:17.0},
+      {id:5, x:38.3,y:56.9,w:20.3,h:28.2, poly:"28% 4%,94% 23%,97% 64%,66% 95%,13% 83%,2% 45%", tx:47.0,ty:60.0,tw:11.0,th:18.0},
+      {id:6, x:62.8,y:55.8,w:21.2,h:28.2, poly:"18% 4%,93% 21%,99% 62%,69% 94%,10% 83%,1% 43%", tx:58.0,ty:60.0,tw:11.5,th:18.0}
+    ];
+    const placedPuzzlePieces = new Set();
+    let puzzleDrag = null;
 
-    const rectPct = () => frame.getBoundingClientRect();
-    function eventToPct(e){
-      const r = rectPct();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      return {x: ((clientX - r.left) / r.width) * 100, y: ((clientY - r.top) / r.height) * 100};
+    function setPuzzleElementGeometry(){
+      puzzleConfig.forEach(c => {
+        const origin = puzzleOrigins.find(el => Number(el.dataset.piece) === c.id);
+        const cover = puzzleCovers.find(el => Number(el.dataset.cover) === c.id);
+        const target = puzzleTargets.find(el => Number(el.dataset.target) === c.id);
+        [origin,cover].forEach(el => {
+          el.style.left=c.x+"%"; el.style.top=c.y+"%"; el.style.width=c.w+"%"; el.style.height=c.h+"%";
+        });
+        cover.style.setProperty("--poly",c.poly);
+        target.style.left=c.tx+"%"; target.style.top=c.ty+"%"; target.style.width=c.tw+"%"; target.style.height=c.th+"%";
+      });
     }
 
-    function startDrag(e){
-      e.preventDefault(); e.stopPropagation();
-      dragState = { active:true };
-      keySprite.classList.add('dragging');
-      document.addEventListener('pointermove', moveDrag);
-      document.addEventListener('pointerup', endDrag);
-      document.addEventListener('touchmove', moveDrag, {passive:false});
-      document.addEventListener('touchend', endDrag, {passive:false});
+    function resetMirrorPuzzle(){
+      placedPuzzlePieces.clear();
+      puzzleOrigins.forEach(el => { el.style.pointerEvents="auto"; el.classList.remove("dragging"); });
+      puzzleCovers.forEach(el => el.style.display="none");
+      puzzleTargets.forEach(el => el.classList.remove("lit"));
+      puzzleGhost.style.display="none";
+      scene24PuzzleStatus.textContent="Drag each mirror piece into its matching place.";
+      puzzleDrag=null;
+      setPuzzleElementGeometry();
     }
-    function moveDrag(e){
-      if (!dragState?.active) return;
+
+    function framePercentFromPointer(clientX,clientY){
+      const r=scene24.getBoundingClientRect();
+      return {x:(clientX-r.left)/r.width*100,y:(clientY-r.top)/r.height*100};
+    }
+
+    function beginPuzzleDrag(el,e){
+      const id=Number(el.dataset.piece);
+      if(placedPuzzlePieces.has(id)) return;
+      const c=puzzleConfig[id-1];
+      const p=framePercentFromPointer(e.clientX,e.clientY);
+      puzzleDrag={id,el,c,x:p.x,y:p.y};
+      el.classList.add("dragging");
+      const cover=puzzleCovers.find(v=>Number(v.dataset.cover)===id);
+      cover.style.display="block";
+      puzzleGhost.src=`./puzzle_piece_${id}.png?v=34`;
+      puzzleGhost.style.width=c.w+"%";
+      puzzleGhost.style.left=p.x+"%"; puzzleGhost.style.top=p.y+"%";
+      puzzleGhost.style.display="block";
+      try{el.setPointerCapture(e.pointerId);}catch(_){ }
+    }
+
+    function movePuzzleDrag(e){
+      if(!puzzleDrag) return;
       e.preventDefault();
-      const p = eventToPct(e);
-      keyPos.x = Math.max(5, Math.min(95, p.x));
-      keyPos.y = Math.max(8, Math.min(92, p.y));
-      placeKey(); renderLine();
+      const p=framePercentFromPointer(e.clientX,e.clientY);
+      puzzleDrag.x=p.x; puzzleDrag.y=p.y;
+      puzzleGhost.style.left=p.x+"%"; puzzleGhost.style.top=p.y+"%";
     }
-    function cleanupDrag(){
-      document.removeEventListener('pointermove', moveDrag);
-      document.removeEventListener('pointerup', endDrag);
-      document.removeEventListener('touchmove', moveDrag);
-      document.removeEventListener('touchend', endDrag);
-      keySprite.classList.remove('dragging');
-      dragState = null;
+
+    function wrongPuzzleDrop(p){
+      scene24WrongPulse.style.left=p.x+"%"; scene24WrongPulse.style.top=p.y+"%";
+      scene24WrongPulse.classList.remove("play"); void scene24WrongPulse.offsetWidth; scene24WrongPulse.classList.add("play");
     }
-    function endDrag(e){
-      if (!dragState?.active) return;
+
+    function endPuzzleDrag(e){
+      if(!puzzleDrag) return;
       e.preventDefault();
-      const dx = keyPos.x - target.x;
-      const dy = keyPos.y - target.y;
-      const dist = Math.hypot(dx,dy);
-      if (dist < 7.5){
-        keyPos = {x:target.x, y:target.y};
-        placeKey(); renderLine();
-        flash.classList.add('on');
-        cleanupDrag();
-        setTimeout(() => show('scene15_portal'), 480);
-      } else {
-        keyPos = {...start};
-        placeKey(); renderLine();
-        cleanupDrag();
+      const {id,el,c}=puzzleDrag;
+      const p=framePercentFromPointer(e.clientX,e.clientY);
+      const inside = p.x >= c.tx && p.x <= c.tx+c.tw && p.y >= c.ty && p.y <= c.ty+c.th;
+      const cover=puzzleCovers.find(v=>Number(v.dataset.cover)===id);
+      const target=puzzleTargets.find(v=>Number(v.dataset.target)===id);
+      el.classList.remove("dragging");
+      if(inside){
+        placedPuzzlePieces.add(id);
+        el.style.pointerEvents="none";
+        target.classList.add("lit");
+        puzzleGhost.style.left=(c.tx+c.tw/2)+"%";
+        puzzleGhost.style.top=(c.ty+c.th/2)+"%";
+        puzzleGhost.style.width=(c.tw*1.15)+"%";
+        puzzleGhost.style.display="block";
+        // freeze a copy of the successfully placed shard in the target
+        const fixed=puzzleGhost.cloneNode(true);
+        fixed.removeAttribute("id");
+        fixed.className="fixedPuzzlePiece";
+        fixed.style.position="absolute"; fixed.style.zIndex="101"; fixed.style.pointerEvents="none";
+        scene24.querySelector("#scene24PuzzleLayer").appendChild(fixed);
+        puzzleGhost.style.display="none";
+        scene24PuzzleStatus.textContent=`${placedPuzzlePieces.size} / 6 pieces placed`;
+        if(placedPuzzlePieces.size===6){
+          scene24PuzzleStatus.textContent="The mirror is complete.";
+          setTimeout(()=>showScene(scene25),650);
+        }
+      }else{
+        cover.style.display="none";
+        puzzleGhost.style.display="none";
+        wrongPuzzleDrop(p);
+        scene24PuzzleStatus.textContent="That piece does not fit there. Try again.";
+        setTimeout(()=>{ if(placedPuzzlePieces.size<6) scene24PuzzleStatus.textContent="Drag each mirror piece into its matching place."; },900);
       }
+      puzzleDrag=null;
     }
-    keySprite.onpointerdown = startDrag;
-    keySprite.ontouchstart = startDrag;
-  }
 
-  show('scene01');
-})();
-</script>
+    setPuzzleElementGeometry();
+    puzzleOrigins.forEach(el => {
+      el.addEventListener("pointerdown", e => { e.preventDefault(); e.stopPropagation(); beginPuzzleDrag(el,e); });
+    });
+    window.addEventListener("pointermove", movePuzzleDrag, {passive:false});
+    window.addEventListener("pointerup", endPuzzleDrag, {passive:false});
+    window.addEventListener("pointercancel", () => {
+      if(!puzzleDrag) return;
+      const cover=puzzleCovers.find(v=>Number(v.dataset.cover)===puzzleDrag.id);
+      cover.style.display="none"; puzzleGhost.style.display="none"; puzzleDrag.el.classList.remove("dragging"); puzzleDrag=null;
+    });
+
+    scene25Continue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene26), 260);
+    });
+
+    scene26PortalTouch.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      // Scene 26 is the end of the second mission for now.
+    });
+
+
+
+    const CARD_RATIO = 1672 / 941;
+
+    function fitCardToIPhone(){
+      /*
+        window.innerWidth/innerHeight describe Safari's actual webpage area.
+        We fit the entire 16:9 card inside it, maximizing height.
+      */
+      const vw = Math.max(1, window.innerWidth);
+      const vh = Math.max(1, window.innerHeight);
+
+      document.documentElement.style.setProperty("--phone-vw", vw + "px");
+      document.documentElement.style.setProperty("--phone-vh", vh + "px");
+
+      let w, h;
+
+      if((vw / vh) > CARD_RATIO){
+        // Extra-wide Safari landscape: fill height, leave side areas.
+        h = vh;
+        w = h * CARD_RATIO;
+      }else{
+        // Narrower viewport: fill width.
+        w = vw;
+        h = w / CARD_RATIO;
+      }
+
+      // 2 px breathing room so the gold frame is never clipped.
+      w = Math.max(1, w - 2);
+      h = Math.max(1, h - 2);
+
+      document.documentElement.style.setProperty("--fit-w", Math.floor(w) + "px");
+      document.documentElement.style.setProperty("--fit-h", Math.floor(h) + "px");
+    }
+
+    function refitCard(){
+      fitCardToIPhone();
+      requestAnimationFrame(fitCardToIPhone);
+      setTimeout(fitCardToIPhone, 80);
+      setTimeout(fitCardToIPhone, 250);
+      setTimeout(fitCardToIPhone, 600);
+    }
+
+    window.addEventListener("load", () => {
+      refitCard();
+      /* Always start from Scene 1. Never resume at Scene 14/15. */
+      showScene(scene1);
+      updateSceneBackdrop(scene1);
+    }, {once:true});
+
+    window.addEventListener("resize", refitCard, {passive:true});
+    window.addEventListener("orientationchange", refitCard, {passive:true});
+
+  })();
+  </script>
 </body>
 </html>
