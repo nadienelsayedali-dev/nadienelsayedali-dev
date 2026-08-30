@@ -7,7 +7,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Our Little Adventure</title>
-  <!-- navigation-fix-v2: scene9 and scene12 full-scene tap -->
 
   <style>
     :root{
@@ -379,74 +378,6 @@
       -webkit-tap-highlight-color:transparent;
     }
 
-
-    /* ===== Scene 14: The Key Thief — 4-step crab interaction ===== */
-    #scene14{
-      background:#020b13;
-      touch-action:none;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    .scene14State{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      display:block;
-      object-fit:fill;
-      opacity:0;
-      transform:scale(1.003);
-      transition:opacity .42s ease, transform .42s ease;
-      pointer-events:none;
-      -webkit-user-drag:none;
-    }
-
-    .scene14State.active14{
-      opacity:1;
-      transform:scale(1);
-    }
-
-    #scene14Action{
-      position:absolute;
-      z-index:70;
-      border:0;
-      padding:0;
-      margin:0;
-      background:transparent;
-      appearance:none;
-      -webkit-appearance:none;
-      cursor:pointer;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    /* Tap targets are moved with each image-state so the visible crab/key is what is tapped. */
-    #scene14Action.phase0{ left:40%; top:57%; width:29%; height:31%; }
-    #scene14Action.phase1{ left:43%; top:60%; width:28%; height:30%; }
-    #scene14Action.phase2{ left:37%; top:72%; width:25%; height:17%; }
-    #scene14Action.phase3{ left:35%; top:87%; width:30%; height:10%; }
-
-    #scene14Spark{
-      position:absolute;
-      z-index:62;
-      width:88px;
-      height:88px;
-      border-radius:50%;
-      border:2px solid rgba(242,193,91,.85);
-      box-shadow:0 0 30px rgba(242,193,91,.7), inset 0 0 20px rgba(242,193,91,.28);
-      opacity:0;
-      pointer-events:none;
-      transform:translate(-50%,-50%) scale(.35);
-    }
-
-    #scene14Spark.play{ animation:scene14Spark .5s ease forwards; }
-
-    @keyframes scene14Spark{
-      0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
-      42%{opacity:1;transform:translate(-50%,-50%) scale(.95)}
-      100%{opacity:0;transform:translate(-50%,-50%) scale(1.45)}
-    }
-
     /* =========================================================
        iPHONE BEST-FIT LAYOUT
        Full artwork visible, maximum height, soft side fill.
@@ -607,227 +538,40 @@
 
   
 
-    /* ===== Scene 14 video + Scene 15 hybrid mission ===== */
-    #scene14Video,
-    #scene15Intro,
-    #scene15Reaction,
-    #scene15Success,
-    #scene15ChestOpen{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:fill;
-      display:block;
-      background:#020b13;
-      z-index:80;
-      pointer-events:none;
+    /* ===== Scene 14 video + Scene 15 Rock/Paper/Scissors mission ===== */
+    #scene14Video{
+      position:absolute; inset:0; width:100%; height:100%; object-fit:fill;
+      background:#020b13; display:block; z-index:20;
     }
-
-    /* Old Scene 14 tap-state control remains in the DOM only for compatibility. */
-    #scene14Action{ pointer-events:none !important; opacity:0 !important; }
-    .scene14State{ opacity:0 !important; }
-
-    #scene15{
-      background:#020b13;
-      touch-action:none;
+    #scene15RpsChoice,#scene15PaperLose,#scene15ScissorsTie,#scene15RockWin,#scene15KeyDragImage{
+      position:absolute; inset:0; width:100%; height:100%; object-fit:fill;
+      display:none; z-index:30; pointer-events:none;
+    }
+    #scene15RpsButtons{position:absolute; inset:0; z-index:55; display:none; pointer-events:none;}
+    .rpsChoice{
+      position:absolute; bottom:4.1%; height:18%; border:0; background:transparent;
+      border-radius:22px; pointer-events:auto; touch-action:manipulation;
       -webkit-tap-highlight-color:transparent;
     }
-
-    #scene15BackdropSource{ display:none; }
-
-    #scene15Reaction,
-    #scene15Success,
-    #scene15ChestOpen{ display:none; }
-
-    #scene15Choices{
-      position:absolute;
-      left:50%;
-      bottom:4.2%;
-      transform:translateX(-50%);
-      width:min(78%, 1080px);
-      display:none;
-      grid-template-columns:repeat(3,1fr);
-      gap:clamp(8px,1.2vw,18px);
-      z-index:105;
-    }
-
-    .scene15Choice{
-      min-height:clamp(54px,8vh,86px);
-      border:1px solid rgba(239,201,120,.62);
-      border-radius:18px;
-      background:linear-gradient(180deg,rgba(6,15,26,.76),rgba(2,8,15,.88));
-      color:#f1d693;
-      font-family:Georgia,"Times New Roman",serif;
-      font-size:clamp(14px,1.55vw,24px);
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      text-shadow:0 2px 8px #000;
-      box-shadow:0 10px 30px rgba(0,0,0,.28), inset 0 0 24px rgba(235,182,78,.05);
-      backdrop-filter:blur(7px);
-      cursor:pointer;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    .scene15Choice:active{
-      transform:scale(.98);
-      box-shadow:0 0 24px rgba(234,187,89,.28);
-    }
-
-    #scene15ChoiceHint,
-    #scene15DragHint{
-      position:absolute;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:106;
-      padding:.45rem 1rem;
-      border:1px solid rgba(239,201,120,.45);
-      border-radius:999px;
-      background:rgba(2,11,19,.58);
-      color:#efd18b;
-      font-family:Georgia,"Times New Roman",serif;
-      font-size:clamp(12px,1.2vw,20px);
-      letter-spacing:.05em;
-      text-shadow:0 2px 8px #000;
-      backdrop-filter:blur(4px);
-      pointer-events:none;
-      white-space:nowrap;
-      display:none;
-    }
-
-    #scene15ChoiceHint{ bottom:15.4%; }
-    #scene15DragHint{ bottom:2.8%; }
-
-    #scene15KeyDragImage{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:fill;
-      display:none;
-      z-index:82;
-      pointer-events:none;
-    }
-
-    #scene15KeyCanvas{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      z-index:100;
-      display:none;
-      pointer-events:none;
-    }
-
+    .rpsChoice.rock{left:9.5%;width:26.5%;}
+    .rpsChoice.paper{left:36.8%;width:26.5%;}
+    .rpsChoice.scissors{left:64.0%;width:26.5%;}
+    .rpsChoice:active{background:rgba(241,193,95,.10);box-shadow:0 0 30px rgba(241,193,95,.25) inset;}
+    #scene15KeyCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:60;pointer-events:none;}
     #scene15KeyStart{
-      position:absolute;
-      left:35%;
-      top:72%;
-      width:23%;
-      height:20%;
-      z-index:108;
-      border:0;
-      padding:0;
-      margin:0;
-      background:transparent;
-      appearance:none;
-      -webkit-appearance:none;
-      display:none;
-      touch-action:none;
-      -webkit-tap-highlight-color:transparent;
+      position:absolute;left:34%;top:70%;width:24%;height:22%;display:none;z-index:65;
+      border:0;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;
     }
-
-
-    /* ===== Fix v16: clear lock beat + obvious Scene 15 reactions ===== */
-    #scene13FailGlow{
-      position:absolute;
-      left:64.7%;
-      top:63.7%;
-      width:13%;
-      aspect-ratio:1;
-      border-radius:50%;
-      z-index:95;
-      pointer-events:none;
-      opacity:0;
-      border:2px solid rgba(246,202,102,.9);
-      box-shadow:0 0 10px rgba(239,188,77,.85),0 0 34px rgba(239,188,77,.6),inset 0 0 24px rgba(239,188,77,.25);
+    #scene15DragHint{
+      position:absolute;left:50%;bottom:2.7%;transform:translateX(-50%);display:none;z-index:70;
+      padding:.48rem 1.2rem;border:1px solid rgba(239,201,120,.55);border-radius:999px;
+      background:rgba(2,11,19,.68);color:#efd18b;font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(14px,1.45vw,23px);letter-spacing:.06em;text-shadow:0 2px 8px #000;pointer-events:none;
     }
-    #scene13FailGlow.play{
-      animation:scene13FailPulse .95s ease forwards;
+    #scene15ChestOpen{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:none;z-index:80;background:#020b13;
     }
-    @keyframes scene13FailPulse{
-      0%{opacity:0;transform:scale(.65)}
-      35%{opacity:1;transform:scale(1.02)}
-      60%{opacity:.9;transform:scale(.94)}
-      100%{opacity:0;transform:scale(1.3)}
-    }
-
-    #scene15ReactionFeedback{
-      position:absolute;
-      left:50%;
-      top:15%;
-      transform:translateX(-50%);
-      width:min(72%,900px);
-      z-index:125;
-      text-align:center;
-      pointer-events:none;
-      opacity:0;
-      transition:opacity .25s ease;
-      color:#f5dda1;
-      font-family:Georgia,"Times New Roman",serif;
-      text-shadow:0 3px 16px #000,0 0 24px rgba(0,0,0,.85);
-    }
-    #scene15ReactionFeedback.show{opacity:1;}
-    #scene15ReactionFeedback .reactionTitle{
-      font-size:clamp(26px,4vw,58px);
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      color:#e9b95d;
-      margin-bottom:.25em;
-    }
-    #scene15ReactionFeedback .reactionText{
-      font-size:clamp(16px,2vw,28px);
-      line-height:1.25;
-    }
-    #scene15Reaction.feedback-fruit{animation:reactionFruit 2.5s ease both;}
-    #scene15Reaction.feedback-pearl{animation:reactionPearl 2.7s ease both;}
-    #scene15Reaction.feedback-shell{animation:reactionShell 3.2s ease both;}
-    @keyframes reactionFruit{
-      0%{transform:translateX(0) scale(1);filter:none}
-      35%{transform:translateX(-1.2%) scale(1.01);filter:saturate(.92)}
-      55%{transform:translateX(1.1%) scale(1.005)}
-      75%{transform:translateX(-.6%) scale(1)}
-      100%{transform:translateX(0) scale(1)}
-    }
-    @keyframes reactionPearl{
-      0%{transform:scale(1);filter:brightness(1)}
-      45%{transform:scale(1.018);filter:brightness(1.12)}
-      100%{transform:scale(1);filter:brightness(1)}
-    }
-    @keyframes reactionShell{
-      0%{transform:scale(1);filter:brightness(1)}
-      55%{transform:scale(1.025);filter:brightness(1.18) saturate(1.08)}
-      100%{transform:scale(1);filter:brightness(1.06)}
-    }
-
-    #scene16 img{ object-fit:fill; }
-
-  
-    /* ===== Rock Paper Scissors mission ===== */
-    #scene15Reveal, #scene15RpsChoice, #scene15PaperLose, #scene15ScissorsTie, #scene15RockWin{
-      position:absolute; inset:0; width:100%; height:100%; object-fit:fill; display:none; z-index:35;
-    }
-    #scene15RpsButtons{position:absolute; inset:0; z-index:50; display:none; pointer-events:none;}
-    .rpsChoice{position:absolute; bottom:4.5%; height:17%; background:transparent; border:0; border-radius:22px; pointer-events:auto; -webkit-tap-highlight-color:transparent;}
-    .rpsChoice.rock{left:10.5%; width:25.5%;}
-    .rpsChoice.paper{left:37.5%; width:25.5%;}
-    .rpsChoice.scissors{left:64.5%; width:25.5%;}
-    .rpsChoice:active{background:rgba(236,190,95,.10); box-shadow:0 0 28px rgba(236,190,95,.25) inset;}
-    #scene15RpsTapHint{position:absolute; left:50%; bottom:1.6%; transform:translateX(-50%); z-index:52; display:none; color:#f0d8a8; font:600 15px Georgia,serif; text-shadow:0 2px 8px #000; pointer-events:none;}
-    #scene15RevealTap{position:absolute; inset:0; z-index:48; display:none; background:transparent; border:0;}
-    .rpsResultPulse{animation:rpsResultPulse .5s ease-out both;}
-    @keyframes rpsResultPulse{from{filter:brightness(.75);transform:scale(.985)}to{filter:brightness(1);transform:scale(1)}}
+    #scene16 img{object-fit:fill;}
 
   </style>
 </head>
@@ -913,56 +657,35 @@
     <section id="scene13" class="scene">
       <img src="./scene13.png?v=13" alt="Locked Secret - Tap the lock">
       <button id="scene13Lock" type="button" aria-label="Tap the lock"></button>
-      <div id="scene13FailGlow" aria-hidden="true"></div>
     </section>
 
+
+
     <section id="scene14" class="scene">
-      <!-- Compatibility images remain hidden so the previous JS does not break. -->
-      <img id="scene14State1" class="scene14State active14" src="./scene13.png?v=13" alt="">
-      <img id="scene14State2" class="scene14State" src="./scene13.png?v=13" alt="">
-      <img id="scene14State3" class="scene14State" src="./scene13.png?v=13" alt="">
-      <img id="scene14State4" class="scene14State" src="./scene13.png?v=13" alt="">
-      <button id="scene14Action" class="phase0" type="button" aria-label=""></button>
-      <div id="scene14Spark" aria-hidden="true"></div>
-      <video id="scene14Video" src="./scene14.mp4?v=22" poster="./scene13.png?v=13" muted playsinline preload="auto"></video>
+      <video id="scene14Video" src="./scene14.mp4?v=30" poster="./scene13.png?v=13" muted playsinline preload="auto"></video>
     </section>
 
     <section id="scene15" class="scene">
-      <img id="scene15Reveal" src="./scene14_reveal.png?v=22" alt="Apparently someone got here first">
-      <button id="scene15RevealTap" type="button" aria-label="Continue to the crab challenge"></button>
-      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=22" alt="Rock Paper Scissors challenge">
-      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=22" alt="The crab wins and chases her">
-      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=22" alt="A tie - try again">
-      <img id="scene15RockWin" src="./scene15_rock_win.png?v=22" alt="You win - the crab gives up the key">
+      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=30" alt="Rock Paper Scissors challenge">
+      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=30" alt="Paper loses. The crab chases her.">
+      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=30" alt="Scissors versus scissors. A tie.">
+      <img id="scene15RockWin" src="./scene15_rock_win.png?v=30" alt="Rock wins. The crab gives up the key.">
+
       <div id="scene15RpsButtons" aria-label="Choose rock paper or scissors">
         <button class="rpsChoice rock" data-rps="rock" type="button" aria-label="Rock"></button>
         <button class="rpsChoice paper" data-rps="paper" type="button" aria-label="Paper"></button>
         <button class="rpsChoice scissors" data-rps="scissors" type="button" aria-label="Scissors"></button>
       </div>
-      <div id="scene15RpsTapHint">Tap ROCK, PAPER or SCISSORS</div>
-      <img id="scene15BackdropSource" src="./scene15_keydrag.png?v=22" alt="">
-      <video id="scene15Intro" src="./scene15_intro.mp4?v=22" muted playsinline preload="auto"></video>
-      <video id="scene15Reaction" muted playsinline preload="auto"></video>
-      <video id="scene15Success" src="./scene15_success.mp4?v=22" muted playsinline preload="auto"></video>
-      <img id="scene15KeyDragImage" src="./scene15_keydrag.png?v=22" alt="Drag the key to the lock">
+
+      <img id="scene15KeyDragImage" src="./scene15_keydrag.png?v=30" alt="You found the key">
       <canvas id="scene15KeyCanvas" width="1672" height="941"></canvas>
-      <button id="scene15KeyStart" type="button" aria-label="Drag the key to the lock"></button>
-      <div id="scene15ChoiceHint">Choose something the little key keeper might like</div>
-      <div id="scene15ReactionFeedback" aria-live="polite">
-        <div class="reactionTitle"></div>
-        <div class="reactionText"></div>
-      </div>
-      <div id="scene15Choices" aria-label="Choose a gift for the crab">
-        <button class="scene15Choice" data-choice="pearl" type="button">Pearl</button>
-        <button class="scene15Choice" data-choice="fruit" type="button">Fruit</button>
-        <button class="scene15Choice" data-choice="shell" type="button">Beautiful Shell</button>
-      </div>
+      <button id="scene15KeyStart" type="button" aria-label="Drag the key to the chest lock"></button>
       <div id="scene15DragHint">DRAG THE KEY TO THE LOCK</div>
-      <video id="scene15ChestOpen" src="./scene15_chest_open.mp4?v=22" muted playsinline preload="auto"></video>
+      <video id="scene15ChestOpen" src="./scene15_chest_open.mp4?v=30" muted playsinline preload="auto"></video>
     </section>
 
     <section id="scene16" class="scene">
-      <img src="./scene16_alchemy.png?v=16" alt="The Alchemy Room">
+      <img src="./scene16_alchemy.png?v=30" alt="The Alchemy Room">
     </section>
 
     <div id="tapPulse" aria-hidden="true"></div>
@@ -989,6 +712,8 @@
     const scene12 = document.getElementById("scene12");
     const scene13 = document.getElementById("scene13");
     const scene14 = document.getElementById("scene14");
+    const scene15 = document.getElementById("scene15");
+    const scene16 = document.getElementById("scene16");
 
     const beginStory = document.getElementById("beginStory");
     const scene2Continue = document.getElementById("scene2Continue");
@@ -1012,30 +737,18 @@
     const scene11Continue = document.getElementById("scene11Continue");
     const scene12Continue = document.getElementById("scene12Continue");
     const scene13Lock = document.getElementById("scene13Lock");
-    const scene14State1 = document.getElementById("scene14State1");
-    const scene14State2 = document.getElementById("scene14State2");
-    const scene14State3 = document.getElementById("scene14State3");
-    const scene14State4 = document.getElementById("scene14State4");
-    const scene14Action = document.getElementById("scene14Action");
-    const scene14Spark = document.getElementById("scene14Spark");
     const scene14Video = document.getElementById("scene14Video");
-    const scene15 = document.getElementById("scene15");
-    const scene15Intro = document.getElementById("scene15Intro");
-    const scene15Reaction = document.getElementById("scene15Reaction");
-    const scene15Success = document.getElementById("scene15Success");
-    const scene15Choices = document.getElementById("scene15Choices");
-    const scene15ChoiceHint = document.getElementById("scene15ChoiceHint");
-    const scene15ReactionFeedback = document.getElementById("scene15ReactionFeedback");
-    const scene15ReactionTitle = scene15ReactionFeedback.querySelector(".reactionTitle");
-    const scene15ReactionText = scene15ReactionFeedback.querySelector(".reactionText");
-    const scene13FailGlow = document.getElementById("scene13FailGlow");
+    const scene15RpsChoice = document.getElementById("scene15RpsChoice");
+    const scene15PaperLose = document.getElementById("scene15PaperLose");
+    const scene15ScissorsTie = document.getElementById("scene15ScissorsTie");
+    const scene15RockWin = document.getElementById("scene15RockWin");
+    const scene15RpsButtons = document.getElementById("scene15RpsButtons");
     const scene15KeyDragImage = document.getElementById("scene15KeyDragImage");
     const scene15KeyCanvas = document.getElementById("scene15KeyCanvas");
     const scene15KeyCtx = scene15KeyCanvas.getContext("2d");
     const scene15KeyStart = document.getElementById("scene15KeyStart");
     const scene15DragHint = document.getElementById("scene15DragHint");
     const scene15ChestOpen = document.getElementById("scene15ChestOpen");
-    const scene16 = document.getElementById("scene16");
 
     /*
       Locked coordinates in the 1672 x 941 artwork.
@@ -1051,7 +764,7 @@
 
     function updateSceneBackdrop(scene){
       if(!sceneBackdrop || !scene) return;
-      const img = scene.querySelector(".scene14State.active14, .scene8State.active8, img");
+      const img = scene.querySelector("img");
       if(!img) return;
 
       const src = img.currentSrc || img.getAttribute("src") || "";
@@ -1548,265 +1261,150 @@
       setTimeout(() => showScene(scene13), 260);
     });
 
-    /* Scene 13 -> Scene 14.
-       The tap on the lock is the user gesture that starts the clip.
-       We switch immediately so iPhone/iPad Safari cannot block playback.
-       The video has scene13.png as its poster, so there is never a black flash while loading. */
-    let scene13LockBusy = false;
-    function beginScene14FromLock(e){
-      if(scene13LockBusy) return;
-      scene13LockBusy = true;
+    /* Scene 13 -> Scene 14. The lock tap is the user gesture that starts the video. */
+    let scene14Started = false;
+    function startScene14(e){
+      if(scene14Started) return;
+      scene14Started = true;
       if(e){ e.preventDefault(); pulseAt(e); }
-      scene13FailGlow.classList.remove("play");
-      void scene13FailGlow.offsetWidth;
-      scene13FailGlow.classList.add("play");
-
-      resetScene14();
-      scene14Video.style.display = "block";
-      scene14Video.currentTime = 0;
       showScene(scene14);
-
+      scene14Video.currentTime = 0;
+      scene14Video.style.display = "block";
       const p = scene14Video.play();
-      if(p && typeof p.then === "function") {
-        p.then(()=>{ scene13LockBusy = false; }).catch(()=>{
-          scene13LockBusy = false;
-          showScene14Fallback();
-        });
-      } else {
-        scene13LockBusy = false;
+      if(p && typeof p.catch === "function"){
+        p.catch(() => setTimeout(startRpsMission, 350));
       }
+      /* Never leave a black/broken screen if GitHub/Safari fails to load the video. */
+      setTimeout(() => {
+        if(scene14.classList.contains("active") && (scene14Video.error || scene14Video.readyState < 2)){
+          startRpsMission();
+        }
+      }, 2200);
     }
-    scene13Lock.addEventListener("click", beginScene14FromLock);
+    scene13Lock.addEventListener("pointerup", startScene14);
+    scene14Video.addEventListener("ended", () => setTimeout(startRpsMission, 180));
+    scene14Video.addEventListener("error", () => setTimeout(startRpsMission, 250));
 
-    /* ===== Scene 14: 4-step interaction =====
-       1) Tap the crab holding the key.
-       2) Tap it again as it scuttles away.
-       3) Tap the key after it falls to the sand.
-       4) Continue from the success frame.
-       The PNGs change as state images; nothing is cropped or duplicated.
-    */
-    let scene14Phase = 0;
-
-    function setScene14State(n){
-      scene14State1.classList.toggle("active14", n === 1);
-      scene14State2.classList.toggle("active14", n === 2);
-      scene14State3.classList.toggle("active14", n === 3);
-      scene14State4.classList.toggle("active14", n === 4);
-    }
-
-    function setScene14ActionPhase(phase){
-      scene14Action.classList.remove("phase0","phase1","phase2","phase3");
-      scene14Action.classList.add("phase" + phase);
-      if(phase === 0) scene14Action.setAttribute("aria-label","Tap the crab");
-      if(phase === 1) scene14Action.setAttribute("aria-label","Tap the crab again");
-      if(phase === 2) scene14Action.setAttribute("aria-label","Tap the key");
-      if(phase === 3) scene14Action.setAttribute("aria-label","Continue");
-    }
-
-    function resetScene14(){
-      scene14Phase = 0;
-      setScene14State(1);
-      setScene14ActionPhase(0);
-      scene14Action.style.pointerEvents = "auto";
-    }
-
-    function playScene14Spark(e){
-      if(!scene14Spark || typeof e.clientX !== "number") return;
-      const r = scene14.getBoundingClientRect();
-      scene14Spark.style.left = (e.clientX - r.left) + "px";
-      scene14Spark.style.top = (e.clientY - r.top) + "px";
-      scene14Spark.classList.remove("play");
-      void scene14Spark.offsetWidth;
-      scene14Spark.classList.add("play");
-    }
-
-    ["./scene14_1.png?v=14","./scene14_2.png?v=14","./scene14_3.png?v=14","./scene14_4.png?v=14"].forEach(src => {
-      const img = new Image();
-      img.src = src;
-    });
-
-    scene14Action.addEventListener("pointerup", e => {
-      e.preventDefault();
-      pulseAt(e);
-      playScene14Spark(e);
-
-      if(scene14Phase === 0){
-        scene14Phase = 1;
-        setScene14State(2);
-        setScene14ActionPhase(1);
-        updateSceneBackdrop(scene14);
-        return;
-      }
-
-      if(scene14Phase === 1){
-        scene14Phase = 2;
-        setScene14State(3);
-        setScene14ActionPhase(2);
-        updateSceneBackdrop(scene14);
-        return;
-      }
-
-      if(scene14Phase === 2){
-        scene14Phase = 3;
-        setScene14State(4);
-        setScene14ActionPhase(3);
-        updateSceneBackdrop(scene14);
-        document.dispatchEvent(new CustomEvent("scene14KeyFound"));
-        return;
-      }
-
-      /* Scene 14 is the current end of the story.
-         The event lets the next scene plug in cleanly when we add it. */
-      document.dispatchEvent(new CustomEvent("scene14Complete"));
-    });
-
-
-
-
-    /* =========================================================
-       Scene 14 + 15 Rock–Paper–Scissors mission
-       ========================================================= */
-    const scene15Reveal = document.getElementById("scene15Reveal");
-    const scene15RevealTap = document.getElementById("scene15RevealTap");
-    const scene15RpsChoice = document.getElementById("scene15RpsChoice");
-    const scene15PaperLose = document.getElementById("scene15PaperLose");
-    const scene15ScissorsTie = document.getElementById("scene15ScissorsTie");
-    const scene15RockWin = document.getElementById("scene15RockWin");
-    const scene15RpsButtons = document.getElementById("scene15RpsButtons");
-    const scene15RpsTapHint = document.getElementById("scene15RpsTapHint");
+    /* ===== Scene 15: Rock / Paper / Scissors ===== */
     let rpsTimer = null;
     let rpsBusy = false;
-
-    function hideAllRpsLayers(){
-      if(rpsTimer){ clearTimeout(rpsTimer); rpsTimer=null; }
-      [scene15Reveal,scene15RpsChoice,scene15PaperLose,scene15ScissorsTie,scene15RockWin].forEach(el=>{
-        el.style.display="none"; el.classList.remove("rpsResultPulse");
-      });
-      scene15RevealTap.style.display="none";
+    function clearRpsTimer(){ if(rpsTimer){ clearTimeout(rpsTimer); rpsTimer=null; } }
+    function hideRpsLayers(){
+      clearRpsTimer();
+      [scene15RpsChoice,scene15PaperLose,scene15ScissorsTie,scene15RockWin,scene15KeyDragImage].forEach(el=>el.style.display="none");
       scene15RpsButtons.style.display="none";
-      scene15RpsTapHint.style.display="none";
-      /* old gift/video layers stay disabled */
-      scene15Intro.pause(); scene15Reaction.pause(); scene15Success.pause();
-      scene15Intro.style.display="none"; scene15Reaction.style.display="none"; scene15Success.style.display="none";
-      scene15Choices.style.display="none"; scene15ChoiceHint.style.display="none";
-      scene15ReactionFeedback.classList.remove("show");
-      scene15KeyDragImage.style.display="none"; scene15KeyCanvas.style.display="none"; scene15KeyStart.style.display="none"; scene15DragHint.style.display="none";
-      scene15ChestOpen.pause(); scene15ChestOpen.style.display="none";
+      scene15KeyCanvas.style.display="none";
+      scene15KeyStart.style.display="none";
+      scene15DragHint.style.display="none";
+      scene15ChestOpen.pause();
+      scene15ChestOpen.style.display="none";
     }
-
-    let scene14FallbackTimer = null;
-    function clearScene14FallbackTimer(){
-      if(scene14FallbackTimer){ clearTimeout(scene14FallbackTimer); scene14FallbackTimer=null; }
-    }
-
-    function showScene14Fallback(){
-      clearScene14FallbackTimer();
+    function startRpsMission(){
       scene14Video.pause();
-      scene14Video.style.display = "none";
       showScene(scene15);
-      hideAllRpsLayers();
-      scene15Reveal.style.display = "block";
-      scene15RevealTap.style.display = "block";
-      updateSceneBackdrop(scene15);
-      rpsTimer=setTimeout(showRpsChoice, 3400);
+      showRpsChoice();
     }
-
-    function playScene14Video(){
-      clearScene14FallbackTimer();
-      scene14Video.currentTime = 0;
-      scene14Video.style.display = "block";
-      const p = scene14Video.play();
-      if(p && typeof p.catch === "function") p.catch(showScene14Fallback);
-      /* If the browser cannot load the MP4, never leave the user on black. */
-      scene14FallbackTimer=setTimeout(()=>{
-        if(scene14Video.readyState < 2 || scene14Video.error) showScene14Fallback();
-      },1800);
-    }
-
     function showRpsChoice(){
       rpsBusy=false;
-      hideAllRpsLayers();
+      hideRpsLayers();
       scene15RpsChoice.style.display="block";
       scene15RpsButtons.style.display="block";
-      scene15RpsTapHint.style.display="block";
       updateSceneBackdrop(scene15);
     }
-
-    function startScene15(){
-      hideAllRpsLayers();
-      showScene(scene15);
-      scene15Reveal.style.display="block";
-      scene15RevealTap.style.display="block";
-      updateSceneBackdrop(scene15);
-      /* Let her read the reveal, then continue automatically if she does not tap. */
-      rpsTimer=setTimeout(showRpsChoice, 3200);
-    }
-
-    scene14Video.addEventListener("playing", clearScene14FallbackTimer);
-    scene14Video.addEventListener("ended", ()=>{ clearScene14FallbackTimer(); setTimeout(startScene15,180); });
-    scene14Video.addEventListener("error", showScene14Fallback);
-    scene15RevealTap.addEventListener("click", e=>{ e.preventDefault(); showRpsChoice(); });
-
     function showRpsResult(which){
       if(rpsBusy) return;
       rpsBusy=true;
-      hideAllRpsLayers();
+      hideRpsLayers();
       let el, ms;
-      if(which==="paper"){ el=scene15PaperLose; ms=5200; }
-      else if(which==="scissors"){ el=scene15ScissorsTie; ms=3800; }
-      else { el=scene15RockWin; ms=4400; }
+      if(which === "paper"){
+        /* Crab always uses scissors: PAPER loses -> funny chase scene. */
+        el = scene15PaperLose; ms = 5200;
+      } else if(which === "scissors"){
+        /* Scissors vs crab's scissors -> tie. */
+        el = scene15ScissorsTie; ms = 3900;
+      } else {
+        /* ROCK beats crab's scissors -> win. */
+        el = scene15RockWin; ms = 4300;
+      }
       el.style.display="block";
-      void el.offsetWidth;
-      el.classList.add("rpsResultPulse");
       updateSceneBackdrop(scene15);
-      rpsTimer=setTimeout(()=>{
-        if(which==="rock") enterScene15KeyDrag();
+      rpsTimer=setTimeout(() => {
+        if(which === "rock") enterKeyDrag();
         else showRpsChoice();
-      },ms);
+      }, ms);
     }
-
-    scene15RpsButtons.querySelectorAll(".rpsChoice").forEach(btn=>{
-      btn.addEventListener("click", e=>{ e.preventDefault(); e.stopPropagation(); pulseAt(e); showRpsResult(btn.dataset.rps); });
+    scene15RpsButtons.querySelectorAll(".rpsChoice").forEach(btn => {
+      btn.addEventListener("pointerup", e => {
+        e.preventDefault(); e.stopPropagation(); pulseAt(e);
+        showRpsResult(btn.dataset.rps);
+      });
     });
 
-    function enterScene15KeyDrag(){
-      rpsBusy=false;
-      hideAllRpsLayers();
-      scene15KeyDragImage.style.display="block";
-      scene15KeyCanvas.style.display="block";
-      scene15KeyStart.style.display="block";
-      scene15KeyStart.style.pointerEvents="auto";
-      scene15DragHint.style.display="block";
-      clearScene15KeyLine();
-      updateSceneBackdrop(scene15);
-    }
-
-    const scene15Key = { x: 760, y: 790 };
-    const scene15LockTarget = { x: 1250, y: 570 };
-    const scene15LockRadius = 135;
+    /* ===== After winning: drag the real key to the chest lock ===== */
+    const scene15Key = {x:760,y:790};
+    const scene15Lock = {x:1250,y:570};
+    const scene15LockRadius = 145;
     let scene15Dragging = false;
-
-    function scene15Point(e){
+    function clearKeyLine(){ scene15KeyCtx.clearRect(0,0,W,H); }
+    function keyPoint(e){
       const r=scene15KeyCanvas.getBoundingClientRect();
       return {x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height};
     }
-    function clearScene15KeyLine(){ scene15KeyCtx.clearRect(0,0,W,H); }
-    function drawScene15KeyLine(p,success=false){
-      clearScene15KeyLine(); scene15KeyCtx.save(); scene15KeyCtx.lineCap="round"; scene15KeyCtx.lineJoin="round";
-      scene15KeyCtx.shadowColor=success?"rgba(255,225,155,.98)":"rgba(232,183,83,.92)"; scene15KeyCtx.shadowBlur=success?28:18;
-      scene15KeyCtx.strokeStyle=success?"rgba(255,230,166,.98)":"rgba(235,191,96,.95)"; scene15KeyCtx.lineWidth=success?5:4; scene15KeyCtx.setLineDash(success?[]:[12,10]);
-      scene15KeyCtx.beginPath(); scene15KeyCtx.moveTo(scene15Key.x,scene15Key.y); const mx=(scene15Key.x+p.x)/2,my=(scene15Key.y+p.y)/2-18; scene15KeyCtx.quadraticCurveTo(mx,my,p.x,p.y); scene15KeyCtx.stroke();
-      scene15KeyCtx.setLineDash([]); scene15KeyCtx.fillStyle="rgba(255,226,156,.98)"; scene15KeyCtx.beginPath(); scene15KeyCtx.arc(p.x,p.y,success?10:7,0,Math.PI*2); scene15KeyCtx.fill(); scene15KeyCtx.restore();
+    function drawKeyLine(p){
+      clearKeyLine();
+      scene15KeyCtx.save();
+      scene15KeyCtx.strokeStyle="#f3c55d";
+      scene15KeyCtx.shadowColor="#f3c55d";
+      scene15KeyCtx.shadowBlur=18;
+      scene15KeyCtx.lineWidth=8;
+      scene15KeyCtx.lineCap="round";
+      scene15KeyCtx.setLineDash([18,12]);
+      scene15KeyCtx.beginPath();
+      scene15KeyCtx.moveTo(scene15Key.x,scene15Key.y);
+      scene15KeyCtx.lineTo(p.x,p.y);
+      scene15KeyCtx.stroke();
+      scene15KeyCtx.restore();
     }
-    function finishScene15KeyDrag(){
-      scene15Dragging=false; scene15KeyStart.style.pointerEvents="none"; scene15DragHint.style.display="none"; drawScene15KeyLine(scene15LockTarget,true);
-      setTimeout(()=>{ scene15KeyDragImage.style.display="none"; scene15KeyCanvas.style.display="none"; scene15KeyStart.style.display="none"; scene15ChestOpen.style.display="block"; scene15ChestOpen.currentTime=0; const p=scene15ChestOpen.play(); if(p&&typeof p.catch==="function")p.catch(()=>{}); },520);
+    function enterKeyDrag(){
+      rpsBusy=false;
+      hideRpsLayers();
+      scene15KeyDragImage.style.display="block";
+      scene15KeyCanvas.style.display="block";
+      scene15KeyStart.style.display="block";
+      scene15DragHint.style.display="block";
+      clearKeyLine();
+      updateSceneBackdrop(scene15);
     }
-    function scene15DragStart(e){ e.preventDefault(); scene15Dragging=true; try{scene15KeyStart.setPointerCapture(e.pointerId)}catch(_){} drawScene15KeyLine(scene15Point(e)); }
-    function scene15DragMove(e){ if(!scene15Dragging)return; e.preventDefault(); const p=scene15Point(e); drawScene15KeyLine(p); if(Math.hypot(p.x-scene15LockTarget.x,p.y-scene15LockTarget.y)<=scene15LockRadius)finishScene15KeyDrag(); }
-    function scene15DragEnd(e){ if(!scene15Dragging)return; e.preventDefault(); scene15Dragging=false; const p=scene15Point(e); if(Math.hypot(p.x-scene15LockTarget.x,p.y-scene15LockTarget.y)<=scene15LockRadius)finishScene15KeyDrag(); else clearScene15KeyLine(); }
-    scene15KeyStart.addEventListener("pointerdown",scene15DragStart); scene15KeyStart.addEventListener("pointermove",scene15DragMove); scene15KeyStart.addEventListener("pointerup",scene15DragEnd); scene15KeyStart.addEventListener("pointercancel",scene15DragEnd);
+    function finishKeyDrag(){
+      scene15Dragging=false;
+      scene15KeyStart.style.display="none";
+      scene15DragHint.style.display="none";
+      clearKeyLine();
+      scene15KeyDragImage.style.display="none";
+      scene15KeyCanvas.style.display="none";
+      scene15ChestOpen.style.display="block";
+      scene15ChestOpen.currentTime=0;
+      const p=scene15ChestOpen.play();
+      if(p && typeof p.catch === "function") p.catch(()=>setTimeout(()=>showScene(scene16),500));
+      updateSceneBackdrop(scene15);
+    }
+    scene15KeyStart.addEventListener("pointerdown", e => {
+      e.preventDefault(); scene15Dragging=true;
+      try{ scene15KeyStart.setPointerCapture(e.pointerId); }catch(_){}
+      drawKeyLine(keyPoint(e));
+    });
+    scene15KeyStart.addEventListener("pointermove", e => {
+      if(!scene15Dragging) return;
+      e.preventDefault();
+      const p=keyPoint(e); drawKeyLine(p);
+      if(Math.hypot(p.x-scene15Lock.x,p.y-scene15Lock.y) <= scene15LockRadius){ finishKeyDrag(); }
+    });
+    function cancelKeyDrag(){ if(!scene15Dragging) return; scene15Dragging=false; clearKeyLine(); }
+    scene15KeyStart.addEventListener("pointerup", cancelKeyDrag);
+    scene15KeyStart.addEventListener("pointercancel", cancelKeyDrag);
     scene15ChestOpen.addEventListener("ended",()=>showScene(scene16));
+    scene15ChestOpen.addEventListener("error",()=>setTimeout(()=>showScene(scene16),350));
+
 
     const CARD_RATIO = 1672 / 941;
 
@@ -1851,8 +1449,9 @@
 
     window.addEventListener("load", () => {
       refitCard();
-      const firstActive = document.querySelector(".scene.active") || document.getElementById("scene1");
-      if(firstActive) updateSceneBackdrop(firstActive);
+      /* Always start from Scene 1. Never resume at Scene 14/15. */
+      showScene(scene1);
+      updateSceneBackdrop(scene1);
     }, {once:true});
 
     window.addEventListener("resize", refitCard, {passive:true});
