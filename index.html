@@ -538,14 +538,14 @@
 
   
 
-    /* ===== Scene 14 video + Scene 15 Rock/Paper/Scissors mission ===== */
-    #scene14Video{
-      position:absolute; inset:0; width:100%; height:100%; object-fit:fill;
-      background:#020b13; display:block; z-index:20;
+    /* ===== Locked crab conversation + Rock/Paper/Scissors mission ===== */
+    #scene14DialogueContinue,#scene14InstructionContinue,#scene14HowContinue,#scene15PortalContinue{
+      position:absolute;inset:0;width:100%;height:100%;z-index:55;
+      border:0;background:transparent;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
     }
-    #scene15RpsChoice,#scene15PaperLose,#scene15ScissorsTie,#scene15RockWin,#scene15KeyDragImage{
-      position:absolute; inset:0; width:100%; height:100%; object-fit:fill;
-      display:none; z-index:30; pointer-events:none;
+    #scene15RpsChoice,#scene15PaperLose,#scene15ScissorsTie,#scene15RockWin{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:fill;
+      display:none;z-index:30;pointer-events:none;
     }
     #scene15RpsButtons{position:absolute; inset:0; z-index:55; display:none; pointer-events:none;}
     .rpsChoice{
@@ -559,7 +559,7 @@
     .rpsChoice:active{background:rgba(241,193,95,.10);box-shadow:0 0 30px rgba(241,193,95,.25) inset;}
     #scene15KeyCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;z-index:60;pointer-events:none;}
     #scene15KeyStart{
-      position:absolute;left:34%;top:70%;width:24%;height:22%;display:none;z-index:65;
+      position:absolute;left:54%;top:79%;width:19%;height:17%;display:none;z-index:65;
       border:0;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;
     }
     #scene15DragHint{
@@ -567,9 +567,6 @@
       padding:.48rem 1.2rem;border:1px solid rgba(239,201,120,.55);border-radius:999px;
       background:rgba(2,11,19,.68);color:#efd18b;font-family:Georgia,"Times New Roman",serif;
       font-size:clamp(14px,1.45vw,23px);letter-spacing:.06em;text-shadow:0 2px 8px #000;pointer-events:none;
-    }
-    #scene15ChestOpen{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:none;z-index:80;background:#020b13;
     }
     #scene16 img{object-fit:fill;}
 
@@ -659,17 +656,26 @@
       <button id="scene13Lock" type="button" aria-label="Tap the lock"></button>
     </section>
 
+    <section id="scene14Dialogue" class="scene">
+      <img src="./scene14_dialogue.png?v=31" alt="You can talk? I know a secret about this chest">
+      <button id="scene14DialogueContinue" type="button" aria-label="Continue the conversation"></button>
+    </section>
 
+    <section id="scene14Instruction" class="scene">
+      <img src="./scene14_instruction.png?v=31" alt="To discover what is inside, you must open the chest">
+      <button id="scene14InstructionContinue" type="button" aria-label="Continue"></button>
+    </section>
 
-    <section id="scene14" class="scene">
-      <video id="scene14Video" src="./scene14.mp4?v=30" poster="./scene13.png?v=13" muted playsinline preload="auto"></video>
+    <section id="scene14How" class="scene">
+      <img src="./scene14_how.png?v=31" alt="How?">
+      <button id="scene14HowContinue" type="button" aria-label="Start the challenge"></button>
     </section>
 
     <section id="scene15" class="scene">
-      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=30" alt="Rock Paper Scissors challenge">
-      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=30" alt="Paper loses. The crab chases her.">
-      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=30" alt="Scissors versus scissors. A tie.">
-      <img id="scene15RockWin" src="./scene15_rock_win.png?v=30" alt="Rock wins. The crab gives up the key.">
+      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=31" alt="Rock Paper Scissors challenge">
+      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=31" alt="Paper loses. The crab chases her.">
+      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=31" alt="Scissors versus scissors. A tie.">
+      <img id="scene15RockWin" src="./scene15_rock_win.png?v=31" alt="Rock wins. The crab gives up the key.">
 
       <div id="scene15RpsButtons" aria-label="Choose rock paper or scissors">
         <button class="rpsChoice rock" data-rps="rock" type="button" aria-label="Rock"></button>
@@ -677,15 +683,18 @@
         <button class="rpsChoice scissors" data-rps="scissors" type="button" aria-label="Scissors"></button>
       </div>
 
-      <img id="scene15KeyDragImage" src="./scene15_keydrag.png?v=30" alt="You found the key">
       <canvas id="scene15KeyCanvas" width="1672" height="941"></canvas>
       <button id="scene15KeyStart" type="button" aria-label="Drag the key to the chest lock"></button>
       <div id="scene15DragHint">DRAG THE KEY TO THE LOCK</div>
-      <video id="scene15ChestOpen" src="./scene15_chest_open.mp4?v=30" muted playsinline preload="auto"></video>
+    </section>
+
+    <section id="scene15Portal" class="scene">
+      <img src="./scene15_portal.png?v=31" alt="What's happening?">
+      <button id="scene15PortalContinue" type="button" aria-label="Continue to the next world"></button>
     </section>
 
     <section id="scene16" class="scene">
-      <img src="./scene16_alchemy.png?v=30" alt="The Alchemy Room">
+      <img src="./scene16_alchemy.png?v=31" alt="The Alchemy Room">
     </section>
 
     <div id="tapPulse" aria-hidden="true"></div>
@@ -711,8 +720,11 @@
     const scene11 = document.getElementById("scene11");
     const scene12 = document.getElementById("scene12");
     const scene13 = document.getElementById("scene13");
-    const scene14 = document.getElementById("scene14");
+    const scene14Dialogue = document.getElementById("scene14Dialogue");
+    const scene14Instruction = document.getElementById("scene14Instruction");
+    const scene14How = document.getElementById("scene14How");
     const scene15 = document.getElementById("scene15");
+    const scene15Portal = document.getElementById("scene15Portal");
     const scene16 = document.getElementById("scene16");
 
     const beginStory = document.getElementById("beginStory");
@@ -737,18 +749,19 @@
     const scene11Continue = document.getElementById("scene11Continue");
     const scene12Continue = document.getElementById("scene12Continue");
     const scene13Lock = document.getElementById("scene13Lock");
-    const scene14Video = document.getElementById("scene14Video");
+    const scene14DialogueContinue = document.getElementById("scene14DialogueContinue");
+    const scene14InstructionContinue = document.getElementById("scene14InstructionContinue");
+    const scene14HowContinue = document.getElementById("scene14HowContinue");
     const scene15RpsChoice = document.getElementById("scene15RpsChoice");
     const scene15PaperLose = document.getElementById("scene15PaperLose");
     const scene15ScissorsTie = document.getElementById("scene15ScissorsTie");
     const scene15RockWin = document.getElementById("scene15RockWin");
     const scene15RpsButtons = document.getElementById("scene15RpsButtons");
-    const scene15KeyDragImage = document.getElementById("scene15KeyDragImage");
     const scene15KeyCanvas = document.getElementById("scene15KeyCanvas");
     const scene15KeyCtx = scene15KeyCanvas.getContext("2d");
     const scene15KeyStart = document.getElementById("scene15KeyStart");
     const scene15DragHint = document.getElementById("scene15DragHint");
-    const scene15ChestOpen = document.getElementById("scene15ChestOpen");
+    const scene15PortalContinue = document.getElementById("scene15PortalContinue");
 
     /*
       Locked coordinates in the 1672 x 941 artwork.
@@ -1261,29 +1274,27 @@
       setTimeout(() => showScene(scene13), 260);
     });
 
-    /* Scene 13 -> Scene 14. The lock tap is the user gesture that starts the video. */
-    let scene14Started = false;
-    function startScene14(e){
-      if(scene14Started) return;
-      scene14Started = true;
-      if(e){ e.preventDefault(); pulseAt(e); }
-      showScene(scene14);
-      scene14Video.currentTime = 0;
-      scene14Video.style.display = "block";
-      const p = scene14Video.play();
-      if(p && typeof p.catch === "function"){
-        p.catch(() => setTimeout(startRpsMission, 350));
-      }
-      /* Never leave a black/broken screen if GitHub/Safari fails to load the video. */
-      setTimeout(() => {
-        if(scene14.classList.contains("active") && (scene14Video.error || scene14Video.readyState < 2)){
-          startRpsMission();
-        }
-      }, 2200);
-    }
-    scene13Lock.addEventListener("pointerup", startScene14);
-    scene14Video.addEventListener("ended", () => setTimeout(startRpsMission, 180));
-    scene14Video.addEventListener("error", () => setTimeout(startRpsMission, 250));
+    /* Scene 13 -> locked crab conversation -> challenge */
+    scene13Lock.addEventListener("pointerup", e => {
+      e.preventDefault();
+      pulseAt(e);
+      setTimeout(() => showScene(scene14Dialogue), 220);
+    });
+
+    scene14DialogueContinue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene14Instruction), 220);
+    });
+
+    scene14InstructionContinue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene14How), 220);
+    });
+
+    scene14HowContinue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(startRpsMission, 220);
+    });
 
     /* ===== Scene 15: Rock / Paper / Scissors ===== */
     let rpsTimer = null;
@@ -1291,16 +1302,13 @@
     function clearRpsTimer(){ if(rpsTimer){ clearTimeout(rpsTimer); rpsTimer=null; } }
     function hideRpsLayers(){
       clearRpsTimer();
-      [scene15RpsChoice,scene15PaperLose,scene15ScissorsTie,scene15RockWin,scene15KeyDragImage].forEach(el=>el.style.display="none");
+      [scene15RpsChoice,scene15PaperLose,scene15ScissorsTie,scene15RockWin].forEach(el=>el.style.display="none");
       scene15RpsButtons.style.display="none";
       scene15KeyCanvas.style.display="none";
       scene15KeyStart.style.display="none";
       scene15DragHint.style.display="none";
-      scene15ChestOpen.pause();
-      scene15ChestOpen.style.display="none";
     }
     function startRpsMission(){
-      scene14Video.pause();
       showScene(scene15);
       showRpsChoice();
     }
@@ -1324,7 +1332,7 @@
         el = scene15ScissorsTie; ms = 3900;
       } else {
         /* ROCK beats crab's scissors -> win. */
-        el = scene15RockWin; ms = 4300;
+        el = scene15RockWin; ms = 3600;
       }
       el.style.display="block";
       updateSceneBackdrop(scene15);
@@ -1340,10 +1348,10 @@
       });
     });
 
-    /* ===== After winning: drag the real key to the chest lock ===== */
-    const scene15Key = {x:760,y:790};
-    const scene15Lock = {x:1250,y:570};
-    const scene15LockRadius = 145;
+    /* ===== After winning: drag the key directly from the win scene to the lock ===== */
+    const scene15Key = {x:1040,y:846};
+    const scene15Lock = {x:924,y:680};
+    const scene15LockRadius = 138;
     let scene15Dragging = false;
     function clearKeyLine(){ scene15KeyCtx.clearRect(0,0,W,H); }
     function keyPoint(e){
@@ -1368,7 +1376,8 @@
     function enterKeyDrag(){
       rpsBusy=false;
       hideRpsLayers();
-      scene15KeyDragImage.style.display="block";
+      /* Keep the WIN scene visible; the key is already lying on the sand. */
+      scene15RockWin.style.display="block";
       scene15KeyCanvas.style.display="block";
       scene15KeyStart.style.display="block";
       scene15DragHint.style.display="block";
@@ -1380,17 +1389,13 @@
       scene15KeyStart.style.display="none";
       scene15DragHint.style.display="none";
       clearKeyLine();
-      scene15KeyDragImage.style.display="none";
       scene15KeyCanvas.style.display="none";
-      scene15ChestOpen.style.display="block";
-      scene15ChestOpen.currentTime=0;
-      const p=scene15ChestOpen.play();
-      if(p && typeof p.catch === "function") p.catch(()=>setTimeout(()=>showScene(scene16),500));
-      updateSceneBackdrop(scene15);
+      /* No Continue state and no delay: successful drag goes straight to the portal scene. */
+      showScene(scene15Portal);
     }
     scene15KeyStart.addEventListener("pointerdown", e => {
       e.preventDefault(); scene15Dragging=true;
-      try{ scene15KeyStart.setPointerCapture(e.pointerId); }catch(_){}
+      try{ scene15KeyStart.setPointerCapture(e.pointerId); }catch(_){ }
       drawKeyLine(keyPoint(e));
     });
     scene15KeyStart.addEventListener("pointermove", e => {
@@ -1402,8 +1407,12 @@
     function cancelKeyDrag(){ if(!scene15Dragging) return; scene15Dragging=false; clearKeyLine(); }
     scene15KeyStart.addEventListener("pointerup", cancelKeyDrag);
     scene15KeyStart.addEventListener("pointercancel", cancelKeyDrag);
-    scene15ChestOpen.addEventListener("ended",()=>showScene(scene16));
-    scene15ChestOpen.addEventListener("error",()=>setTimeout(()=>showScene(scene16),350));
+
+    /* The chest-light scene is locked; tap anywhere when ready to enter the chemistry world. */
+    scene15PortalContinue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene16), 260);
+    });
 
 
     const CARD_RATIO = 1672 / 941;
