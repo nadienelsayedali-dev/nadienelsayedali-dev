@@ -3,72 +3,261 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Mirror Mission</title>
+  <meta name="theme-color" content="#020b13" />
+  <title>Our Little Adventure</title>
   <style>
-    html, body {
-      margin: 0; padding: 0; width: 100%; height: 100%;
-      background: #020b18; overflow: hidden; font-family: Georgia, serif;
-    }
-    .screen {
-      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(circle at center, rgba(15,35,60,0.35), rgba(2,8,20,0.95));
-    }
-    img {
-      max-width: 100vw; max-height: 100vh; width: 100vw; height: 100vh;
-      object-fit: contain; user-select: none; -webkit-user-drag: none;
-    }
-    .nav {
-      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 10px; z-index: 10; background: rgba(0,0,0,0.35);
-      padding: 10px 14px; border-radius: 999px; backdrop-filter: blur(6px);
-    }
-    button {
-      border: 1px solid rgba(214,173,89,0.55); background: rgba(30,20,10,0.75);
-      color: #f3d28a; padding: 10px 16px; border-radius: 999px; font-size: 14px;
-      cursor: pointer;
-    }
-    button:disabled { opacity: 0.45; cursor: default; }
-    .counter {
-      position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
-      color: #f3d28a; background: rgba(0,0,0,0.35); padding: 8px 14px; border-radius: 999px;
-      z-index: 10; font-size: 14px; letter-spacing: 0.04em;
-    }
+    :root{ --bg:#020b13; --gold:#f2cb77; --ratio:1672/941; }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; width:100%; height:100%; overflow:hidden; background:var(--bg); font-family: Georgia, 'Times New Roman', serif; }
+    body{ position:fixed; inset:0; touch-action:none; -webkit-user-select:none; user-select:none; }
+    #app{ position:fixed; inset:0; display:grid; place-items:center; background:var(--bg); }
+    #frame{ position:relative; width:min(100vw, calc(100vh * 1672 / 941)); height:min(100vh, calc(100vw * 941 / 1672)); aspect-ratio:var(--ratio); overflow:hidden; background:var(--bg); }
+    #sceneImg{ position:absolute; inset:0; width:100%; height:100%; object-fit:fill; display:block; -webkit-user-drag:none; user-select:none; }
+    #overlay{ position:absolute; inset:0; }
+    .taplayer, .hotspot{ position:absolute; background:transparent; border:0; outline:0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .taplayer{ inset:0; }
+    .hotspot.showDebug{ outline:2px dashed rgba(255,255,255,.35); }
+    .badge{ position:absolute; left:50%; transform:translateX(-50%); bottom:2.8%; z-index:20; padding:.55rem 1rem; color:#f4d68d; border:1px solid rgba(232,183,83,.45); border-radius:999px; background:rgba(5,12,24,.62); backdrop-filter:blur(4px); font-size:clamp(12px,1.35vw,20px); letter-spacing:.03em; text-shadow:0 1px 4px rgba(0,0,0,.6); box-shadow:0 10px 18px rgba(0,0,0,.18); display:none; }
+    #lockHint{ bottom:2.6%; }
+    #keyCover{ position:absolute; left:39%; top:85.5%; width:23%; height:9%; border-radius:999px; background:rgba(2,8,18,.72); filter:blur(2px); display:none; }
+    #targetRing{ position:absolute; left:65.8%; top:52.6%; width:8%; height:14%; border-radius:50%; border:2px solid rgba(242,203,119,.86); box-shadow:0 0 22px rgba(242,203,119,.8), inset 0 0 14px rgba(242,203,119,.32); display:none; }
+    #dragSvg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; display:none; }
+    #dragLine{ stroke:rgba(246,211,134,.95); stroke-width:5; stroke-linecap:round; filter:drop-shadow(0 0 8px rgba(246,211,134,.95)); }
+    #keySprite{ position:absolute; width:14%; height:auto; transform:translate(-50%,-50%); display:none; z-index:25; cursor:grab; touch-action:none; filter:drop-shadow(0 0 12px rgba(255,210,120,.7)); }
+    #keySprite.dragging{ cursor:grabbing; }
+    #flash{ position:absolute; inset:0; background:radial-gradient(circle at center, rgba(255,240,180,.35), rgba(255,220,140,.0) 55%); opacity:0; pointer-events:none; transition:opacity .35s ease; }
+    #flash.on{ opacity:1; }
+    .spark{ position:absolute; width:22px; height:22px; border-radius:50%; background:radial-gradient(circle, rgba(255,235,180,.95), rgba(255,210,120,.5) 45%, rgba(255,210,120,0) 70%); pointer-events:none; opacity:0; }
+    @keyframes pulse { from { transform:translate(-50%,-50%) scale(.5); opacity:0; } 40%{ opacity:1; } to { transform:translate(-50%,-50%) scale(1.7); opacity:0; } }
+    .pulse{ animation:pulse .7s ease-out forwards; }
   </style>
 </head>
 <body>
-  <div class="counter" id="counter"></div>
-  <div class="screen"><img id="scene" src="scene21_intro.png" alt="Mirror mission scene" /></div>
-  <div class="nav">
-    <button id="prevBtn">◀ Previous</button>
-    <button id="nextBtn">Next ▶</button>
+<div id="app">
+  <div id="frame">
+    <img id="sceneImg" src="scene01.png" alt="story scene" />
+    <div id="overlay"></div>
+    <svg id="dragSvg" viewBox="0 0 100 100" preserveAspectRatio="none"><line id="dragLine" x1="0" y1="0" x2="0" y2="0"/></svg>
+    <div id="keyCover"></div>
+    <div id="targetRing"></div>
+    <img id="keySprite" src="key.png" alt="key" draggable="false" />
+    <div id="lockHint" class="badge">Drag the key to the lock</div>
+    <div id="flash"></div>
   </div>
-  <script>
-    const scenes = [
-      'scene21_intro.png',
-      'scene22_choice.png',
-      'scene23_wrong_choice.png',
-      'scene24_puzzle.png',
-      'scene25_symbol.png',
-      'scene26_portal.png'
+</div>
+<script>
+(() => {
+  const img = document.getElementById('sceneImg');
+  const overlay = document.getElementById('overlay');
+  const frame = document.getElementById('frame');
+  const keySprite = document.getElementById('keySprite');
+  const dragSvg = document.getElementById('dragSvg');
+  const dragLine = document.getElementById('dragLine');
+  const keyCover = document.getElementById('keyCover');
+  const targetRing = document.getElementById('targetRing');
+  const lockHint = document.getElementById('lockHint');
+  const flash = document.getElementById('flash');
+
+  const assets = {
+    scene01:'scene01.png', scene02:'scene02.png', scene03:'scene03.png', scene04:'scene04.png', scene05:'scene05.png', scene06:'scene06.png', scene07:'scene07.png',
+    scene08_1:'scene08_1.png', scene08_2:'scene08_2.png', scene08_3:'scene08_3.png', scene09:'scene09.png', scene10:'scene10.png', scene11:'scene11.png', scene12:'scene12.png', scene13:'scene13.png',
+    scene14_dialogue:'scene14_dialogue.png', scene14_instruction:'scene14_instruction.png', scene14_how:'scene14_how.png',
+    scene15_rps_choice:'scene15_rps_choice.png', scene15_paper_lose:'scene15_paper_lose.png', scene15_scissors_tie:'scene15_scissors_tie.png', scene15_rock_win:'scene15_rock_win.png', scene15_keydrag:'scene15_keydrag.png', scene15_portal:'scene15_portal.png',
+    scene16_alchemy:'scene16_alchemy.png', scene17_formula:'scene17_formula.png', scene18_ingredients:'scene18_ingredients.png', scene19_formula_awakens:'scene19_formula_awakens.png', scene20_symbol:'scene20_symbol.png',
+    scene21_intro:'scene21_intro.png', scene22_choice:'scene22_choice.png', scene23_wrong_choice:'scene23_wrong_choice.png', scene24_puzzle:'scene24_puzzle.png', scene25_symbol:'scene25_symbol.png', scene26_portal:'scene26_portal.png'
+  };
+
+  Object.values(assets).forEach(src => { const i = new Image(); i.src = src; });
+  new Image().src = 'key.png';
+
+  const tapNext = {
+    scene01:'scene02', scene02:'scene03', scene03:'scene04', scene04:'scene05', scene05:'scene06', scene06:'scene07', scene07:'scene08_1',
+    scene08_1:'scene08_2', scene08_2:'scene08_3', scene08_3:'scene09', scene09:'scene10', scene10:'scene11', scene11:'scene12', scene12:'scene13',
+    scene13:'scene14_dialogue', scene14_dialogue:'scene14_instruction', scene14_instruction:'scene14_how', scene14_how:'scene15_rps_choice',
+    scene15_paper_lose:'scene15_rps_choice', scene15_scissors_tie:'scene15_rps_choice', scene15_rock_win:'scene15_keydrag', scene15_portal:'scene16_alchemy',
+    scene16_alchemy:'scene17_formula', scene17_formula:'scene18_ingredients', scene18_ingredients:'scene19_formula_awakens', scene19_formula_awakens:'scene20_symbol', scene20_symbol:'scene21_intro',
+    scene21_intro:'scene22_choice', scene23_wrong_choice:'scene22_choice', scene25_symbol:'scene26_portal'
+  };
+
+  let current = 'scene01';
+  let dragState = null;
+  let puzzleDone = 0;
+  let puzzleTouched = new Set();
+
+  function pct(v){ return `${v}%`; }
+  function clearOverlay(){
+    overlay.innerHTML = '';
+    overlay.onclick = null;
+    keySprite.style.display = 'none';
+    keySprite.onpointerdown = null;
+    keySprite.ontouchstart = null;
+    keySprite.classList.remove('dragging');
+    dragSvg.style.display = 'none';
+    keyCover.style.display = 'none';
+    targetRing.style.display = 'none';
+    lockHint.style.display = 'none';
+    flash.classList.remove('on');
+    dragState = null;
+    puzzleDone = 0;
+    puzzleTouched = new Set();
+  }
+
+  function makeHotspot(x,y,w,h,onTap,extraClass=''){
+    const btn = document.createElement('button');
+    btn.className = `hotspot ${extraClass}`.trim();
+    btn.style.left = pct(x); btn.style.top = pct(y); btn.style.width = pct(w); btn.style.height = pct(h);
+    btn.addEventListener('click', (e) => { e.stopPropagation(); onTap(); });
+    overlay.appendChild(btn);
+    return btn;
+  }
+
+  function addFullTap(nextId){
+    const btn = document.createElement('button');
+    btn.className = 'taplayer';
+    btn.addEventListener('click', () => show(nextId));
+    overlay.appendChild(btn);
+  }
+
+  function sparkle(x,y){
+    const s = document.createElement('div');
+    s.className = 'spark pulse';
+    s.style.left = pct(x); s.style.top = pct(y);
+    frame.appendChild(s);
+    setTimeout(() => s.remove(), 700);
+  }
+
+  function show(id){
+    current = id;
+    clearOverlay();
+    img.src = assets[id];
+
+    if (id === 'scene15_rps_choice') return setupRPS();
+    if (id === 'scene15_keydrag') return setupKeyDrag();
+    if (id === 'scene22_choice') return setupMirrorChoice();
+    if (id === 'scene24_puzzle') return setupPuzzle();
+    if (id === 'scene26_portal') return; // end scene, no forced next
+
+    const next = tapNext[id];
+    if (next) addFullTap(next);
+  }
+
+  function setupRPS(){
+    makeHotspot(7, 80.5, 26, 15, () => show('scene15_rock_win'));     // Rock wins against crab scissors
+    makeHotspot(36, 80.5, 27, 15, () => show('scene15_paper_lose'));  // Paper loses to crab scissors
+    makeHotspot(64, 80.5, 29, 15, () => show('scene15_scissors_tie')); // Scissors ties
+  }
+
+  function setupMirrorChoice(){
+    makeHotspot(24, 15, 17, 61, () => show('scene23_wrong_choice'));
+    makeHotspot(41.5, 15, 16.5, 61, () => show('scene23_wrong_choice'));
+    makeHotspot(58.5, 13.5, 17, 63, () => show('scene24_puzzle'));
+    makeHotspot(76.5, 15, 16.5, 61, () => show('scene23_wrong_choice'));
+  }
+
+  function setupPuzzle(){
+    const pieces = [
+      [29.5,17.5,15,21],
+      [61,15.5,18,24],
+      [34.2,39.5,13.5,19],
+      [66.8,38.5,12.5,18.5],
+      [40.5,60,15.5,23],
+      [57.5,59.5,18.5,23.5]
     ];
-    let index = 0;
-    const img = document.getElementById('scene');
-    const counter = document.getElementById('counter');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    function render() {
-      img.src = scenes[index];
-      counter.textContent = `${index + 1} / ${scenes.length}`;
-      prevBtn.disabled = index === 0;
-      nextBtn.disabled = index === scenes.length - 1;
-    }
-    prevBtn.addEventListener('click', () => { if (index > 0) { index--; render(); } });
-    nextBtn.addEventListener('click', () => { if (index < scenes.length - 1) { index++; render(); } });
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' && index < scenes.length - 1) { index++; render(); }
-      if (e.key === 'ArrowLeft' && index > 0) { index--; render(); }
+    pieces.forEach((p, idx) => {
+      const [x,y,w,h] = p;
+      const btn = makeHotspot(x,y,w,h, () => {
+        if (puzzleTouched.has(idx)) return;
+        puzzleTouched.add(idx);
+        btn.style.pointerEvents = 'none';
+        btn.style.boxShadow = 'inset 0 0 0 2px rgba(0,0,0,0), 0 0 26px rgba(242,203,119,.9)';
+        btn.style.borderRadius = '14px';
+        sparkle(x + w/2, y + h/2);
+        puzzleDone += 1;
+        if (puzzleDone >= pieces.length){
+          flash.classList.add('on');
+          setTimeout(() => show('scene25_symbol'), 450);
+        }
+      });
     });
-    render();
-  </script>
+  }
+
+  function setupKeyDrag(){
+    keyCover.style.display = 'block';
+    targetRing.style.display = 'block';
+    lockHint.style.display = 'block';
+    dragSvg.style.display = 'block';
+    const start = {x:49.5, y:84.0};
+    const target = {x:69.7, y:59.5};
+    let keyPos = {...start};
+
+    function renderLine(){
+      dragLine.setAttribute('x1', start.x); dragLine.setAttribute('y1', start.y);
+      dragLine.setAttribute('x2', keyPos.x); dragLine.setAttribute('y2', keyPos.y);
+    }
+    function placeKey(){
+      keySprite.style.left = pct(keyPos.x);
+      keySprite.style.top = pct(keyPos.y);
+    }
+    keySprite.style.display = 'block';
+    placeKey(); renderLine();
+
+    const rectPct = () => frame.getBoundingClientRect();
+    function eventToPct(e){
+      const r = rectPct();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {x: ((clientX - r.left) / r.width) * 100, y: ((clientY - r.top) / r.height) * 100};
+    }
+
+    function startDrag(e){
+      e.preventDefault(); e.stopPropagation();
+      dragState = { active:true };
+      keySprite.classList.add('dragging');
+      document.addEventListener('pointermove', moveDrag);
+      document.addEventListener('pointerup', endDrag);
+      document.addEventListener('touchmove', moveDrag, {passive:false});
+      document.addEventListener('touchend', endDrag, {passive:false});
+    }
+    function moveDrag(e){
+      if (!dragState?.active) return;
+      e.preventDefault();
+      const p = eventToPct(e);
+      keyPos.x = Math.max(5, Math.min(95, p.x));
+      keyPos.y = Math.max(8, Math.min(92, p.y));
+      placeKey(); renderLine();
+    }
+    function cleanupDrag(){
+      document.removeEventListener('pointermove', moveDrag);
+      document.removeEventListener('pointerup', endDrag);
+      document.removeEventListener('touchmove', moveDrag);
+      document.removeEventListener('touchend', endDrag);
+      keySprite.classList.remove('dragging');
+      dragState = null;
+    }
+    function endDrag(e){
+      if (!dragState?.active) return;
+      e.preventDefault();
+      const dx = keyPos.x - target.x;
+      const dy = keyPos.y - target.y;
+      const dist = Math.hypot(dx,dy);
+      if (dist < 7.5){
+        keyPos = {x:target.x, y:target.y};
+        placeKey(); renderLine();
+        flash.classList.add('on');
+        cleanupDrag();
+        setTimeout(() => show('scene15_portal'), 480);
+      } else {
+        keyPos = {...start};
+        placeKey(); renderLine();
+        cleanupDrag();
+      }
+    }
+    keySprite.onpointerdown = startDrag;
+    keySprite.ontouchstart = startDrag;
+  }
+
+  show('scene01');
+})();
+</script>
 </body>
 </html>
