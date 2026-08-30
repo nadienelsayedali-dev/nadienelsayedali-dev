@@ -570,6 +570,49 @@
     }
     #scene16 img{object-fit:fill;}
 
+  
+
+    /* === Alchemy mission (Scenes 16–20) === */
+    #scene16Continue,#scene17Continue,#scene19Continue{
+      position:absolute; inset:0; width:100%; height:100%; z-index:72;
+      border:0; background:transparent; padding:0; margin:0;
+      appearance:none; -webkit-appearance:none; touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+    #scene18IngredientButtons{position:absolute;inset:0;z-index:76;}
+    .alchemyIngredient{
+      position:absolute;border:0;background:transparent;padding:0;margin:0;
+      appearance:none;-webkit-appearance:none;touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;border-radius:18px;
+    }
+    .alchemyIngredient:active{background:rgba(239,198,105,.10);}
+    .alchemyIngredient.stardust{left:1.5%;top:57%;width:17%;height:34%;}
+    .alchemyIngredient.moonwater{left:17.5%;top:57%;width:17%;height:34%;}
+    .alchemyIngredient.pearl{left:31.5%;top:57%;width:15%;height:34%;}
+    .alchemyIngredient.golden{left:64%;top:48%;width:15%;height:31%;}
+    .alchemyIngredient.blue{left:78%;top:49%;width:20%;height:34%;}
+    #alchemySlots{position:absolute;inset:0;z-index:77;pointer-events:none;}
+    .alchemySlotMark{
+      position:absolute;top:78.4%;width:4.8%;height:6.8%;
+      display:grid;place-items:center;border-radius:999px;
+      color:#ffe4a1;font-family:Georgia,serif;font-weight:700;
+      font-size:clamp(18px,2.4vw,34px);text-shadow:0 0 13px #f1b947,0 0 24px #f1b947;
+      opacity:0;transform:scale(.75);transition:opacity .22s ease,transform .22s ease;
+    }
+    .alchemySlotMark.on{opacity:1;transform:scale(1);}
+    #alchemySlot1{left:41.1%;} #alchemySlot2{left:50.7%;} #alchemySlot3{left:60.3%;}
+    #alchemyStatus{
+      position:absolute;left:50%;bottom:5.2%;transform:translateX(-50%);
+      z-index:80;padding:.55em 1.1em;border:1px solid rgba(230,184,92,.72);
+      border-radius:999px;background:rgba(6,11,20,.78);color:#f5d797;
+      font:600 clamp(14px,1.7vw,24px)/1.1 Georgia,serif;letter-spacing:.02em;
+      opacity:0;pointer-events:none;transition:opacity .2s ease;white-space:nowrap;
+      box-shadow:0 0 18px rgba(219,166,64,.18);
+    }
+    #alchemyStatus.show{opacity:1;}
+    #scene18.wrongFlash{animation:alchemyWrong .42s ease 1;}
+    @keyframes alchemyWrong{0%,100%{filter:none}45%{filter:brightness(.82) sepia(.15)}}
+
   </style>
 </head>
 
@@ -657,25 +700,25 @@
     </section>
 
     <section id="scene14Dialogue" class="scene">
-      <img src="./scene14_dialogue.png?v=32" alt="You can talk? I know a secret about this chest">
+      <img src="./scene14_dialogue.png?v=33" alt="You can talk? I know a secret about this chest">
       <button id="scene14DialogueContinue" type="button" aria-label="Continue the conversation"></button>
     </section>
 
     <section id="scene14Instruction" class="scene">
-      <img src="./scene14_instruction.png?v=32" alt="To discover what is inside, you must open the chest">
+      <img src="./scene14_instruction.png?v=33" alt="To discover what is inside, you must open the chest">
       <button id="scene14InstructionContinue" type="button" aria-label="Continue"></button>
     </section>
 
     <section id="scene14How" class="scene">
-      <img src="./scene14_how.png?v=32" alt="How?">
+      <img src="./scene14_how.png?v=33" alt="How?">
       <button id="scene14HowContinue" type="button" aria-label="Start the challenge"></button>
     </section>
 
     <section id="scene15" class="scene">
-      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=32" alt="Rock Paper Scissors challenge">
-      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=32" alt="Paper loses. The crab chases her.">
-      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=32" alt="Scissors versus scissors. A tie.">
-      <img id="scene15RockWin" src="./scene15_rock_win.png?v=32" alt="Rock wins. The crab gives up the key.">
+      <img id="scene15RpsChoice" src="./scene15_rps_choice.png?v=33" alt="Rock Paper Scissors challenge">
+      <img id="scene15PaperLose" src="./scene15_paper_lose.png?v=33" alt="Paper loses. The crab chases her.">
+      <img id="scene15ScissorsTie" src="./scene15_scissors_tie.png?v=33" alt="Scissors versus scissors. A tie.">
+      <img id="scene15RockWin" src="./scene15_rock_win.png?v=33" alt="Rock wins. The crab gives up the key.">
 
       <div id="scene15RpsButtons" aria-label="Choose rock paper or scissors">
         <button class="rpsChoice rock" data-rps="rock" type="button" aria-label="Rock"></button>
@@ -689,12 +732,44 @@
     </section>
 
     <section id="scene15Portal" class="scene">
-      <img src="./scene15_portal.png?v=32" alt="What's happening?">
+      <img src="./scene15_portal.png?v=33" alt="What's happening?">
       <button id="scene15PortalContinue" type="button" aria-label="Continue to the next world"></button>
     </section>
 
     <section id="scene16" class="scene">
-      <img src="./scene16_alchemy.png?v=32" alt="The Alchemy Room">
+      <img src="./scene16_alchemy.png?v=33" alt="Where am I? The golden dawn alchemy world">
+      <button id="scene16Continue" type="button" aria-label="Explore the alchemy room"></button>
+    </section>
+
+    <section id="scene17" class="scene">
+      <img src="./scene17_formula.png?v=33" alt="The First Formula clue">
+      <button id="scene17Continue" type="button" aria-label="Begin the formula challenge"></button>
+    </section>
+
+    <section id="scene18" class="scene">
+      <img src="./scene18_ingredients.png?v=33" alt="Choose the three ingredients in the correct order">
+      <div id="scene18IngredientButtons" aria-label="Alchemy ingredient choices">
+        <button class="alchemyIngredient stardust" data-ingredient="stardust" type="button" aria-label="Stardust"></button>
+        <button class="alchemyIngredient moonwater" data-ingredient="moonwater" type="button" aria-label="Moonwater"></button>
+        <button class="alchemyIngredient pearl" data-ingredient="pearl" type="button" aria-label="Pearl Essence"></button>
+        <button class="alchemyIngredient golden" data-ingredient="golden" type="button" aria-label="Golden Powder"></button>
+        <button class="alchemyIngredient blue" data-ingredient="blue" type="button" aria-label="Blue Crystal"></button>
+      </div>
+      <div id="alchemySlots" aria-hidden="true">
+        <div id="alchemySlot1" class="alchemySlotMark">✓</div>
+        <div id="alchemySlot2" class="alchemySlotMark">✓</div>
+        <div id="alchemySlot3" class="alchemySlotMark">✓</div>
+      </div>
+      <div id="alchemyStatus" aria-live="polite"></div>
+    </section>
+
+    <section id="scene19" class="scene">
+      <img src="./scene19_formula_awakens.png?v=33" alt="The Formula Awakens. What is that?">
+      <button id="scene19Continue" type="button" aria-label="Continue"></button>
+    </section>
+
+    <section id="scene20" class="scene">
+      <img src="./scene20_symbol.png?v=33" alt="One symbol found. One of three collected.">
     </section>
 
     <div id="tapPulse" aria-hidden="true"></div>
@@ -726,6 +801,10 @@
     const scene15 = document.getElementById("scene15");
     const scene15Portal = document.getElementById("scene15Portal");
     const scene16 = document.getElementById("scene16");
+    const scene17 = document.getElementById("scene17");
+    const scene18 = document.getElementById("scene18");
+    const scene19 = document.getElementById("scene19");
+    const scene20 = document.getElementById("scene20");
 
     const beginStory = document.getElementById("beginStory");
     const scene2Continue = document.getElementById("scene2Continue");
@@ -758,6 +837,16 @@
     const scene15RockWin = document.getElementById("scene15RockWin");
     const scene15RpsButtons = document.getElementById("scene15RpsButtons");
     const scene15KeyCanvas = document.getElementById("scene15KeyCanvas");
+    const scene16Continue = document.getElementById("scene16Continue");
+    const scene17Continue = document.getElementById("scene17Continue");
+    const scene19Continue = document.getElementById("scene19Continue");
+    const alchemyIngredientButtons = [...document.querySelectorAll(".alchemyIngredient")];
+    const alchemyStatus = document.getElementById("alchemyStatus");
+    const alchemySlots = [
+      document.getElementById("alchemySlot1"),
+      document.getElementById("alchemySlot2"),
+      document.getElementById("alchemySlot3")
+    ];
     const scene15KeyCtx = scene15KeyCanvas.getContext("2d");
     const scene15KeyStart = document.getElementById("scene15KeyStart");
     const scene15DragHint = document.getElementById("scene15DragHint");
@@ -1490,6 +1579,77 @@
       e.preventDefault(); pulseAt(e);
       setTimeout(() => showScene(scene16), 260);
     });
+
+    /* Alchemy World: arrival -> clue -> ordered ingredient mission -> symbol. */
+    scene16Continue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene17), 240);
+    });
+
+    scene17Continue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      resetAlchemyMission();
+      setTimeout(() => showScene(scene18), 240);
+    });
+
+    const alchemyCorrectOrder = ["stardust","pearl","golden"];
+    let alchemyStep = 0;
+    let alchemyLocked = false;
+    let alchemyStatusTimer = null;
+
+    function setAlchemyStatus(message){
+      if(alchemyStatusTimer) clearTimeout(alchemyStatusTimer);
+      alchemyStatus.textContent = message;
+      alchemyStatus.classList.add("show");
+      alchemyStatusTimer = setTimeout(() => alchemyStatus.classList.remove("show"), 1050);
+    }
+
+    function resetAlchemyMission(){
+      alchemyStep = 0;
+      alchemyLocked = false;
+      alchemySlots.forEach(s => s.classList.remove("on"));
+      alchemyStatus.classList.remove("show");
+      scene18.classList.remove("wrongFlash");
+    }
+
+    function chooseAlchemyIngredient(name, e){
+      if(alchemyLocked) return;
+      if(e){ e.preventDefault(); e.stopPropagation(); pulseAt(e); }
+
+      const expected = alchemyCorrectOrder[alchemyStep];
+      if(name !== expected){
+        alchemyLocked = true;
+        scene18.classList.remove("wrongFlash");
+        void scene18.offsetWidth;
+        scene18.classList.add("wrongFlash");
+        setAlchemyStatus("The formula resets… try the order again.");
+        setTimeout(() => {
+          alchemySlots.forEach(s => s.classList.remove("on"));
+          alchemyStep = 0;
+          alchemyLocked = false;
+        }, 820);
+        return;
+      }
+
+      alchemySlots[alchemyStep].classList.add("on");
+      alchemyStep += 1;
+
+      if(alchemyStep === alchemyCorrectOrder.length){
+        alchemyLocked = true;
+        setAlchemyStatus("The formula is complete.");
+        setTimeout(() => showScene(scene19), 850);
+      }
+    }
+
+    alchemyIngredientButtons.forEach(btn => {
+      btn.addEventListener("pointerup", e => chooseAlchemyIngredient(btn.dataset.ingredient, e));
+    });
+
+    scene19Continue.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      setTimeout(() => showScene(scene20), 260);
+    });
+
 
 
     const CARD_RATIO = 1672 / 941;
