@@ -773,20 +773,28 @@
     }
 
   
-    /* v41: normal jigsaw puzzle directly on the mirror */
+    /* ===== v42 clear normal jigsaw puzzle ===== */
     #scene24 .puzzleTarget{
-      border:1px dashed rgba(247,211,137,.14) !important;
-      background:rgba(235,192,98,.008) !important;
-      border-radius:34px !important;
-    }
-    #scene24 .puzzleTarget.lit{
-      border-color:transparent !important;
+      border:0 !important;
       background:transparent !important;
       box-shadow:none !important;
+      border-radius:34px !important;
+      transition:box-shadow .14s ease, background .14s ease !important;
+    }
+    #scene24 .puzzleTarget.lit{
+      border:2px solid rgba(255,218,142,.92) !important;
+      background:rgba(255,210,118,.08) !important;
+      box-shadow:0 0 24px rgba(245,190,82,.78), inset 0 0 24px rgba(245,190,82,.18) !important;
     }
     #scene24 #scene24PuzzleLayer .puzzlePiece{
-      filter:drop-shadow(0 5px 8px rgba(0,0,0,.72))
-             drop-shadow(0 0 8px rgba(239,194,100,.62)) !important;
+      transform:translate(-50%,-50%) !important;
+      filter:drop-shadow(0 5px 8px rgba(0,0,0,.80))
+             drop-shadow(0 0 7px rgba(255,216,135,.70)) !important;
+    }
+    #scene24 #scene24PuzzleLayer .puzzlePiece.dragging{
+      transform:translate(-50%,-50%) scale(1.08) !important;
+      filter:drop-shadow(0 10px 14px rgba(0,0,0,.82))
+             drop-shadow(0 0 20px rgba(255,222,150,1)) !important;
     }
 
   </style>
@@ -972,7 +980,7 @@
     </section>
 
     <section id="scene24" class="scene">
-      <img src="./scene24.png?v=41" alt="The mirror broke. Put the pieces back in the right place.">
+      <img src="./scene24.png?v=42" alt="The mirror broke. Put the pieces back in the right place.">
       <div id="scene24PuzzleLayer" aria-label="Drag the six mirror pieces into the mirror">
         <div class="puzzleTarget" data-target="1"></div>
         <div class="puzzleTarget" data-target="2"></div>
@@ -986,12 +994,12 @@
         <div class="originCover" data-cover="4"></div>
         <div class="originCover" data-cover="5"></div>
         <div class="originCover" data-cover="6"></div>
-        <img class="puzzlePiece" data-piece="1" src="./puzzle_piece_1.png?v=41" alt="Mirror piece 1" draggable="false">
-        <img class="puzzlePiece" data-piece="2" src="./puzzle_piece_2.png?v=41" alt="Mirror piece 2" draggable="false">
-        <img class="puzzlePiece" data-piece="3" src="./puzzle_piece_3.png?v=41" alt="Mirror piece 3" draggable="false">
-        <img class="puzzlePiece" data-piece="4" src="./puzzle_piece_4.png?v=41" alt="Mirror piece 4" draggable="false">
-        <img class="puzzlePiece" data-piece="5" src="./puzzle_piece_5.png?v=41" alt="Mirror piece 5" draggable="false">
-        <img class="puzzlePiece" data-piece="6" src="./puzzle_piece_6.png?v=41" alt="Mirror piece 6" draggable="false">
+        <img class="puzzlePiece" data-piece="1" src="./puzzle_piece_1.png?v=42" alt="Mirror piece 1" draggable="false">
+        <img class="puzzlePiece" data-piece="2" src="./puzzle_piece_2.png?v=42" alt="Mirror piece 2" draggable="false">
+        <img class="puzzlePiece" data-piece="3" src="./puzzle_piece_3.png?v=42" alt="Mirror piece 3" draggable="false">
+        <img class="puzzlePiece" data-piece="4" src="./puzzle_piece_4.png?v=42" alt="Mirror piece 4" draggable="false">
+        <img class="puzzlePiece" data-piece="5" src="./puzzle_piece_5.png?v=42" alt="Mirror piece 5" draggable="false">
+        <img class="puzzlePiece" data-piece="6" src="./puzzle_piece_6.png?v=42" alt="Mirror piece 6" draggable="false">
         <div id="scene24PuzzleStatus">Drag each mirror piece into its matching place.</div>
         <div id="scene24WrongPulse" aria-hidden="true"></div>
       </div>
@@ -1944,12 +1952,12 @@
     });
 
     const puzzleConfig = [
-      {id:1, x:16.4,y:83.5,w:10.0,h:16.0, tx:47.2,ty:16.5,tw:10.5,th:16.5},
-      {id:2, x:29.4,y:83.5,w:10.0,h:16.0, tx:56.7,ty:38.5,tw:10.5,th:16.5},
-      {id:3, x:42.3,y:83.5,w:10.5,h:16.0, tx:41.3,ty:25.0,tw:10.5,th:16.5},
-      {id:4, x:55.3,y:83.5,w:10.5,h:16.0, tx:49.2,ty:51.2,tw:10.5,th:16.5},
-      {id:5, x:68.4,y:83.5,w:10.5,h:16.0, tx:41.8,ty:45.2,tw:10.5,th:16.5},
-      {id:6, x:82.7,y:83.5,w:10.5,h:16.0, tx:57.6,ty:55.0,tw:10.5,th:16.5}
+      {id:1, x:12.8,y:82.1,w:12.0,h:18.0, tx:49.5,ty:30.5,tw:13.0,th:20.0},
+      {id:2, x:27.7,y:82.1,w:12.0,h:18.0, tx:39.1,ty:45.0,tw:13.0,th:20.0},
+      {id:3, x:42.2,y:82.1,w:12.0,h:18.0, tx:59.0,ty:45.0,tw:13.0,th:20.0},
+      {id:4, x:56.9,y:82.1,w:12.0,h:18.0, tx:39.1,ty:57.3,tw:13.0,th:20.0},
+      {id:5, x:71.4,y:82.1,w:12.0,h:18.0, tx:49.5,ty:57.3,tw:13.0,th:20.0},
+      {id:6, x:86.2,y:82.1,w:12.0,h:18.0, tx:59.0,ty:57.3,tw:13.0,th:20.0}
     ];
     const placedPuzzlePieces = new Set();
     let puzzleDrag = null;
@@ -1992,7 +2000,7 @@
       placedPuzzlePieces.clear();
       puzzleTargets.forEach(el => el.classList.remove("lit"));
       puzzlePieces.forEach(piece => { const c=cfgFor(Number(piece.dataset.piece)); setOriginCover(c,false); positionPieceAtOrigin(piece,c); });
-      scene24PuzzleStatus.textContent="Drag each jigsaw piece onto its matching place in the mirror.";
+      scene24PuzzleStatus.textContent="Drag a piece to the matching part of the mirror.";
       puzzleDrag=null;
     }
 
@@ -2010,6 +2018,8 @@
       puzzleDrag={id,piece,c,startX:p.x,startY:p.y,moved:false};
       setOriginCover(c,true);
       piece.classList.add("dragging");
+      const ownTarget = puzzleTargets.find(t => Number(t.dataset.target) === c.id);
+      if(ownTarget) ownTarget.classList.add("lit");
       piece.style.setProperty("z-index","140","important");
       try{ piece.setPointerCapture(e.pointerId); }catch(_){ }
     }
@@ -2033,7 +2043,7 @@
       e.preventDefault();
       const {id,piece,c,moved}=puzzleDrag;
       const p=framePercentFromPointer(e.clientX,e.clientY);
-      const margin=3.2;
+      const margin=4.8;
       const inside = moved && p.x >= c.tx-margin && p.x <= c.tx+c.tw+margin && p.y >= c.ty-margin && p.y <= c.ty+c.th+margin;
       const target=puzzleTargets.find(v=>Number(v.dataset.target)===id);
       piece.classList.remove("dragging");
@@ -2057,7 +2067,7 @@
         positionPieceAtOrigin(piece,c);
         wrongPuzzleDrop(p);
         scene24PuzzleStatus.textContent="That piece does not fit there. Try again.";
-        setTimeout(()=>{ if(placedPuzzlePieces.size<6) scene24PuzzleStatus.textContent="Drag each jigsaw piece onto its matching place in the mirror."; },900);
+        setTimeout(()=>{ if(placedPuzzlePieces.size<6) scene24PuzzleStatus.textContent="Drag a piece to the matching part of the mirror."; },900);
       }
       puzzleDrag=null;
     }
