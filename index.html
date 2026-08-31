@@ -812,25 +812,97 @@
     }
 
   
-    /* ===== Mission 3 — Enchanted Music Box (real uploaded audio) ===== */
-    #scene27Box,#scene28Play,#scene29Replay,#scene30ListenAgain,#scene30TryAgain,#scene32Continue{
-      position:absolute;z-index:150;border:0;background:transparent;appearance:none;-webkit-appearance:none;
-      touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;
+    /* ===== Mission 3: choose the next sentence ===== */
+    #scene27BoxTap,#scene28Replay,#scene32Continue{
+      position:absolute; z-index:150; border:0; background:transparent;
+      appearance:none; -webkit-appearance:none; touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent; cursor:pointer;
     }
-    #scene27Box{left:37%;top:28%;width:27%;height:49%;}
-    #scene28Play{left:41%;top:31%;width:18%;height:20%;}
-    #scene29Keys{position:absolute;inset:0;z-index:151;pointer-events:none;}
-    .musicKey{position:absolute;top:69%;width:13%;height:22%;border:0;background:transparent;border-radius:50%;
-      appearance:none;-webkit-appearance:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-      pointer-events:auto;cursor:pointer;}
-    .musicKey.k1{left:22%}.musicKey.k2{left:36.5%}.musicKey.k3{left:51%}.musicKey.k4{left:65.5%}
-    #scene29Replay{left:34%;bottom:0%;width:32%;height:10%;pointer-events:auto;}
-    #scene30ListenAgain{left:22%;bottom:0%;width:27%;height:14%;}
-    #scene30TryAgain{left:49%;bottom:0%;width:28%;height:14%;}
-    #scene31Timer{position:absolute;left:44%;top:78%;width:12%;height:9%;z-index:155;display:grid;place-items:center;
-      color:#f4cf78;font:600 clamp(17px,2vw,30px)/1 Georgia,serif;text-shadow:0 0 12px rgba(229,179,75,.75);
-      pointer-events:none;}
-    #scene32Continue{inset:0;}
+    #scene27BoxTap{left:37%;top:24%;width:43%;height:65%;}
+    #scene28Replay{left:4%;top:43%;width:36%;height:34%;}
+    #scene32Continue{left:34%;top:75%;width:30%;height:15%;}
+
+    #scene29ChoiceLayer{position:absolute;inset:0;z-index:155;pointer-events:none;}
+    .lyricChoice{
+      position:absolute;left:49.0%;width:35.0%;height:9.3%;
+      border:1px solid rgba(208,151,55,.82);
+      border-radius:14px;
+      background:linear-gradient(180deg,rgba(33,28,22,.985),rgba(21,18,15,.985));
+      color:#f2d58c;
+      font-family:Tahoma,Arial,sans-serif;
+      font-size:clamp(15px,1.45vw,24px);
+      line-height:1.35;
+      padding:.2em 1.0em .2em 3.8em;
+      direction:rtl;
+      text-align:center;
+      box-shadow:inset 0 0 0 1px rgba(255,216,139,.06);
+      pointer-events:auto;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+      cursor:pointer;
+      overflow:hidden;
+    }
+    .lyricChoice::before{
+      content:"▶";
+      position:absolute;left:1.55em;top:50%;transform:translateY(-50%);
+      width:2.05em;height:2.05em;border-radius:50%;
+      display:grid;place-items:center;
+      background:#efd18b;color:#241b0e;
+      font:700 .72em/1 Arial,sans-serif;
+      direction:ltr;
+    }
+    .lyricChoice.c1{top:38.0%}
+    .lyricChoice.c2{top:49.5%}
+    .lyricChoice.c3{top:61.0%}
+    .lyricChoice.c4{top:72.4%}
+    .lyricChoice:active{transform:scale(.985);filter:brightness(1.12);}
+    #scene29ListenAgain{
+      position:absolute;left:85%;top:68%;width:12%;height:9%;
+      z-index:158;border:0;background:transparent;cursor:pointer;
+      touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+    }
+
+    #scene30TryAgain,#scene30ListenAgain{
+      position:absolute;left:13.4%;width:35.8%;height:12.0%;
+      z-index:155;border:0;background:transparent;cursor:pointer;
+      touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+    }
+    #scene30TryAgain{top:54.5%}
+    #scene30ListenAgain{top:69.5%}
+
+    #scene28LiveTime{
+      position:absolute;left:8.1%;top:62.4%;z-index:160;
+      min-width:5.2%;padding:.12em .2em;text-align:center;
+      color:#f0d183;background:rgba(24,20,15,.96);
+      font:500 clamp(13px,1.25vw,21px)/1.1 Georgia,serif;
+      pointer-events:none;
+    }
+    #scene28Duration{
+      position:absolute;left:33.0%;top:62.4%;z-index:160;
+      min-width:5.2%;padding:.12em .2em;text-align:center;
+      color:#f0d183;background:rgba(24,20,15,.96);
+      font:500 clamp(13px,1.25vw,21px)/1.1 Georgia,serif;
+      pointer-events:none;
+    }
+    #scene28TapToHear{
+      position:absolute;left:8%;bottom:4.5%;z-index:170;
+      padding:.65em 1em;border:1px solid rgba(227,175,76,.8);
+      border-radius:999px;background:rgba(17,14,11,.93);color:#f5d890;
+      font:600 clamp(13px,1.25vw,20px)/1 Georgia,serif;
+      opacity:0;pointer-events:none;transition:opacity .2s ease;
+    }
+    #scene28TapToHear.show{opacity:1;pointer-events:auto;}
+
+    #rewardCountdown{
+      position:absolute;left:65.0%;top:77.0%;width:10.5%;height:15.8%;
+      z-index:165;border-radius:50%;
+      display:grid;place-items:center;
+      background:#14100c;border:2px solid #b88332;color:#f0d18b;
+      box-shadow:0 0 0 5px rgba(184,131,50,.13) inset;
+      font:600 clamp(17px,2.0vw,30px)/1 Georgia,serif;
+      text-align:center;pointer-events:none;
+    }
+    #rewardCountdown small{display:block;font-size:.48em;margin-top:.1em}
 
 </style>
 </head>
@@ -995,12 +1067,12 @@
 
 
     <section id="scene21" class="scene">
-      <img src="./scene21.png?v=40" alt="Where did you bring me now?">
+      <img src="./scene21.png?v=46" alt="Where did you bring me now?">
       <button id="scene21Continue" type="button" aria-label="Look at the mirrors"></button>
     </section>
 
     <section id="scene22" class="scene">
-      <img src="./scene22.png?v=40" alt="Only one reflection tells the truth">
+      <img src="./scene22.png?v=46" alt="Only one reflection tells the truth">
       <div id="scene22MirrorButtons" aria-label="Choose the true reflection">
         <button class="mirrorChoice m1" data-mirror="1" type="button" aria-label="First mirror"></button>
         <button class="mirrorChoice m2" data-mirror="2" type="button" aria-label="Second mirror"></button>
@@ -1010,7 +1082,7 @@
     </section>
 
     <section id="scene23" class="scene">
-      <img src="./scene23.png?v=40" alt="That's not right. Try again.">
+      <img src="./scene23.png?v=46" alt="That's not right. Try again.">
       <button id="scene23Retry" type="button" aria-label="Try the mirror challenge again"></button>
     </section>
 
@@ -1041,46 +1113,49 @@
     </section>
 
     <section id="scene25" class="scene">
-      <img src="./scene25.png?v=40" alt="Two of three symbols found">
+      <img src="./scene25.png?v=46" alt="Two of three symbols found">
       <button id="scene25Continue" type="button" aria-label="Continue"></button>
     </section>
 
     <section id="scene26" class="scene">
-      <img src="./scene26.png?v=40" alt="The mirror becomes a portal">
+      <img src="./scene26.png?v=46" alt="The mirror becomes a portal">
       <button id="scene26PortalTouch" type="button" aria-label="Touch the portal"></button>
     </section>
 
 
     <section id="scene27" class="scene">
-      <img src="./scene27.png?v=46" alt="A music box with a special melody">
-      <button id="scene27Box" type="button" aria-label="Tap the music box"></button>
+      <img src="./scene27.png?v=46" alt="A mysterious music box">
+      <button id="scene27BoxTap" type="button" aria-label="Tap the music box"></button>
     </section>
 
     <section id="scene28" class="scene">
-      <img src="./scene28.png?v=46" alt="Listen carefully and remember the melody">
-      <button id="scene28Play" type="button" aria-label="Play the melody"></button>
+      <img src="./scene28.png?v=46" alt="Listen carefully to the melody">
+      <button id="scene28Replay" type="button" aria-label="Replay the melody"></button>
+      <div id="scene28LiveTime">0:00</div>
+      <div id="scene28Duration">0:08</div>
+      <button id="scene28TapToHear" type="button">🔊 Tap to hear the melody</button>
     </section>
 
     <section id="scene29" class="scene">
-      <img src="./scene29.png?v=46" alt="Your turn. Repeat the melody by ear">
-      <div id="scene29Keys">
-        <button class="musicKey k1" data-key="0" type="button" aria-label="First note"></button>
-        <button class="musicKey k2" data-key="1" type="button" aria-label="Second note"></button>
-        <button class="musicKey k3" data-key="2" type="button" aria-label="Third note"></button>
-        <button class="musicKey k4" data-key="3" type="button" aria-label="Fourth note"></button>
-        <button id="scene29Replay" type="button" aria-label="Replay the melody"></button>
+      <img src="./scene29.png?v=46" alt="What comes next? Choose the next sentence">
+      <div id="scene29ChoiceLayer">
+        <button class="lyricChoice c1" type="button" data-choice="1" lang="ar">يا أغلى حلم عاش في قلبي وما يغيبش</button>
+        <button class="lyricChoice c2" type="button" data-choice="2" lang="ar">يا أحلى غنوة، غنوة سمعها قلبي ولا تتنسيش</button>
+        <button class="lyricChoice c3" type="button" data-choice="3" lang="ar">يا نور عيني يا حكاية عمر ما تخلصش</button>
+        <button class="lyricChoice c4" type="button" data-choice="4" lang="ar">مهما يطول البعد حبك ما يتغيرش</button>
       </div>
+      <button id="scene29ListenAgain" type="button" aria-label="Listen to the melody again"></button>
     </section>
 
     <section id="scene30" class="scene">
-      <img src="./scene30.png?v=46" alt="Not quite. Listen again and try once more">
-      <button id="scene30ListenAgain" type="button" aria-label="Listen again"></button>
+      <img src="./scene30.png?v=46" alt="Not quite. Try again or listen again.">
       <button id="scene30TryAgain" type="button" aria-label="Try again"></button>
+      <button id="scene30ListenAgain" type="button" aria-label="Listen again"></button>
     </section>
 
     <section id="scene31" class="scene">
-      <img src="./scene31.png?v=46" alt="Correct. Listen to the melody for thirty seconds">
-      <div id="scene31Timer" aria-live="polite">00:30</div>
+      <img src="./scene31.png?v=46" alt="Correct. Enjoy the rest of the melody.">
+      <div id="rewardCountdown">23<small>sec</small></div>
     </section>
 
     <section id="scene32" class="scene">
@@ -1088,7 +1163,9 @@
       <button id="scene32Continue" type="button" aria-label="Continue"></button>
     </section>
 
-    <audio id="amalAudio" src="./amal_hayati_clip.mp3?v=46" preload="auto"></audio>
+    <audio id="mission3Audio" preload="auto" playsinline>
+      <source src="./amal_hayati_clip.mp3?v=46" type="audio/mpeg">
+    </audio>
 
     <div id="tapPulse" aria-hidden="true"></div>
   </main>
@@ -1143,15 +1220,18 @@
     const scene30 = document.getElementById("scene30");
     const scene31 = document.getElementById("scene31");
     const scene32 = document.getElementById("scene32");
-    const scene27Box = document.getElementById("scene27Box");
-    const scene28Play = document.getElementById("scene28Play");
-    const scene29Replay = document.getElementById("scene29Replay");
-    const musicKeys = [...document.querySelectorAll(".musicKey")];
-    const scene30ListenAgain = document.getElementById("scene30ListenAgain");
+
+    const scene27BoxTap = document.getElementById("scene27BoxTap");
+    const scene28Replay = document.getElementById("scene28Replay");
+    const scene28LiveTime = document.getElementById("scene28LiveTime");
+    const scene28TapToHear = document.getElementById("scene28TapToHear");
+    const lyricChoices = [...document.querySelectorAll(".lyricChoice")];
+    const scene29ListenAgain = document.getElementById("scene29ListenAgain");
     const scene30TryAgain = document.getElementById("scene30TryAgain");
-    const scene31Timer = document.getElementById("scene31Timer");
+    const scene30ListenAgain = document.getElementById("scene30ListenAgain");
     const scene32Continue = document.getElementById("scene32Continue");
-    const amalAudio = document.getElementById("amalAudio");
+    const rewardCountdown = document.getElementById("rewardCountdown");
+    const mission3Audio = document.getElementById("mission3Audio");
 
 
     const beginStory = document.getElementById("beginStory");
@@ -2270,128 +2350,130 @@
       setTimeout(() => showScene(scene26), 260);
     });
 
-    /* ===== Mission 3: real recording + by-ear challenge ===== */
-    const challengeSequence = [0,1,2,1,0,1,2,3,2,1,0,1];
-    const keyFreqs = [261.63,329.63,392.00,523.25];
-    const CHALLENGE_SECONDS = 12.0;
-    let attempt = [];
-    let audioStopTimer = null;
-    let rewardCountdown = null;
-    let webAudio = null;
+    /* ===== Mission 3: listen, then choose the next sentence ===== */
+    const CHALLENGE_STOP = 8.0;
+    let mission3Mode = "idle";
+    let rewardTick = null;
 
-    function stopSong(){
-      clearTimeout(audioStopTimer);
-      try{ amalAudio.pause(); }catch(_){ }
+    function formatTime(s){
+      const n = Math.max(0, Math.floor(Number(s)||0));
+      return Math.floor(n/60) + ":" + String(n%60).padStart(2,"0");
     }
 
-    function playSongSegment(seconds, onDone){
-      stopSong();
-      amalAudio.currentTime = 0;
-      const p = amalAudio.play();
-      if(p && p.catch) p.catch(()=>{});
-      audioStopTimer = setTimeout(()=>{
-        try{ amalAudio.pause(); }catch(_){ }
-        if(onDone) onDone();
-      }, seconds*1000);
+    function stopMission3Audio(){
+      try{ mission3Audio.pause(); }catch(_){}
+      mission3Mode = "idle";
     }
 
-    function playKey(freq){
-      try{
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if(!AC) return;
-        if(!webAudio) webAudio = new AC();
-        if(webAudio.state === "suspended") webAudio.resume();
-        const o=webAudio.createOscillator(), g=webAudio.createGain();
-        o.type="sine"; o.frequency.value=freq;
-        g.gain.setValueAtTime(0.0001,webAudio.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.055,webAudio.currentTime+0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001,webAudio.currentTime+0.34);
-        o.connect(g); g.connect(webAudio.destination);
-        o.start(); o.stop(webAudio.currentTime+0.36);
-      }catch(_){ }
-    }
-
-    function beginAttempt(){
-      stopSong();
-      attempt=[];
-      showScene(scene29);
-    }
-
-    function listenChallenge(){
+    async function playChallenge(){
+      clearInterval(rewardTick);
+      rewardTick = null;
+      mission3Mode = "challenge";
       showScene(scene28);
-      playSongSegment(CHALLENGE_SECONDS, beginAttempt);
+      scene28TapToHear.classList.remove("show");
+      mission3Audio.currentTime = 0;
+      scene28LiveTime.textContent = "0:00";
+      try{
+        await mission3Audio.play();
+      }catch(err){
+        scene28TapToHear.classList.add("show");
+      }
     }
 
-    function beginReward(){
+    async function playReward(){
+      clearInterval(rewardTick);
+      rewardTick = null;
+      mission3Mode = "reward";
       showScene(scene31);
-      let left=30;
-      scene31Timer.textContent="00:30";
-      amalAudio.currentTime=0;
-      const p=amalAudio.play();
-      if(p && p.catch) p.catch(()=>{});
-      clearInterval(rewardCountdown);
-      rewardCountdown=setInterval(()=>{
-        left--;
-        scene31Timer.textContent="00:"+String(Math.max(0,left)).padStart(2,"0");
-        if(left<=0){
-          clearInterval(rewardCountdown); rewardCountdown=null;
-          try{ amalAudio.pause(); }catch(_){ }
-          showScene(scene32);
-        }
+      mission3Audio.currentTime = CHALLENGE_STOP;
+      const remaining = Math.max(1, Math.ceil((mission3Audio.duration || 30.7) - CHALLENGE_STOP));
+      let left = remaining;
+      rewardCountdown.innerHTML = left + "<small>sec</small>";
+      rewardTick = setInterval(()=>{
+        left = Math.max(0,left-1);
+        rewardCountdown.innerHTML = left + "<small>sec</small>";
       },1000);
+      try{
+        await mission3Audio.play();
+      }catch(err){
+        scene31.addEventListener("pointerup", function resumeReward(){
+          mission3Audio.play().catch(()=>{});
+          scene31.removeEventListener("pointerup", resumeReward);
+        }, {once:true});
+      }
     }
+
+    mission3Audio.addEventListener("timeupdate", ()=>{
+      if(mission3Mode === "challenge"){
+        scene28LiveTime.textContent = formatTime(mission3Audio.currentTime);
+        if(mission3Audio.currentTime >= CHALLENGE_STOP){
+          mission3Audio.pause();
+          mission3Audio.currentTime = CHALLENGE_STOP;
+          mission3Mode = "waiting";
+          showScene(scene29);
+        }
+      }
+    });
+
+    mission3Audio.addEventListener("ended", ()=>{
+      if(mission3Mode === "reward"){
+        clearInterval(rewardTick);
+        rewardTick = null;
+        rewardCountdown.innerHTML = "0<small>sec</small>";
+        mission3Mode = "done";
+        setTimeout(()=>showScene(scene32),300);
+      }
+    });
 
     scene26PortalTouch.addEventListener("pointerup", e => {
       e.preventDefault(); pulseAt(e);
-      stopSong();
-      setTimeout(()=>showScene(scene27),260);
+      stopMission3Audio();
+      setTimeout(() => showScene(scene27), 260);
     });
 
-    scene27Box.addEventListener("pointerup", e => {
+    scene27BoxTap.addEventListener("pointerup", e => {
       e.preventDefault(); pulseAt(e);
-      setTimeout(()=>showScene(scene28),220);
+      playChallenge();
     });
 
-    scene28Play.addEventListener("pointerup", e => {
+    scene28Replay.addEventListener("pointerup", e => {
       e.preventDefault(); pulseAt(e);
-      playSongSegment(CHALLENGE_SECONDS, beginAttempt);
+      playChallenge();
     });
 
-    scene29Replay.addEventListener("pointerup", e => {
+    scene28TapToHear.addEventListener("pointerup", e => {
       e.preventDefault(); pulseAt(e);
-      listenChallenge();
+      playChallenge();
     });
 
-    musicKeys.forEach(btn=>btn.addEventListener("pointerup",e=>{
+    scene29ListenAgain.addEventListener("pointerup", e => {
       e.preventDefault(); pulseAt(e);
-      const key=Number(btn.dataset.key);
-      playKey(keyFreqs[key]);
-      const pos=attempt.length;
-      if(challengeSequence[pos] !== key){
-        attempt=[];
-        setTimeout(()=>showScene(scene30),240);
-        return;
-      }
-      attempt.push(key);
-      if(attempt.length===challengeSequence.length){
-        attempt=[];
-        setTimeout(beginReward,340);
+      playChallenge();
+    });
+
+    lyricChoices.forEach(btn => btn.addEventListener("pointerup", e => {
+      e.preventDefault(); pulseAt(e);
+      if(btn.dataset.choice === "2"){
+        playReward();
+      }else{
+        stopMission3Audio();
+        setTimeout(()=>showScene(scene30),220);
       }
     }));
 
-    scene30ListenAgain.addEventListener("pointerup",e=>{
+    scene30TryAgain.addEventListener("pointerup", e => {
       e.preventDefault(); pulseAt(e);
-      listenChallenge();
+      showScene(scene29);
     });
 
-    scene30TryAgain.addEventListener("pointerup",e=>{
+    scene30ListenAgain.addEventListener("pointerup", e => {
       e.preventDefault(); pulseAt(e);
-      beginAttempt();
+      playChallenge();
     });
 
-    scene32Continue.addEventListener("pointerup",e=>{
+    scene32Continue.addEventListener("pointerup", e => {
       e.preventDefault(); pulseAt(e);
-      // Mission 3 complete. The next birthday-surprise chapter can begin here.
+      // Mission 3 complete. This is the handoff point for the final birthday surprise.
     });
 
 
