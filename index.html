@@ -918,7 +918,12 @@
   <main id="app">
     <img id="sceneBackdrop" aria-hidden="true" alt="">
 
-    <section id="scene1" class="scene active">
+    <section id="scene0" class="scene active">
+      <img src="./scene0.png?v=45" alt="Before you begin">
+      <button id="scene0Continue" class="hotspot" aria-label="Let the adventure begin" style="inset:0;"></button>
+    </section>
+
+    <section id="scene1" class="scene">
       <img src="./scene 1.png" alt="Our Little Adventure">
       <button id="beginStory" class="hotspot" aria-label="Begin the story"></button>
     </section>
@@ -1239,6 +1244,8 @@
     const mission3Audio = document.getElementById("mission3Audio");
 
 
+    const scene0 = document.getElementById("scene0");
+    const scene0Continue = document.getElementById("scene0Continue");
     const beginStory = document.getElementById("beginStory");
     const scene2Continue = document.getElementById("scene2Continue");
     const tapPulse = document.getElementById("tapPulse");
@@ -1484,6 +1491,11 @@
       Scene 3 = 3 seconds.
       Scene 4 = 3 seconds.
     */
+    scene0Continue.addEventListener("pointerup",e=>{
+      e.preventDefault(); pulseAt(e);
+      showScene(scene1);
+    });
+
     beginStory.addEventListener("pointerup",e=>{
       e.preventDefault();
       pulseAt(e);
@@ -2526,9 +2538,9 @@
 
     window.addEventListener("load", () => {
       refitCard();
-      /* Always start from Scene 1. Never resume at Scene 14/15. */
-      showScene(scene1);
-      updateSceneBackdrop(scene1);
+      /* Always start from the prologue. */
+      showScene(scene0);
+      updateSceneBackdrop(scene0);
     }, {once:true});
 
     window.addEventListener("resize", refitCard, {passive:true});
