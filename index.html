@@ -797,6 +797,20 @@
              drop-shadow(0 0 20px rgba(255,222,150,1)) !important;
     }
 
+  
+    /* v44: snap to the six REAL mirror-hole coordinates */
+    #scene24 .puzzleTarget{
+      border:0 !important;
+      background:transparent !important;
+      box-shadow:none !important;
+      border-radius:28px !important;
+    }
+    #scene24 .puzzleTarget.lit{
+      border:2px solid rgba(255,218,142,.78) !important;
+      background:rgba(255,210,118,.045) !important;
+      box-shadow:0 0 20px rgba(245,190,82,.55), inset 0 0 18px rgba(245,190,82,.10) !important;
+    }
+
   </style>
 </head>
 
@@ -980,7 +994,7 @@
     </section>
 
     <section id="scene24" class="scene">
-      <img src="./scene24.png?v=43" alt="The mirror broke. Put the pieces back in the right place.">
+      <img src="./scene24.png?v=44" alt="The mirror broke. Put the pieces back in the right place.">
       <div id="scene24PuzzleLayer" aria-label="Drag the six mirror pieces into the mirror">
         <div class="puzzleTarget" data-target="1"></div>
         <div class="puzzleTarget" data-target="2"></div>
@@ -994,12 +1008,12 @@
         <div class="originCover" data-cover="4"></div>
         <div class="originCover" data-cover="5"></div>
         <div class="originCover" data-cover="6"></div>
-        <img class="puzzlePiece" data-piece="1" src="./puzzle_piece_1.png?v=43" alt="Mirror piece 1" draggable="false">
-        <img class="puzzlePiece" data-piece="2" src="./puzzle_piece_2.png?v=43" alt="Mirror piece 2" draggable="false">
-        <img class="puzzlePiece" data-piece="3" src="./puzzle_piece_3.png?v=43" alt="Mirror piece 3" draggable="false">
-        <img class="puzzlePiece" data-piece="4" src="./puzzle_piece_4.png?v=43" alt="Mirror piece 4" draggable="false">
-        <img class="puzzlePiece" data-piece="5" src="./puzzle_piece_5.png?v=43" alt="Mirror piece 5" draggable="false">
-        <img class="puzzlePiece" data-piece="6" src="./puzzle_piece_6.png?v=43" alt="Mirror piece 6" draggable="false">
+        <img class="puzzlePiece" data-piece="1" src="./puzzle_piece_1.png?v=44" alt="Mirror piece 1" draggable="false">
+        <img class="puzzlePiece" data-piece="2" src="./puzzle_piece_2.png?v=44" alt="Mirror piece 2" draggable="false">
+        <img class="puzzlePiece" data-piece="3" src="./puzzle_piece_3.png?v=44" alt="Mirror piece 3" draggable="false">
+        <img class="puzzlePiece" data-piece="4" src="./puzzle_piece_4.png?v=44" alt="Mirror piece 4" draggable="false">
+        <img class="puzzlePiece" data-piece="5" src="./puzzle_piece_5.png?v=44" alt="Mirror piece 5" draggable="false">
+        <img class="puzzlePiece" data-piece="6" src="./puzzle_piece_6.png?v=44" alt="Mirror piece 6" draggable="false">
         <div id="scene24PuzzleStatus">Drag each mirror piece into its matching place.</div>
         <div id="scene24WrongPulse" aria-hidden="true"></div>
       </div>
@@ -1952,18 +1966,31 @@
     });
 
     const puzzleConfig = [
-      {id:1, x:12.8,y:82.1,w:12.0,h:18.0, tx:48.9,ty:23.8,tw:14.0,th:19.0},
-      {id:2, x:27.7,y:82.1,w:12.0,h:18.0, tx:39.7,ty:36.0,tw:14.0,th:19.0},
-      {id:3, x:42.2,y:82.1,w:12.0,h:18.0, tx:58.2,ty:36.0,tw:14.0,th:19.0},
-      {id:4, x:56.9,y:82.1,w:12.0,h:18.0, tx:39.7,ty:49.0,tw:14.0,th:19.0},
-      {id:5, x:71.4,y:82.1,w:12.0,h:18.0, tx:49.0,ty:49.0,tw:14.0,th:19.0},
-      {id:6, x:86.2,y:82.1,w:12.0,h:18.0, tx:58.2,ty:49.0,tw:14.0,th:19.0}
+      {id:1, x:12.8,y:82.1,w:12.0,h:18.0},
+      {id:2, x:27.7,y:82.1,w:12.0,h:18.0},
+      {id:3, x:42.2,y:82.1,w:12.0,h:18.0},
+      {id:4, x:56.9,y:82.1,w:12.0,h:18.0},
+      {id:5, x:71.4,y:82.1,w:12.0,h:18.0},
+      {id:6, x:86.2,y:82.1,w:12.0,h:18.0}
     ];
+
+    const puzzleSlots = [
+      {id:1, cx:39.8, cy:30.0, w:12.0, h:16.5},
+      {id:2, cx:50.5, cy:30.0, w:12.0, h:16.5},
+      {id:3, cx:61.1, cy:30.0, w:12.0, h:16.5},
+      {id:4, cx:39.8, cy:44.7, w:12.0, h:16.5},
+      {id:5, cx:50.5, cy:44.7, w:12.0, h:16.5},
+      {id:6, cx:61.1, cy:44.7, w:12.0, h:16.5}
+    ];
+
     const placedPuzzlePieces = new Set();
+    const occupiedPuzzleSlots = new Set();
     let puzzleDrag = null;
 
     function cfgFor(id){ return puzzleConfig.find(c => c.id === id); }
+    function slotFor(id){ return puzzleSlots.find(s => s.id === id); }
     function coverFor(id){ return puzzleCovers.find(el => Number(el.dataset.cover) === id); }
+
     function setOriginCover(c, show){
       const cover = coverFor(c.id);
       if(!cover) return;
@@ -1984,23 +2011,47 @@
       piece.style.opacity="1";
       piece.style.pointerEvents="auto";
       piece.dataset.placed="0";
+      delete piece.dataset.slot;
     }
 
     function setPuzzleElementGeometry(){
+      puzzleSlots.forEach(s => {
+        const target = puzzleTargets.find(el => Number(el.dataset.target) === s.id);
+        if(!target) return;
+        target.style.left=(s.cx-s.w/2)+"%";
+        target.style.top=(s.cy-s.h/2)+"%";
+        target.style.width=s.w+"%";
+        target.style.height=s.h+"%";
+      });
+
       puzzleConfig.forEach(c => {
-        const target = puzzleTargets.find(el => Number(el.dataset.target) === c.id);
-        target.style.left=c.tx+"%"; target.style.top=c.ty+"%"; target.style.width=c.tw+"%"; target.style.height=c.th+"%";
         const piece = puzzlePieces.find(el => Number(el.dataset.piece) === c.id);
         setOriginCover(c,false);
         positionPieceAtOrigin(piece,c);
       });
     }
 
+    function clearPuzzleSlotGlow(){
+      puzzleTargets.forEach(t => t.classList.remove("lit"));
+    }
+
+    function glowFreePuzzleSlots(){
+      puzzleSlots.forEach(s => {
+        const target=puzzleTargets.find(t=>Number(t.dataset.target)===s.id);
+        if(target && !occupiedPuzzleSlots.has(s.id)) target.classList.add("lit");
+      });
+    }
+
     function resetMirrorPuzzle(){
       placedPuzzlePieces.clear();
-      puzzleTargets.forEach(el => el.classList.remove("lit"));
-      puzzlePieces.forEach(piece => { const c=cfgFor(Number(piece.dataset.piece)); setOriginCover(c,false); positionPieceAtOrigin(piece,c); });
-      scene24PuzzleStatus.textContent="Drag a piece to the matching part of the mirror.";
+      occupiedPuzzleSlots.clear();
+      clearPuzzleSlotGlow();
+      puzzlePieces.forEach(piece => {
+        const c=cfgFor(Number(piece.dataset.piece));
+        setOriginCover(c,false);
+        positionPieceAtOrigin(piece,c);
+      });
+      scene24PuzzleStatus.textContent="Drag each piece into an empty space in the mirror.";
       puzzleDrag=null;
     }
 
@@ -2012,52 +2063,96 @@
     function beginPuzzleDrag(piece,e){
       const id=Number(piece.dataset.piece);
       if(placedPuzzlePieces.has(id)) return;
-      e.preventDefault(); e.stopPropagation();
+
+      e.preventDefault();
+      e.stopPropagation();
+
       const c=cfgFor(id);
       const p=framePercentFromPointer(e.clientX,e.clientY);
       puzzleDrag={id,piece,c,startX:p.x,startY:p.y,moved:false};
+
       setOriginCover(c,true);
       piece.classList.add("dragging");
-      const ownTarget = puzzleTargets.find(t => Number(t.dataset.target) === c.id);
-      if(ownTarget) ownTarget.classList.add("lit");
       piece.style.setProperty("z-index","140","important");
-      try{ piece.setPointerCapture(e.pointerId); }catch(_){ }
+
+      clearPuzzleSlotGlow();
+      glowFreePuzzleSlots();
+
+      try{ piece.setPointerCapture(e.pointerId); }catch(_){}
     }
 
     function movePuzzleDrag(e){
       if(!puzzleDrag) return;
       e.preventDefault();
+
       const p=framePercentFromPointer(e.clientX,e.clientY);
-      if(Math.hypot(p.x-puzzleDrag.startX,p.y-puzzleDrag.startY)>0.9) puzzleDrag.moved=true;
+      if(Math.hypot(p.x-puzzleDrag.startX,p.y-puzzleDrag.startY)>0.9){
+        puzzleDrag.moved=true;
+      }
+
       puzzleDrag.piece.style.setProperty("left",p.x+"%","important");
       puzzleDrag.piece.style.setProperty("top",p.y+"%","important");
     }
 
     function wrongPuzzleDrop(p){
-      scene24WrongPulse.style.left=p.x+"%"; scene24WrongPulse.style.top=p.y+"%";
-      scene24WrongPulse.classList.remove("play"); void scene24WrongPulse.offsetWidth; scene24WrongPulse.classList.add("play");
+      scene24WrongPulse.style.left=p.x+"%";
+      scene24WrongPulse.style.top=p.y+"%";
+      scene24WrongPulse.classList.remove("play");
+      void scene24WrongPulse.offsetWidth;
+      scene24WrongPulse.classList.add("play");
+    }
+
+    function nearestFreePuzzleSlot(p){
+      let best=null;
+      let bestDistance=Infinity;
+
+      puzzleSlots.forEach(s => {
+        if(occupiedPuzzleSlots.has(s.id)) return;
+
+        // Normalize Y slightly because the artwork is wider than it is tall.
+        const dx=p.x-s.cx;
+        const dy=(p.y-s.cy)*1.35;
+        const d=Math.hypot(dx,dy);
+
+        if(d<bestDistance){
+          bestDistance=d;
+          best=s;
+        }
+      });
+
+      // Very forgiving: the finger only has to enter the visible mirror-hole area.
+      return bestDistance <= 10.5 ? best : null;
     }
 
     function endPuzzleDrag(e){
       if(!puzzleDrag) return;
       e.preventDefault();
+
       const {id,piece,c,moved}=puzzleDrag;
       const p=framePercentFromPointer(e.clientX,e.clientY);
-      const margin=4.8;
-      const inside = moved && p.x >= c.tx-margin && p.x <= c.tx+c.tw+margin && p.y >= c.ty-margin && p.y <= c.ty+c.th+margin;
-      const target=puzzleTargets.find(v=>Number(v.dataset.target)===id);
+      const slot=moved ? nearestFreePuzzleSlot(p) : null;
+
       piece.classList.remove("dragging");
-      if(inside){
+      clearPuzzleSlotGlow();
+
+      if(slot){
         placedPuzzlePieces.add(id);
-        target.classList.add("lit");
-        piece.style.setProperty("left",(c.tx+c.tw/2)+"%","important");
-        piece.style.setProperty("top",(c.ty+c.th/2)+"%","important");
-        piece.style.setProperty("width",c.tw+"%","important");
+        occupiedPuzzleSlots.add(slot.id);
+
+        piece.style.setProperty("left",slot.cx+"%","important");
+        piece.style.setProperty("top",slot.cy+"%","important");
+        piece.style.setProperty("width",slot.w+"%","important");
         piece.style.setProperty("height","auto","important");
         piece.style.setProperty("z-index","112","important");
         piece.style.pointerEvents="none";
         piece.dataset.placed="1";
+        piece.dataset.slot=String(slot.id);
+
+        const target=puzzleTargets.find(t=>Number(t.dataset.target)===slot.id);
+        if(target) target.classList.remove("lit");
+
         scene24PuzzleStatus.textContent=`${placedPuzzlePieces.size} / 6 pieces placed`;
+
         if(placedPuzzlePieces.size===6){
           scene24PuzzleStatus.textContent="The mirror is complete.";
           setTimeout(()=>showScene(scene25),750);
@@ -2066,9 +2161,14 @@
         setOriginCover(c,false);
         positionPieceAtOrigin(piece,c);
         wrongPuzzleDrop(p);
-        scene24PuzzleStatus.textContent="That piece does not fit there. Try again.";
-        setTimeout(()=>{ if(placedPuzzlePieces.size<6) scene24PuzzleStatus.textContent="Drag a piece to the matching part of the mirror."; },900);
+        scene24PuzzleStatus.textContent="Move the piece farther inside one of the empty mirror spaces.";
+        setTimeout(()=>{
+          if(placedPuzzlePieces.size<6){
+            scene24PuzzleStatus.textContent="Drag each piece into an empty space in the mirror.";
+          }
+        },900);
       }
+
       puzzleDrag=null;
     }
 
@@ -2080,6 +2180,7 @@
     window.addEventListener("pointerup", endPuzzleDrag, {passive:false});
     window.addEventListener("pointercancel", () => {
       if(!puzzleDrag) return;
+      clearPuzzleSlotGlow();
       setOriginCover(puzzleDrag.c,false);
       positionPieceAtOrigin(puzzleDrag.piece,puzzleDrag.c);
       puzzleDrag.piece.classList.remove("dragging");
